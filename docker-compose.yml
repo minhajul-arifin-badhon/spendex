@@ -1,0 +1,15 @@
+services:
+    postgres:
+        image: postgres:15-alpine
+        ports:
+            - 5431:5432
+        environment:
+            POSTGRES_USER: badhon
+            POSTGRES_PASSWORD: mypassword
+            POSTGRES_DB: spendex
+            POSTGRES_HOST_AUTH_METHOD: trust
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+
+volumes:
+    postgres-data:

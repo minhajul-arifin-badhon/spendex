@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id           Int           @id @default(autoincrement())
+    clerkId      String        @unique
+    email        String        @unique
+    fullName     String
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    transactions Transaction[]
+    categories   Category[]
+    merchants    Merchant[]
+    mappings     Mapping[]
+
+    @@map("users")
+}
+
+model Transaction {
+    id            Int      @id @default(autoincrement())
+    amount        Float
+    date          DateTime
+    description   String?
+    categoryId    Int
+    subcategoryId Int
+    merchantId    Int
+    userId        Int
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    category    Category    @relation(fields: [categoryId], references: [id])
+    subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+    merchant    Merchant    @relation(fields: [merchantId], references: [id])
+
+    @@map("transactions")
+}
+
+model Category {
+    id        Int           @id @default(autoincrement())
+    name      String
+    group     CategoryGroup
+    userId    Int
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+
+    user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    subcategories Subcategory[]
+    transactions  Transaction[]
+    merchants     Merchant[]
+
+    @@map("categories")
+}
+
+model Subcategory {
+    id         Int      @id @default(autoincrement())
+    name       String
+    categoryId Int
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    transactions Transaction[]
+    merchants    Merchant[]
+
+    @@map("subcategories")
+}
+
+model Merchant {
+    id            Int      @id @default(autoincrement())
+    name          String
+    categoryId    Int?
+    subcategoryId Int?
+    userId        Int
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    category     Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+    subcategory  Subcategory?  @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+    user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    transactions Transaction[]
+
+    @@map("merchants")
+}
+
+enum CategoryGroup {
+    expense
+    income
+    transfer
+}
+
+model Mapping {
+    id                 Int      @id @default(autoincrement())
+    userId             Int
+    mappingName        String
+    columnFieldMapping Json
+    includesHeader     Boolean  @default(false)
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("mappings")
+}
