@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { createPredefinedCategories } from "@/lib/actions/onboarding.actions";
 
 export async function POST(req: Request) {
 	const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -75,6 +76,8 @@ export async function POST(req: Request) {
 				update: data,
 			});
 
+			await createPredefinedCategories(id);
+
 			return new Response(JSON.stringify(user), {
 				status: 201,
 			});
@@ -89,6 +92,36 @@ export async function POST(req: Request) {
 					status: 500,
 				}
 			);
+		}
+	}
+
+	if (eventType == "user.deleted") {
+		try {
+			const userExists = await prisma.user.findUnique({
+				where: { id: id },
+			});
+
+			if (!userExists) {
+				return new Response("User is not found", {
+					status: 500,
+				});
+			}
+
+			// If the user exists, delete the user
+			await prisma.user.delete({
+				where: { id: id },
+			});
+
+			console.log("User is deleted");
+
+			return new Response("Webhook User deleted successfully", {
+				status: 200,
+			});
+		} catch (error) {
+			console.error(error);
+			return new Response("Failed to delete user.", {
+				status: 500,
+			});
 		}
 	}
 
