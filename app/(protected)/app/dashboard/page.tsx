@@ -208,8 +208,7 @@ const truncateText = (text: string, maxLength = 30) => {
 };
 
 export default function Page() {
-	const [transactions, setTransactions] =
-		useState<Transaction[]>(initialTransactions);
+	const [transactions] = useState<Transaction[]>(initialTransactions);
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 	const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -530,7 +529,7 @@ export default function Page() {
 			},
 			{
 				id: "actions",
-				cell: ({ row }) => {
+				cell: () => {
 					return (
 						<Button variant="ghost" size="sm">
 							<MoreHorizontal className="h-4 w-4" />

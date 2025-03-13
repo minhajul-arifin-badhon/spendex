@@ -18,6 +18,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 
 // Navigation items
 const navItems = [
@@ -32,11 +33,18 @@ export const Navbar = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const pathname = usePathname();
 
-	// In a real app, this would come from your auth provider
+	const {
+		id,
+		fullName: name,
+		emailAddresses,
+		imageUrl,
+	} = useUser().user || {};
+
 	const user = {
-		name: "John Doe",
-		email: "john.doe@example.com",
-		imageUrl: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+		id,
+		name,
+		email: emailAddresses?.[0]?.emailAddress,
+		imageUrl,
 	};
 
 	const handleSignOut = () => {
@@ -99,13 +107,10 @@ export const Navbar = () => {
 										<Avatar className="h-8 w-8">
 											<AvatarImage
 												src={user.imageUrl}
-												alt={user.name}
+												alt={user?.name ?? "Name"}
 											/>
 											<AvatarFallback>
-												{user.name
-													.split(" ")
-													.map((n) => n[0])
-													.join("")}
+												{user.name}
 											</AvatarFallback>
 										</Avatar>
 									</Button>
@@ -125,21 +130,20 @@ export const Navbar = () => {
 											</p>
 										</div>
 									</DropdownMenuLabel>
-									<DropdownMenuSeparator />
+									{/* <DropdownMenuSeparator />
 									<DropdownMenuGroup>
 										<DropdownMenuItem className="cursor-pointer">
 											<User className="mr-2 h-4 w-4" />
 											<span>Profile</span>
 										</DropdownMenuItem>
-									</DropdownMenuGroup>
+									</DropdownMenuGroup> */}
 									<DropdownMenuSeparator />
-									<DropdownMenuItem
-										className="cursor-pointer"
-										onClick={handleSignOut}
-									>
-										<LogOut className="mr-2 h-4 w-4" />
-										<span>Log out</span>
-									</DropdownMenuItem>
+									<SignOutButton>
+										<DropdownMenuItem className="cursor-pointer">
+											<LogOut className="mr-2 h-4 w-4" />
+											<span>Log out</span>
+										</DropdownMenuItem>
+									</SignOutButton>
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</div>
@@ -190,13 +194,11 @@ export const Navbar = () => {
 
 					<div className="py-4 mt-2 flex items-center">
 						<Avatar className="h-10 w-10 mr-3">
-							<AvatarImage src={user.imageUrl} alt={user.name} />
-							<AvatarFallback>
-								{user.name
-									.split(" ")
-									.map((n) => n[0])
-									.join("")}
-							</AvatarFallback>
+							<AvatarImage
+								src={user.imageUrl}
+								alt={user?.name ?? "Name"}
+							/>
+							<AvatarFallback>{user.name}</AvatarFallback>
 						</Avatar>
 						<div className="flex-1">
 							<p className="text-sm font-medium">{user.name}</p>
@@ -204,15 +206,17 @@ export const Navbar = () => {
 								{user.email}
 							</p>
 						</div>
-						<Button
-							variant="outline"
-							size="sm"
-							className="ml-auto cursor-pointer"
-							onClick={handleSignOut}
-						>
-							<LogOut className="h-4 w-4" />
-							<span className="sr-only">Log out</span>
-						</Button>
+						<SignOutButton>
+							<Button
+								variant="outline"
+								size="sm"
+								className="ml-auto cursor-pointer"
+								onClick={handleSignOut}
+							>
+								<LogOut className="h-4 w-4" />
+								<span className="sr-only">Log out</span>
+							</Button>
+						</SignOutButton>
 					</div>
 				</div>
 			</div>
