@@ -4,27 +4,16 @@ import Link from "next/link";
 // import type { User } from "@clerk/nextjs/api";
 
 export default function Home() {
-	// const user: User | null = await currentUser();
-
-	// if (user) {
-	// 	// If user exists, redirect to the dashboard page
-	// 	router.push("/dashboard");
-	// }
-
 	return (
 		<div
 			className="flex size-full min-h-screen flex-col bg-cover bg-center bg-no-repeat"
 			style={{
-				backgroundImage:
-					"url(https://i.ibb.co/wZK600gt/landing-background.jpg)",
+				backgroundImage: "url(https://i.ibb.co/wZK600gt/landing-background.jpg)"
 			}}
 		>
 			<nav>
 				<div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-6">
-					<a
-						href="/meditrack"
-						className="flex items-center space-x-3 rtl:space-x-reverse"
-					>
+					<a href="/meditrack" className="flex items-center space-x-3 rtl:space-x-reverse">
 						{" "}
 						<Image
 							src="https://cdn-icons-png.flaticon.com/512/7892/7892621.png"
@@ -33,9 +22,7 @@ export default function Home() {
 							width={36}
 							height={40}
 						/>{" "}
-						<span className="self-center text-2xl whitespace-nowrap text-white">
-							Spendex
-						</span>
+						<span className="self-center text-2xl whitespace-nowrap text-white">Spendex</span>
 					</a>
 
 					<div
@@ -44,10 +31,7 @@ export default function Home() {
 					>
 						<ul className="flex font-medium p-4 md:p-0 md:space-x-8 rtl:space-x-reverse mt-0">
 							<li>
-								<Link
-									href=""
-									className="py-2 px-3 text-blue-500 md:p-0"
-								>
+								<Link href="" className="py-2 px-3 text-blue-500 md:p-0">
 									Home
 								</Link>
 							</li>
@@ -73,23 +57,18 @@ export default function Home() {
 				</h1>
 
 				<p className="mt-10 text-gray-300 text-lg text-center">
-					With Spendex, effortlessly import transactions from any bank
-					using custom rules, categorize transactions and merchants in
-					just a few taps, and explore powerful data visualizations to
-					gain insights into your spending habits - ensuring a
-					seamless, personalized financial tracking experience.
+					With Spendex, effortlessly import transactions from any bank using custom rules, categorize
+					transactions and merchants in just a few taps, and explore powerful data visualizations to gain
+					insights into your spending habits - ensuring a seamless, personalized financial tracking
+					experience.
 				</p>
 
 				<div className="mt-20 flex-center flex-col lg:flex-row">
 					<Link className="" href="/sign-up">
-						<Button className="button-base button-primary my-4">
-							Get Started
-						</Button>
+						<Button className="button-base button-primary my-4">Get Started</Button>
 					</Link>
 					<Link href="/sign-in">
-						<Button className="button-base button-ghost my-4 lg:ml-10">
-							Sign In
-						</Button>
+						<Button className="button-base button-ghost my-4 lg:ml-10">Sign In</Button>
 					</Link>
 				</div>
 			</div>

@@ -10,7 +10,7 @@ import {
 	DropdownMenuSub,
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, ArrowUpDown } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
@@ -43,7 +43,7 @@ const initialMerchants: Merchant[] = [
 	{ id: "12", name: "Aldi" },
 	{ id: "13", name: "Publix" },
 	{ id: "14", name: "Walgreens" },
-	{ id: "15", name: "CVS" },
+	{ id: "15", name: "CVS" }
 ];
 
 const categories: Category[] = [
@@ -53,8 +53,8 @@ const categories: Category[] = [
 		subcategories: [
 			{ id: "sub1", name: "Mortgages" },
 			{ id: "sub2", name: "Utilities" },
-			{ id: "sub3", name: "Property Tax" },
-		],
+			{ id: "sub3", name: "Property Tax" }
+		]
 	},
 	{
 		id: "cat2",
@@ -63,8 +63,8 @@ const categories: Category[] = [
 			{ id: "sub4", name: "Gas" },
 			{ id: "sub5", name: "Maintainance" },
 			{ id: "sub6", name: "Insurance" },
-			{ id: "sub7", name: "Other Transportation" },
-		],
+			{ id: "sub7", name: "Other Transportation" }
+		]
 	},
 	{
 		id: "cat3",
@@ -72,8 +72,8 @@ const categories: Category[] = [
 		subcategories: [
 			{ id: "sub8", name: "Groceries" },
 			{ id: "sub9", name: "Restaurants" },
-			{ id: "sub10", name: "Other Food" },
-		],
+			{ id: "sub10", name: "Other Food" }
+		]
 	},
 	{
 		id: "cat4",
@@ -81,95 +81,87 @@ const categories: Category[] = [
 		subcategories: [
 			{ id: "sub11", name: "Medical" },
 			{ id: "sub12", name: "Gym" },
-			{ id: "sub13", name: "Other Health" },
-		],
+			{ id: "sub13", name: "Other Health" }
+		]
 	},
 	{
 		id: "cat5",
 		name: "Travel",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat6",
 		name: "Vacation",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat7",
 		name: "Shopping",
 		subcategories: [
 			{ id: "sub14", name: "Clothing" },
-			{ id: "sub15", name: "Other Shopping" },
-		],
+			{ id: "sub15", name: "Other Shopping" }
+		]
 	},
 	{
 		id: "cat8",
 		name: "Entertainment",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat9",
 		name: "Education",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat10",
 		name: "Subscriptions",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat11",
 		name: "Gifts and Donations",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat12",
 		name: "Business and Work",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat13",
 		name: "Investments",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat14",
 		name: "Insurance",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat15",
 		name: "Loans and Fees",
-		subcategories: [],
+		subcategories: []
 	},
 	{
 		id: "cat16",
 		name: "Other Expenses",
-		subcategories: [],
-	},
+		subcategories: []
+	}
 ];
 
 export default function Page() {
 	const [merchants, setMerchants] = useState<Merchant[]>(initialMerchants);
 
-	const handleCategoryChange = (
-		merchantId: string,
-		categoryId: string,
-		subcategoryId?: string
-	) => {
+	const handleCategoryChange = (merchantId: string, categoryId: string, subcategoryId?: string) => {
 		setMerchants((prevMerchants) =>
 			prevMerchants.map((merchant) => {
 				if (merchant.id === merchantId) {
-					const category = categories.find(
-						(c) => c.id === categoryId
-					);
-					const subcategory = category?.subcategories.find(
-						(s) => s.id === subcategoryId
-					);
+					const category = categories.find((c) => c.id === categoryId);
+					const subcategory = category?.subcategories.find((s) => s.id === subcategoryId);
 					return {
 						...merchant,
 						category: category?.name,
-						subcategory: subcategory?.name,
+						subcategory: subcategory?.name
 					};
 				}
 				return merchant;
@@ -183,61 +175,36 @@ export default function Page() {
 				accessorKey: "name",
 				header: ({ column }) => {
 					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
+						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
 							Merchant
 							<ArrowUpDown className="ml-2 h-4 w-4" />
 						</Button>
 					);
-				},
+				}
 			},
 			{
 				accessorKey: "category",
 				header: ({ column }) => {
 					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
+						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
 							Category
 							<ArrowUpDown className="ml-2 h-4 w-4" />
 						</Button>
 					);
 				},
-				cell: ({ row }) => (
-					<div>{row.original.category || "Uncategorized"}</div>
-				),
+				cell: ({ row }) => <div>{row.original.category || "Uncategorized"}</div>
 			},
 			{
 				accessorKey: "subcategory",
 				header: ({ column }) => {
 					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
+						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
 							Subcategory
 							<ArrowUpDown className="ml-2 h-4 w-4" />
 						</Button>
 					);
 				},
-				cell: ({ row }) => (
-					<div>{row.original.subcategory || "N/A"}</div>
-				),
+				cell: ({ row }) => <div>{row.original.subcategory || "N/A"}</div>
 			},
 			{
 				id: "actions",
@@ -248,61 +215,40 @@ export default function Page() {
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="outline" size="sm">
-									Set Category{" "}
-									<ChevronDown className="ml-2 h-4 w-4" />
+									Set Category <ChevronDown className="ml-2 h-4 w-4" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className="w-56">
 								{categories.map((category) => (
 									<DropdownMenuSub key={category.id}>
-										<DropdownMenuSubTrigger>
-											{category.name}
-										</DropdownMenuSubTrigger>
+										<DropdownMenuSubTrigger>{category.name}</DropdownMenuSubTrigger>
 										<DropdownMenuSubContent className="w-56">
 											<DropdownMenuItem
-												onSelect={() =>
-													handleCategoryChange(
-														merchant.id,
-														category.id
-													)
-												}
+												onSelect={() => handleCategoryChange(merchant.id, category.id)}
 											>
 												{category.name} (General)
 											</DropdownMenuItem>
-											{category.subcategories.map(
-												(subcategory) => (
-													<DropdownMenuItem
-														key={subcategory.id}
-														onSelect={() =>
-															handleCategoryChange(
-																merchant.id,
-																category.id,
-																subcategory.id
-															)
-														}
-													>
-														{subcategory.name}
-													</DropdownMenuItem>
-												)
-											)}
+											{category.subcategories.map((subcategory) => (
+												<DropdownMenuItem
+													key={subcategory.id}
+													onSelect={() =>
+														handleCategoryChange(merchant.id, category.id, subcategory.id)
+													}
+												>
+													{subcategory.name}
+												</DropdownMenuItem>
+											))}
 										</DropdownMenuSubContent>
 									</DropdownMenuSub>
 								))}
 							</DropdownMenuContent>
 						</DropdownMenu>
 					);
-				},
-			},
+				}
+			}
 		],
 		[]
 	);
 
-	return (
-		<DataTable
-			columns={columns}
-			data={merchants}
-			searchColumn="name"
-			searchPlaceholder="Search merchants..."
-		/>
-	);
+	return <DataTable columns={columns} data={merchants} searchColumn="name" searchPlaceholder="Search merchants..." />;
 }

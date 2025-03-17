@@ -8,9 +8,7 @@ export async function POST(req: Request) {
 	const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
 	if (!SIGNING_SECRET) {
-		throw new Error(
-			"Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env"
-		);
+		throw new Error("Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env");
 	}
 
 	// Create new Svix instance with secret
@@ -25,7 +23,7 @@ export async function POST(req: Request) {
 	// If there are no headers, error out
 	if (!svix_id || !svix_timestamp || !svix_signature) {
 		return new Response("Error: Missing Svix headers", {
-			status: 400,
+			status: 400
 		});
 	}
 
@@ -40,12 +38,12 @@ export async function POST(req: Request) {
 		evt = wh.verify(body, {
 			"svix-id": svix_id,
 			"svix-timestamp": svix_timestamp,
-			"svix-signature": svix_signature,
+			"svix-signature": svix_signature
 		}) as WebhookEvent;
 	} catch (err) {
 		console.error("Error: Could not verify webhook:", err);
 		return new Response("Error: Verification error", {
-			status: 400,
+			status: 400
 		});
 	}
 
@@ -53,9 +51,7 @@ export async function POST(req: Request) {
 	// For this guide, log payload to console
 	const { id } = evt.data;
 	const eventType = evt.type;
-	console.log(
-		`Received webhook with ID ${id} and event type of ${eventType}`
-	);
+	console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
 	console.log("Webhook payload:", body);
 
 	if (eventType === "user.created" || eventType === "user.updated") {
@@ -64,7 +60,7 @@ export async function POST(req: Request) {
 		const data = {
 			id: id,
 			email: email_addresses[0].email_address,
-			fullName: first_name + " " + last_name,
+			fullName: first_name + " " + last_name
 		};
 
 		console.log(data);
@@ -73,54 +69,48 @@ export async function POST(req: Request) {
 			const user = await prisma.user.upsert({
 				where: { id },
 				create: data,
-				update: data,
+				update: data
 			});
 
 			await createPredefinedCategories(id);
 
 			return new Response(JSON.stringify(user), {
-				status: 201,
+				status: 201
 			});
 		} catch (error) {
-			console.error(
-				"Error: Failed to store event in the database:",
-				error
-			);
-			return new Response(
-				"Error: Failed to store event in the database",
-				{
-					status: 500,
-				}
-			);
+			console.error("Error: Failed to store event in the database:", error);
+			return new Response("Error: Failed to store event in the database", {
+				status: 500
+			});
 		}
 	}
 
 	if (eventType == "user.deleted") {
 		try {
 			const userExists = await prisma.user.findUnique({
-				where: { id: id },
+				where: { id: id }
 			});
 
 			if (!userExists) {
 				return new Response("User is not found", {
-					status: 500,
+					status: 500
 				});
 			}
 
 			// If the user exists, delete the user
 			await prisma.user.delete({
-				where: { id: id },
+				where: { id: id }
 			});
 
 			console.log("User is deleted");
 
 			return new Response("Webhook User deleted successfully", {
-				status: 200,
+				status: 200
 			});
 		} catch (error) {
 			console.error(error);
 			return new Response("Failed to delete user.", {
-				status: 500,
+				status: 500
 			});
 		}
 	}
