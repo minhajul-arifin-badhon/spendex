@@ -19,11 +19,11 @@ export const createPredefinedCategories = async (userId: string) => {
 		const categoriesData: createCategorySchema[] = [];
 		const subcategoriesData: createSubcategorySchema[] = [];
 
-		initialCategories.forEach((group) => {
-			group.categories.forEach((category) => {
+		Object.keys(initialCategories).forEach((group) => {
+			initialCategories[group as CategoryGroup].forEach((category) => {
 				categoriesData.push({
 					name: category.name,
-					group: group.name as CategoryGroup,
+					group: group as CategoryGroup,
 					userId: userId,
 				});
 			});
@@ -46,8 +46,8 @@ export const createPredefinedCategories = async (userId: string) => {
 			categoriesToId[category.name] = category.id;
 		});
 
-		initialCategories.forEach((group) => {
-			group.categories.forEach((category) => {
+		Object.keys(initialCategories).forEach((group) => {
+			initialCategories[group as CategoryGroup].forEach((category) => {
 				category.subcategories.forEach((subcategory) => {
 					subcategoriesData.push({
 						name: subcategory.name,
