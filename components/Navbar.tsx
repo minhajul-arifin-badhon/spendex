@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	// DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight, LogOut, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,25 +25,20 @@ const navItems = [
 	{ name: "Transactions", href: "/app/dashboard", icon: null },
 	{ name: "Merchants", href: "/app/merchants", icon: null },
 	{ name: "Categories", href: "/app/categories", icon: null },
-	{ name: "Mappings", href: "/app/mappings", icon: null },
+	{ name: "Mappings", href: "/app/mappings", icon: null }
 ];
 
 export const Navbar = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const pathname = usePathname();
 
-	const {
-		id,
-		fullName: name,
-		emailAddresses,
-		imageUrl,
-	} = useUser().user || {};
+	const { id, fullName: name, emailAddresses, imageUrl } = useUser().user || {};
 
 	const user = {
 		id,
 		name,
 		email: emailAddresses?.[0]?.emailAddress,
-		imageUrl,
+		imageUrl
 	};
 
 	const handleSignOut = () => {
@@ -83,9 +77,7 @@ export const Navbar = () => {
 									key={item.name}
 									href={item.href}
 									className={`text-sm font-medium transition-colors duration-300 hover:text-blue-500 ${
-										pathname == item.href
-											? "md:text-blue-500"
-											: "md:text-white"
+										pathname == item.href ? "md:text-blue-500" : "md:text-white"
 									}`}
 								>
 									{item.name}
@@ -100,34 +92,18 @@ export const Navbar = () => {
 						<div className="hidden md:inline-flex">
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										className="cursor-pointer relative h-8 w-8 rounded-full"
-									>
+									<Button variant="ghost" className="cursor-pointer relative h-8 w-8 rounded-full">
 										<Avatar className="h-8 w-8">
-											<AvatarImage
-												src={user.imageUrl}
-												alt={user?.name ?? "Name"}
-											/>
-											<AvatarFallback>
-												{user.name}
-											</AvatarFallback>
+											<AvatarImage src={user.imageUrl} alt={user?.name ?? "Name"} />
+											<AvatarFallback>{user.name}</AvatarFallback>
 										</Avatar>
 									</Button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent
-									className="w-56"
-									align="end"
-									forceMount
-								>
+								<DropdownMenuContent className="w-56" align="end" forceMount>
 									<DropdownMenuLabel className="font-normal">
 										<div className="flex flex-col space-y-1">
-											<p className="text-sm font-medium leading-none">
-												{user.name}
-											</p>
-											<p className="text-xs leading-none text-muted-foreground">
-												{user.email}
-											</p>
+											<p className="text-sm font-medium leading-none">{user.name}</p>
+											<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
 										</div>
 									</DropdownMenuLabel>
 									{/* <DropdownMenuSeparator />
@@ -156,11 +132,7 @@ export const Navbar = () => {
 							onClick={toggleMobileMenu}
 							aria-expanded={mobileMenuOpen}
 						>
-							{mobileMenuOpen ? (
-								<X className="h-6 w-6" />
-							) : (
-								<Menu className="h-6 w-6" />
-							)}
+							{mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
 							<span className="sr-only">Toggle menu</span>
 						</Button>
 					</div>
@@ -171,9 +143,7 @@ export const Navbar = () => {
 			<div
 				className={cn(
 					"md:hidden bg-background border-b overflow-hidden transition-all duration-300 ease-in-out",
-					mobileMenuOpen
-						? "max-h-[400px] opacity-100"
-						: "max-h-0 opacity-0"
+					mobileMenuOpen ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0"
 				)}
 			>
 				<div className="px-4 py-3 space-y-1">
@@ -194,17 +164,12 @@ export const Navbar = () => {
 
 					<div className="py-4 mt-2 flex items-center">
 						<Avatar className="h-10 w-10 mr-3">
-							<AvatarImage
-								src={user.imageUrl}
-								alt={user?.name ?? "Name"}
-							/>
+							<AvatarImage src={user.imageUrl} alt={user?.name ?? "Name"} />
 							<AvatarFallback>{user.name}</AvatarFallback>
 						</Avatar>
 						<div className="flex-1">
 							<p className="text-sm font-medium">{user.name}</p>
-							<p className="text-xs text-muted-foreground">
-								{user.email}
-							</p>
+							<p className="text-xs text-muted-foreground">{user.email}</p>
 						</div>
 						<SignOutButton>
 							<Button
