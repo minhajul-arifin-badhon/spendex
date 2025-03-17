@@ -8,6 +8,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/lib/react-query/query-provider";
+import { Toaster } from "sonner";
 // import { dark, shadesOfPurple } from "@clerk/themes";
 
 const lustria = Lustria({
@@ -52,6 +53,7 @@ export default function RootLayout({
 			<html lang="en">
 				<body className={`${lustria.variable} ${lato.variable} antialiased`}>
 					<QueryProvider>{children}</QueryProvider>
+					<Toaster position="top-right" richColors />
 				</body>
 			</html>
 		</ClerkProvider>

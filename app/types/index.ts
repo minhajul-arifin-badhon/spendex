@@ -4,7 +4,7 @@ import {
 	deleteCategorySchema,
 	deleteSubcategorySchema,
 	updateCategorySchema,
-	updateSubcategorySchema,
+	updateSubcategorySchema
 } from "@/lib/validation";
 import { Prisma, CategoryGroup } from "@prisma/client";
 import { z } from "zod";
@@ -38,9 +38,7 @@ export type CategoriesWithSub = Prisma.CategoryGetPayload<{
 	};
 }>;
 
-export type GroupedCategories = Partial<
-	Record<CategoryGroup, CategoriesWithSub[]>
->;
+export type GroupedCategories = Partial<Record<CategoryGroup, CategoriesWithSub[]>>;
 
 export type CreateCategoryProps = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryProps = z.infer<typeof updateCategorySchema>;

@@ -1,3 +1,5 @@
+"use server";
+
 import { CreateSubcategoryProps, DeleteSubcategoryProps, Response, UpdateSubcategoryProps } from "@/app/types";
 import { sendErrorResponse, sendResponse } from "../response";
 import { prisma } from "../prisma";

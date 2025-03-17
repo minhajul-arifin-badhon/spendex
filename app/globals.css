@@ -148,7 +148,7 @@
 }
 
 .button-base {
-	@apply cursor-pointer rounded-full uppercase tracking-wide font-medium py-5 px-12;
+	@apply cursor-pointer rounded-full uppercase tracking-wide font-medium py-6 px-12 sm:py-5 sm:px-12;
 }
 
 .button-primary {

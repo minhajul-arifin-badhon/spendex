@@ -24,7 +24,7 @@ export const createPredefinedCategories = async (userId: string) => {
 				categoriesData.push({
 					name: category.name,
 					group: group as CategoryGroup,
-					userId: userId,
+					userId: userId
 				});
 			});
 		});
@@ -35,8 +35,8 @@ export const createPredefinedCategories = async (userId: string) => {
 			data: categoriesData,
 			select: {
 				id: true,
-				name: true,
-			},
+				name: true
+			}
 		});
 
 		console.log("created categories");
@@ -51,7 +51,7 @@ export const createPredefinedCategories = async (userId: string) => {
 				category.subcategories.forEach((subcategory) => {
 					subcategoriesData.push({
 						name: subcategory.name,
-						categoryId: categoriesToId[category.name],
+						categoryId: categoriesToId[category.name]
 					});
 				});
 			});
@@ -60,7 +60,7 @@ export const createPredefinedCategories = async (userId: string) => {
 		console.log("Trying to create subcategories");
 
 		await prisma.subcategory.createMany({
-			data: subcategoriesData,
+			data: subcategoriesData
 		});
 
 		console.log("created subcategories");
