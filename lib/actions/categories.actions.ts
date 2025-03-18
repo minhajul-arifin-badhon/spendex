@@ -11,6 +11,7 @@ import { sendErrorResponse, sendResponse } from "../response";
 import { prisma } from "../prisma";
 import { auth } from "@clerk/nextjs/server";
 import { createCategorySchema, deleteCategorySchema, updateCategorySchema } from "../validation";
+import { delay } from "../utils";
 // import { delay } from "../utils";
 
 export const getCategories = async (): Promise<Response<CategoriesWithSub[]>> => {
@@ -20,6 +21,8 @@ export const getCategories = async (): Promise<Response<CategoriesWithSub[]>> =>
 		if (!userId) {
 			return sendErrorResponse(401, "No user is signed in.");
 		}
+
+		// await delay(5000);
 
 		console.log("pulling categories");
 		const categories = await prisma.category.findMany({
@@ -32,6 +35,9 @@ export const getCategories = async (): Promise<Response<CategoriesWithSub[]>> =>
 					select: {
 						id: true,
 						name: true
+					},
+					orderBy: {
+						id: "asc"
 					}
 				}
 			},
@@ -50,7 +56,7 @@ export const getCategories = async (): Promise<Response<CategoriesWithSub[]>> =>
 export const createCategory = async (data: CreateCategoryProps): Promise<Response<string>> => {
 	try {
 		const { userId } = await auth();
-		// await delay(9000);
+		// await delay(5000);
 
 		if (!userId) {
 			return sendErrorResponse(401, "No user is signed in.");
@@ -62,6 +68,16 @@ export const createCategory = async (data: CreateCategoryProps): Promise<Respons
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
 		}
 
+		const isItem = await prisma.category.findFirst({
+			where: {
+				name: data.name
+			}
+		});
+
+		if (isItem) {
+			return sendErrorResponse(400, "A category with that name already exists.");
+		}
+
 		const newItem = await prisma.category.create({
 			data: { ...data, userId }
 		});
@@ -69,7 +85,7 @@ export const createCategory = async (data: CreateCategoryProps): Promise<Respons
 		return sendResponse(200, newItem.id.toString());
 	} catch (error) {
 		console.error("Error creating category:", error);
-		return sendErrorResponse(500, "Failed To Create. <br> Internal Server Error");
+		return sendErrorResponse(500, "Failed To Create. \nInternal Server Error");
 	}
 };
 

@@ -85,6 +85,53 @@ export default function ListCategories() {
 		}
 	};
 
+	// const removeFromGroupCategories = (data: CategoryMutationProps) => {
+	// 	const { type, operation, group, categoryId, subcategoryId, name } = data;
+	// 	console.log(type, operation, group, categoryId, subcategoryId, name);
+
+	// 	if (type == "category") {
+	// 		setGroupedCategories((prev) => {
+	// 			return {
+	// 				...prev,
+	// 				[group]: prev[group]?.filter((category) => (category.id != categoryId)
+	// 			};
+	// 		});
+	// 	} else {
+	// 		setGroupedCategories((prev) => {
+	// 			return {
+	// 				...prev,
+	// 				[group]: prev[group]?.map((category) => {
+	// 					if (category.id == categoryId) {
+	// 						category.subcategories = category.subcategories.filter(
+	// 							(subcategory) => subcategory.id != subcategoryId
+	// 						);
+	// 					}
+	// 					return category;
+	// 				})
+	// 			};
+	// 		});
+	// 	}
+	// };
+
+	// const isDuplicate = (data: CategoryMutationProps): boolean => {
+	// 	const { type, operation, group, categoryId, subcategoryId, name } = data;
+	// 	console.log(type, operation, group, categoryId, subcategoryId, name);
+
+	// 	if (operation === "delete") return false;
+
+	// 	// Check for duplicate category
+	// 	if (type === "category") {
+	// 		return Object.values(groupedCategories).some((categories) =>
+	// 			categories.some((category) => category.name === name)
+	// 		);
+	// 	}
+
+	// 	// Check for duplicate subcategory
+	// 	return Object.values(groupedCategories).some((categories) =>
+	// 		categories.some((category) => category.subcategories?.some((subcategory) => subcategory.name === name))
+	// 	);
+	// };
+
 	const handleMutation = async (data: CategoryMutationProps) => {
 		const { type, operation, group, categoryId, subcategoryId, name } = data;
 		console.log(type, operation, group, categoryId, subcategoryId, name);
@@ -104,8 +151,11 @@ export default function ListCategories() {
 			} else {
 				if (type === "category" && categoryId) {
 					response = await deleteCategoryMutation.mutateAsync({ id: categoryId });
-				} else if (type === "subcategory" && subcategoryId && categoryId) {
+				} else if (type === "subcategory" && subcategoryId) {
+					console.log("Deleting subcategory");
 					response = await deleteSubcategoryMutation.mutateAsync({ id: subcategoryId });
+				} else {
+					console.log("delete did not match");
 				}
 			}
 
@@ -123,11 +173,18 @@ export default function ListCategories() {
 	const saveEdit = async () => {
 		if (!editingItem) return;
 
+		// if (isDuplicate(editingItem)) {
+		// 	toast.error(`A ${editingItem.type} with that name already exists.`);
+		// 	return;
+		// }
+
+		const data = JSON.parse(JSON.stringify(editingItem));
+
 		setTimeout(() => {
 			setEditingItem(null);
-		}, 5);
+		}, 50);
 
-		handleMutation(editingItem);
+		handleMutation(data);
 	};
 
 	const handleDelete = async () => {
@@ -136,7 +193,7 @@ export default function ListCategories() {
 	};
 
 	const addNewCategory = (group: CategoryGroup) => {
-		const newCategoryId = Date.now();
+		const newCategoryId = 0;
 		setGroupedCategories({
 			...groupedCategories,
 			[group]: [
@@ -149,10 +206,10 @@ export default function ListCategories() {
 			]
 		});
 
-		setExpandedCategories((prev) => ({
-			...prev,
-			[newCategoryId]: true
-		}));
+		// setExpandedCategories((prev) => ({
+		// 	...prev,
+		// 	[newCategoryId]: true
+		// }));
 
 		startEditing({
 			type: "category",
@@ -164,7 +221,7 @@ export default function ListCategories() {
 	};
 
 	const addNewSubcategory = (group: CategoryGroup, categoryId: number) => {
-		const newSubcategoryId = Date.now();
+		const newSubcategoryId = 0;
 
 		setGroupedCategories({
 			...groupedCategories,
@@ -196,6 +253,11 @@ export default function ListCategories() {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (editingItem && !(event.target as HTMLElement).closest("input")) {
 				saveEdit();
+				// if (!isDuplicate(editingItem)) saveEdit();
+				// else {
+				// 	removeFromGroupCategories(editingItem);
+				// 	setEditingItem(null);
+				// }
 			}
 		};
 
@@ -323,7 +385,7 @@ export default function ListCategories() {
 									</div>
 
 									{expandedCategories[category.id.toString()] && (
-										<div className="mt-2 mx-6 space-y-2">
+										<div className="mt-2 mx-6">
 											{category.subcategories.map((subcategory) => (
 												<div
 													key={subcategory.id}
@@ -353,7 +415,8 @@ export default function ListCategories() {
 																	operation: "edit",
 																	name: subcategory.name,
 																	group: group as CategoryGroup,
-																	categoryId: category.id
+																	categoryId: category.id,
+																	subcategoryId: subcategory.id
 																})
 															}
 														>
@@ -371,7 +434,8 @@ export default function ListCategories() {
 																operation: "delete",
 																name: subcategory.name,
 																group: group as CategoryGroup,
-																categoryId: category.id
+																categoryId: category.id,
+																subcategoryId: subcategory.id
 															})
 														}
 														className="h-7 w-7 text-destructive hover:text-destructive/90 cursor-pointer"
@@ -383,9 +447,9 @@ export default function ListCategories() {
 											))}
 											<Button
 												variant="ghost"
-												size="sm"
+												// size="default"
 												onClick={() => addNewSubcategory(group as CategoryGroup, category.id)}
-												className="w-full justify-start text-muted-foreground hover:text-primary transition-all duration-300 cursor-pointer"
+												className="w-full justify-start text-muted-foreground p-1 sm:p-5 hover:text-primary transition-all duration-300 cursor-pointer"
 											>
 												<Plus className="h-4 w-4 mr-2" />
 												Add Subcategory

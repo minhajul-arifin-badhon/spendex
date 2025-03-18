@@ -5,6 +5,7 @@ import { sendErrorResponse, sendResponse } from "../response";
 import { prisma } from "../prisma";
 import { auth } from "@clerk/nextjs/server";
 import { createSubcategorySchema, deleteSubcategorySchema, updateSubcategorySchema } from "../validation";
+import { delay } from "../utils";
 
 export const createSubcategory = async (data: CreateSubcategoryProps): Promise<Response<string>> => {
 	try {
@@ -15,9 +16,21 @@ export const createSubcategory = async (data: CreateSubcategoryProps): Promise<R
 		}
 
 		const result = createSubcategorySchema.safeParse(data);
+		console.log("Update data", data);
 
 		if (!result.success) {
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
+		}
+
+		const isItem = await prisma.subcategory.findFirst({
+			where: {
+				categoryId: data.categoryId,
+				name: data.name
+			}
+		});
+
+		if (isItem) {
+			return sendErrorResponse(400, "A subcategory with that name already exists.");
 		}
 
 		const newItem = await prisma.subcategory.create({
@@ -34,6 +47,8 @@ export const createSubcategory = async (data: CreateSubcategoryProps): Promise<R
 export const updateSubcategory = async (data: UpdateSubcategoryProps): Promise<Response<string>> => {
 	try {
 		const { userId } = await auth();
+
+		// await delay(5000);
 
 		if (!userId) {
 			return sendErrorResponse(401, "No user is signed in.");

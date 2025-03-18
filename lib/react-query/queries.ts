@@ -144,17 +144,21 @@ export const useCreateSubcategory = () => {
 			const previousCategories = queryClient.getQueryData([QUERY_KEYS.GET_CATEGORIES]);
 
 			queryClient.setQueryData([QUERY_KEYS.GET_CATEGORIES], (old: SuccessResponse<CategoriesWithSub[]>) => {
+				console.log(old);
 				return {
 					...old,
 					["data"]: old.data.map((category) => {
 						if (category.id == props.categoryId) {
-							category.subcategories = [
-								...category.subcategories,
-								{
-									id: Date.now(),
-									name: props.name
+							category.subcategories = category.subcategories.map((subcategory) => {
+								if (subcategory.id == 0) {
+									console.log("found id 0: deleting .........................");
+									subcategory = {
+										id: Date.now(),
+										name: props.name
+									};
 								}
-							];
+								return subcategory;
+							});
 						}
 						return category;
 					})
@@ -218,6 +222,7 @@ export const useDeleteSubcategory = () => {
 	return useMutation({
 		mutationFn: (props: DeleteSubcategoryProps) => deleteSubcategory(props),
 		onMutate: async (props: DeleteSubcategoryProps) => {
+			console.log("On mutate: delete category");
 			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_CATEGORIES] });
 
 			const previousCategories = queryClient.getQueryData([QUERY_KEYS.GET_CATEGORIES]);
