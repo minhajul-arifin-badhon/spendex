@@ -104,6 +104,7 @@ model Mapping {
     id                 Int      @id @default(autoincrement())
     userId             String
     mappingName        String   @unique
+    accountName        String
     columnFieldMapping Json
     includesHeader     Boolean  @default(false)
     createdAt          DateTime @default(now())

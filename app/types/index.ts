@@ -1,9 +1,14 @@
 import {
+	columnFieldMappingSchema,
 	createCategorySchema,
+	createMappingSchema,
 	createSubcategorySchema,
 	deleteCategorySchema,
+	deleteMappingSchema,
 	deleteSubcategorySchema,
+	mappingFormSchema,
 	updateCategorySchema,
+	updateMappingSchema,
 	updateSubcategorySchema
 } from "@/lib/validation";
 import { Prisma, CategoryGroup } from "@prisma/client";
@@ -40,6 +45,7 @@ export type CategoriesWithSub = Prisma.CategoryGetPayload<{
 
 export type GroupedCategories = Partial<Record<CategoryGroup, CategoriesWithSub[]>>;
 
+// props needed when calling actions
 export type CreateCategoryProps = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryProps = z.infer<typeof updateCategorySchema>;
 export type DeleteCategoryProps = z.infer<typeof deleteCategorySchema>;
@@ -60,3 +66,12 @@ export type CategoryMutationProps = {
 export type CategoryDialogProps = CategoryMutationProps & {
 	isOpen: boolean;
 };
+
+export type MappingFormProps = z.infer<ReturnType<typeof mappingFormSchema>>;
+
+// props needed when calling actions
+export type CreateMappingProps = z.infer<typeof createMappingSchema>;
+export type UpdateMappingProps = z.infer<typeof updateMappingSchema>;
+export type DeleteMappingProps = z.infer<typeof deleteMappingSchema>;
+
+export type ColumnFieldMappingProps = z.infer<typeof columnFieldMappingSchema>;

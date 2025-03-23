@@ -1,4 +1,4 @@
 export enum QUERY_KEYS {
-	// CATEGORY KEYS
-	GET_CATEGORIES = "getCategories"
+	GET_CATEGORIES = "getCategories",
+	GET_MAPPINGS = "getMappings"
 }

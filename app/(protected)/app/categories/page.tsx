@@ -1,7 +1,7 @@
 import type React from "react";
 import ListCategories from "@/components/list-categories";
 
-export default async function Page() {
+export default function Page() {
 	console.log("------------------------------------GETCATEGORIES-----------");
 
 	return (

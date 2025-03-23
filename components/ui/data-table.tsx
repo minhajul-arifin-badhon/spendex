@@ -11,25 +11,12 @@ import {
 	type SortingState,
 	getFilteredRowModel,
 	type ColumnFiltersState,
-	type PaginationState,
+	type PaginationState
 } from "@tanstack/react-table";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -42,13 +29,13 @@ export function DataTable<TData, TValue>({
 	columns,
 	data,
 	searchColumn,
-	searchPlaceholder = "Search...",
+	searchPlaceholder = "Search..."
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0,
-		pageSize: 10,
+		pageSize: 10
 	});
 
 	const table = useReactTable({
@@ -64,8 +51,8 @@ export function DataTable<TData, TValue>({
 		state: {
 			sorting,
 			columnFilters,
-			pagination,
-		},
+			pagination
+		}
 	});
 
 	return (
@@ -74,16 +61,8 @@ export function DataTable<TData, TValue>({
 				<div className="flex items-center justify-between">
 					<Input
 						placeholder={searchPlaceholder}
-						value={
-							(table
-								.getColumn(searchColumn)
-								?.getFilterValue() as string) ?? ""
-						}
-						onChange={(event) =>
-							table
-								.getColumn(searchColumn)
-								?.setFilterValue(event.target.value)
-						}
+						value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
+						onChange={(event) => table.getColumn(searchColumn)?.setFilterValue(event.target.value)}
 						className="max-w-sm"
 					/>
 				</div>
@@ -97,19 +76,11 @@ export function DataTable<TData, TValue>({
 									return (
 										<TableHead
 											key={header.id}
-											className={`${
-												index == 0
-													? "text-left"
-													: "text-center"
-											}`}
+											className={`${index == 0 ? "text-left" : "text-center"}`}
 										>
 											{header.isPlaceholder
 												? null
-												: flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext()
-												  )}
+												: flexRender(header.column.columnDef.header, header.getContext())}
 										</TableHead>
 									);
 								})}
@@ -119,37 +90,20 @@ export function DataTable<TData, TValue>({
 					<TableBody>
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={
-										row.getIsSelected() && "selected"
-									}
-								>
-									{row
-										.getVisibleCells()
-										.map((cell, index) => (
-											<TableCell
-												key={cell.id}
-												className={`${
-													index == 0
-														? "text-left pl-5"
-														: "text-center"
-												}`}
-											>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext()
-												)}
-											</TableCell>
-										))}
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell, index) => (
+										<TableCell
+											key={cell.id}
+											className={`${index == 0 ? "text-left pl-5" : "text-center"}`}
+										>
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
 								</TableRow>
 							))
 						) : (
 							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center"
-								>
+								<TableCell colSpan={columns.length} className="h-24 text-center">
 									No results.
 								</TableCell>
 							</TableRow>
@@ -162,26 +116,17 @@ export function DataTable<TData, TValue>({
 					<p className="text-sm text-muted-foreground inline-flex items-center">
 						Showing
 						<Select
-							value={table
-								.getState()
-								.pagination.pageSize.toString()}
+							value={table.getState().pagination.pageSize.toString()}
 							onValueChange={(value) => {
 								table.setPageSize(Number(value));
 							}}
 						>
 							<SelectTrigger className="h-8 w-[70px] mx-2 ring-0 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none">
-								<SelectValue
-									placeholder={table
-										.getState()
-										.pagination.pageSize.toString()}
-								/>
+								<SelectValue placeholder={table.getState().pagination.pageSize.toString()} />
 							</SelectTrigger>
 							<SelectContent side="top">
 								{[5, 10, 20, 50, 100].map((size) => (
-									<SelectItem
-										key={size}
-										value={size.toString()}
-									>
+									<SelectItem key={size} value={size.toString()}>
 										{size}
 									</SelectItem>
 								))}
@@ -200,8 +145,7 @@ export function DataTable<TData, TValue>({
 						Previous
 					</Button>
 					<div className="flex items-center justify-center text-sm text-muted-foreground">
-						Page {table.getState().pagination.pageIndex + 1} of{" "}
-						{table.getPageCount()}
+						Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
 					</div>
 					<Button
 						variant="outline"
