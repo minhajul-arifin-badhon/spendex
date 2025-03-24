@@ -123,7 +123,9 @@ export const merchantFormSchema = (existingMerchants: Merchant[] = [], currentMe
 					message: "A merchant with this name already exists"
 				}
 			),
-		includes: z.array(z.string()).nonempty("Includes cannot be empty"),
+		includes: z.array(z.string()).refine((values) => values.length > 0, {
+			message: "Please, add at least one substring that define the merchant."
+		}),
 		categorySelection: z
 			.object({
 				type: z.enum(["category", "subcategory"]),

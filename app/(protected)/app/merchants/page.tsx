@@ -15,37 +15,39 @@ import {
 // import MappingsList from "./components/mappings-list";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Mapping, Merchant } from "@prisma/client";
-import { ColumnFieldMappingProps, CreateMappingProps, MappingFormProps, UpdateMappingProps } from "@/app/types";
-import MappingForm from "@/components/mapping-form";
-import { useCreateMapping, useDeleteMapping, useGetMappings, useUpdateMapping } from "@/lib/react-query/queries";
+import { Merchant } from "@prisma/client";
+import { CategoriesWithSub, MerchantFormProps } from "@/app/types";
+import {
+	useCreateMerchant,
+	useDeleteMercant,
+	useGetCategories,
+	useGetMerchants,
+	useUpdateMerchant
+} from "@/lib/react-query/queries";
 import { Spinner } from "@/components/ui/spinner";
-import ListMappings from "@/components/list-mappings";
 import { toast } from "sonner";
+import ListMerchants from "@/components/list-merchants";
 
 // Default form values
-const defaultFormValues: MappingFormProps = {
-	mappingName: "",
-	accountName: "",
-	includesHeader: false,
-	columnCount: 4,
-	columnFieldMapping: Array.from({ length: 4 }, (_, i) => ({
-		columnIndex: i,
-		fieldName: ""
-	}))
+const defaultFormValues: MerchantFormProps = {
+	name: "",
+	includes: [],
+	categorySelection: null
 };
 
 export default function Page() {
-	const { data: mappingsResponse, isLoading: isLoading, isError: isError } = useGetMappings();
+	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
+	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
+
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const [selectedMapping, setSelectedMapping] = useState<Mapping | null>(null);
-	const [formValues, setFormValues] = useState<MappingFormProps>(defaultFormValues);
+	const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
+	const [formValues, setFormValues] = useState<MerchantFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
 
-	// const createMappingMutation = useCreateMapping();
-	// const updateMappingMutation = useUpdateMapping();
-	// const deleteMappingMutation = useDeleteMapping();
+	const createMerchantMutation = useCreateMerchant();
+	const updateMerchantMutation = useUpdateMerchant();
+	const deleteMerchantMutation = useDeleteMercant();
 
 	// Open form for creating a new mapping
 	const handleOpenCreateForm = () => {
@@ -78,7 +80,7 @@ export default function Page() {
 
 	// Open delete confirmation dialog
 	const handleOpenDeleteDialog = (merchant: Merchant) => {
-		setSelectedMapping(mapping);
+		setSelectedMerchant(merchant);
 		setIsDeleteDialogOpen(true);
 	};
 
@@ -143,29 +145,29 @@ export default function Page() {
 	// 	setSelectedMapping(null);
 	// };
 
-	// // Delete mapping
-	// const handleDeleteMapping = async () => {
-	// 	if (!selectedMapping) return;
+	// Delete mapping
+	const handleDeleteMerchant = async () => {
+		if (!selectedMerchant) return;
 
-	// 	console.log(selectedMapping);
+		console.log(selectedMerchant);
 
-	// 	try {
-	// 		const response = await deleteMappingMutation.mutateAsync({ id: selectedMapping.id });
-	// 		console.log(response);
+		try {
+			const response = await deleteMerchantMutation.mutateAsync({ id: selectedMerchant.id });
+			console.log(response);
 
-	// 		if (!response?.success) {
-	// 			toast.error(response?.data);
-	// 		} else {
-	// 			toast.success(response?.data);
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		toast.error("Something went wrong!");
-	// 	}
+			if (!response?.success) {
+				toast.error(response?.data);
+			} else {
+				toast.success(response?.data);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
 
-	// 	setIsDeleteDialogOpen(false);
-	// 	setSelectedMapping(null);
-	// };
+		setIsDeleteDialogOpen(false);
+		setSelectedMerchant(null);
+	};
 
 	// // Handle form submission based on whether we're editing or creating
 	// const handleFormSubmit = (data: MappingFormProps) => {
@@ -179,29 +181,38 @@ export default function Page() {
 	// 	setIsFormOpen(false);
 	// };
 
-	if (isError)
+	if (isErrorCategories || isErrorMerchants)
 		return (
 			<div>
 				<p>Something bad happened</p>
 			</div>
 		);
 
-	if (isLoading)
+	if (isLoadingMerchants || isLoadingCategories)
 		return (
 			<div className="size-full -mt-20 min-h-screen flex items-center justify-center">
 				<Spinner size="large" />
 			</div>
 		);
 
-	if (!mappingsResponse?.success) {
+	if (!merchantsResponse?.success) {
 		return (
 			<div>
-				<p>{`${mappingsResponse?.statusCode}: ${mappingsResponse?.data}:`}</p>
+				<p>{`${merchantsResponse?.statusCode}: ${merchantsResponse?.data}:`}</p>
 			</div>
 		);
 	}
 
-	const mappings = (mappingsResponse.data as Mapping[]) || [];
+	if (!categoriesResponse?.success) {
+		return (
+			<div>
+				<p>{`${categoriesResponse?.statusCode}: ${categoriesResponse?.data}:`}</p>
+			</div>
+		);
+	}
+
+	const merchants = (merchantsResponse.data as Merchant[]) || [];
+	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
 
 	return (
 		<div className="space-y-4">
@@ -211,10 +222,15 @@ export default function Page() {
 				</Button>
 			</div>
 
-			<ListMappings mappings={mappings} onEdit={handleOpenEditForm} onDelete={handleOpenDeleteDialog} />
+			<ListMerchants
+				merchants={merchants}
+				categories={categories}
+				onEdit={handleOpenEditForm}
+				onDelete={handleOpenDeleteDialog}
+			/>
 
 			{/* Mapping Form Dialog */}
-			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+			{/* <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
 				<MappingForm
 					key={isEditing ? selectedMapping?.id : Date.now()}
 					defaultValues={formValues}
@@ -231,7 +247,7 @@ export default function Page() {
 					currentMappingId={selectedMapping?.id}
 					isFormOpen={isFormOpen}
 				/>
-			</Dialog>
+			</Dialog> */}
 
 			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -239,14 +255,14 @@ export default function Page() {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
-							This will permanently delete the mapping {selectedMapping?.mappingName}. This action cannot
-							be undone.
+							This will permanently delete the mapping {selectedMerchant?.name}. This action cannot be
+							undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={handleDeleteMapping}
+							onClick={handleDeleteMerchant}
 							className="bg-destructive text-white hover:bg-destructive/90"
 						>
 							Delete
