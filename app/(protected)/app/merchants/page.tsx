@@ -1,308 +1,259 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import type { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import { useId, useState } from "react";
+import { Dialog } from "@/components/ui/dialog";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown, ArrowUpDown } from "lucide-react";
-import { DataTable } from "@/components/ui/data-table";
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+// import MappingsList from "./components/mappings-list";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Mapping, Merchant } from "@prisma/client";
+import { ColumnFieldMappingProps, CreateMappingProps, MappingFormProps, UpdateMappingProps } from "@/app/types";
+import MappingForm from "@/components/mapping-form";
+import { useCreateMapping, useDeleteMapping, useGetMappings, useUpdateMapping } from "@/lib/react-query/queries";
+import { Spinner } from "@/components/ui/spinner";
+import ListMappings from "@/components/list-mappings";
+import { toast } from "sonner";
 
-type Merchant = {
-	id: string;
-	name: string;
-	category?: string;
-	subcategory?: string;
+// Default form values
+const defaultFormValues: MappingFormProps = {
+	mappingName: "",
+	accountName: "",
+	includesHeader: false,
+	columnCount: 4,
+	columnFieldMapping: Array.from({ length: 4 }, (_, i) => ({
+		columnIndex: i,
+		fieldName: ""
+	}))
 };
-
-type Category = {
-	id: string;
-	name: string;
-	subcategories: { id: string; name: string }[];
-};
-
-const initialMerchants: Merchant[] = [
-	{ id: "1", name: "Walmart" },
-	{ id: "2", name: "Target" },
-	{ id: "3", name: "Amazon" },
-	{ id: "4", name: "Best Buy" },
-	{ id: "5", name: "Costco" },
-	{ id: "6", name: "Home Depot" },
-	{ id: "7", name: "Lowe's" },
-	{ id: "8", name: "Popeyes" },
-	{ id: "9", name: "Safeway" },
-	{ id: "10", name: "Goodlife Fitness" },
-	{ id: "11", name: "Trader Joe's" },
-	{ id: "12", name: "Aldi" },
-	{ id: "13", name: "Publix" },
-	{ id: "14", name: "Walgreens" },
-	{ id: "15", name: "CVS" },
-];
-
-const categories: Category[] = [
-	{
-		id: "cat1",
-		name: "Home",
-		subcategories: [
-			{ id: "sub1", name: "Mortgages" },
-			{ id: "sub2", name: "Utilities" },
-			{ id: "sub3", name: "Property Tax" },
-		],
-	},
-	{
-		id: "cat2",
-		name: "Transportation",
-		subcategories: [
-			{ id: "sub4", name: "Gas" },
-			{ id: "sub5", name: "Maintainance" },
-			{ id: "sub6", name: "Insurance" },
-			{ id: "sub7", name: "Other Transportation" },
-		],
-	},
-	{
-		id: "cat3",
-		name: "Food",
-		subcategories: [
-			{ id: "sub8", name: "Groceries" },
-			{ id: "sub9", name: "Restaurants" },
-			{ id: "sub10", name: "Other Food" },
-		],
-	},
-	{
-		id: "cat4",
-		name: "Health and Wellness",
-		subcategories: [
-			{ id: "sub11", name: "Medical" },
-			{ id: "sub12", name: "Gym" },
-			{ id: "sub13", name: "Other Health" },
-		],
-	},
-	{
-		id: "cat5",
-		name: "Travel",
-		subcategories: [],
-	},
-	{
-		id: "cat6",
-		name: "Vacation",
-		subcategories: [],
-	},
-	{
-		id: "cat7",
-		name: "Shopping",
-		subcategories: [
-			{ id: "sub14", name: "Clothing" },
-			{ id: "sub15", name: "Other Shopping" },
-		],
-	},
-	{
-		id: "cat8",
-		name: "Entertainment",
-		subcategories: [],
-	},
-	{
-		id: "cat9",
-		name: "Education",
-		subcategories: [],
-	},
-	{
-		id: "cat10",
-		name: "Subscriptions",
-		subcategories: [],
-	},
-	{
-		id: "cat11",
-		name: "Gifts and Donations",
-		subcategories: [],
-	},
-	{
-		id: "cat12",
-		name: "Business and Work",
-		subcategories: [],
-	},
-	{
-		id: "cat13",
-		name: "Investments",
-		subcategories: [],
-	},
-	{
-		id: "cat14",
-		name: "Insurance",
-		subcategories: [],
-	},
-	{
-		id: "cat15",
-		name: "Loans and Fees",
-		subcategories: [],
-	},
-	{
-		id: "cat16",
-		name: "Other Expenses",
-		subcategories: [],
-	},
-];
 
 export default function Page() {
-	const [merchants, setMerchants] = useState<Merchant[]>(initialMerchants);
+	const { data: mappingsResponse, isLoading: isLoading, isError: isError } = useGetMappings();
+	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [selectedMapping, setSelectedMapping] = useState<Mapping | null>(null);
+	const [formValues, setFormValues] = useState<MappingFormProps>(defaultFormValues);
+	const [isEditing, setIsEditing] = useState(false);
 
-	const handleCategoryChange = (
-		merchantId: string,
-		categoryId: string,
-		subcategoryId?: string
-	) => {
-		setMerchants((prevMerchants) =>
-			prevMerchants.map((merchant) => {
-				if (merchant.id === merchantId) {
-					const category = categories.find(
-						(c) => c.id === categoryId
-					);
-					const subcategory = category?.subcategories.find(
-						(s) => s.id === subcategoryId
-					);
-					return {
-						...merchant,
-						category: category?.name,
-						subcategory: subcategory?.name,
-					};
-				}
-				return merchant;
-			})
-		);
+	// const createMappingMutation = useCreateMapping();
+	// const updateMappingMutation = useUpdateMapping();
+	// const deleteMappingMutation = useDeleteMapping();
+
+	// Open form for creating a new mapping
+	const handleOpenCreateForm = () => {
+		setFormValues(defaultFormValues);
+		setIsEditing(false);
+		setIsFormOpen(true);
 	};
 
-	const columns = useMemo<ColumnDef<Merchant>[]>(
-		() => [
-			{
-				accessorKey: "name",
-				header: ({ column }) => {
-					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
-							Merchant
-							<ArrowUpDown className="ml-2 h-4 w-4" />
-						</Button>
-					);
-				},
-			},
-			{
-				accessorKey: "category",
-				header: ({ column }) => {
-					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
-							Category
-							<ArrowUpDown className="ml-2 h-4 w-4" />
-						</Button>
-					);
-				},
-				cell: ({ row }) => (
-					<div>{row.original.category || "Uncategorized"}</div>
-				),
-			},
-			{
-				accessorKey: "subcategory",
-				header: ({ column }) => {
-					return (
-						<Button
-							variant="ghost"
-							onClick={() =>
-								column.toggleSorting(
-									column.getIsSorted() === "asc"
-								)
-							}
-						>
-							Subcategory
-							<ArrowUpDown className="ml-2 h-4 w-4" />
-						</Button>
-					);
-				},
-				cell: ({ row }) => (
-					<div>{row.original.subcategory || "N/A"}</div>
-				),
-			},
-			{
-				id: "actions",
-				cell: ({ row }) => {
-					const merchant = row.original;
+	// Open form for editing an existing mapping
+	const handleOpenEditForm = (merchant: Merchant) => {
+		// setSelectedMapping(mapping);
 
-					return (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="sm">
-									Set Category{" "}
-									<ChevronDown className="ml-2 h-4 w-4" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-56">
-								{categories.map((category) => (
-									<DropdownMenuSub key={category.id}>
-										<DropdownMenuSubTrigger>
-											{category.name}
-										</DropdownMenuSubTrigger>
-										<DropdownMenuSubContent className="w-56">
-											<DropdownMenuItem
-												onSelect={() =>
-													handleCategoryChange(
-														merchant.id,
-														category.id
-													)
-												}
-											>
-												{category.name} (General)
-											</DropdownMenuItem>
-											{category.subcategories.map(
-												(subcategory) => (
-													<DropdownMenuItem
-														key={subcategory.id}
-														onSelect={() =>
-															handleCategoryChange(
-																merchant.id,
-																category.id,
-																subcategory.id
-															)
-														}
-													>
-														{subcategory.name}
-													</DropdownMenuItem>
-												)
-											)}
-										</DropdownMenuSubContent>
-									</DropdownMenuSub>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					);
-				},
-			},
-		],
-		[]
-	);
+		// const columnFieldMapping = mapping.columnFieldMapping as ColumnFieldMappingProps[];
+
+		// console.log("editing---------");
+		console.log(merchant);
+
+		// // Set form values with existing mapping data
+		// setFormValues({
+		// 	mappingName: mapping.mappingName,
+		// 	accountName: mapping.accountName,
+		// 	includesHeader: mapping.includesHeader,
+		// 	columnCount: columnFieldMapping.length,
+		// 	columnFieldMapping: columnFieldMapping
+		// });
+
+		// setIsEditing(true);
+		// setIsFormOpen(true);
+	};
+
+	// Open delete confirmation dialog
+	const handleOpenDeleteDialog = (merchant: Merchant) => {
+		setSelectedMapping(mapping);
+		setIsDeleteDialogOpen(true);
+	};
+
+	// // Create new mapping
+	// const handleCreateMapping = async (data: MappingFormProps) => {
+	// 	console.log(data.columnFieldMapping);
+
+	// 	const newMapping: CreateMappingProps = {
+	// 		mappingName: data.mappingName.trim(),
+	// 		accountName: data.accountName.trim(),
+	// 		includesHeader: data.includesHeader,
+	// 		columnFieldMapping: data.columnFieldMapping
+	// 	};
+
+	// 	console.log(newMapping);
+
+	// 	try {
+	// 		const response = await createMappingMutation.mutateAsync(newMapping);
+	// 		console.log(response);
+
+	// 		if (!response?.success) {
+	// 			toast.error(response?.data);
+	// 		} else {
+	// 			toast.success(response?.data);
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		toast.error("Something went wrong!");
+	// 	}
+	// };
+
+	// // Update existing mapping
+	// const handleUpdateMapping = async (data: MappingFormProps) => {
+	// 	if (!selectedMapping) return;
+
+	// 	console.log(data);
+	// 	const updatedMapping: UpdateMappingProps = {
+	// 		id: selectedMapping.id,
+	// 		mappingName: data.mappingName.trim(),
+	// 		accountName: data.accountName.trim(),
+	// 		includesHeader: data.includesHeader,
+	// 		columnFieldMapping: data.columnFieldMapping
+	// 	};
+
+	// 	console.log(updatedMapping);
+
+	// 	try {
+	// 		const response = await updateMappingMutation.mutateAsync(updatedMapping);
+	// 		console.log(response);
+
+	// 		if (!response?.success) {
+	// 			toast.error(response?.data);
+	// 		} else {
+	// 			toast.success(response?.data);
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		toast.error("Something went wrong!");
+	// 	}
+
+	// 	setIsFormOpen(false);
+	// 	setSelectedMapping(null);
+	// };
+
+	// // Delete mapping
+	// const handleDeleteMapping = async () => {
+	// 	if (!selectedMapping) return;
+
+	// 	console.log(selectedMapping);
+
+	// 	try {
+	// 		const response = await deleteMappingMutation.mutateAsync({ id: selectedMapping.id });
+	// 		console.log(response);
+
+	// 		if (!response?.success) {
+	// 			toast.error(response?.data);
+	// 		} else {
+	// 			toast.success(response?.data);
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		toast.error("Something went wrong!");
+	// 	}
+
+	// 	setIsDeleteDialogOpen(false);
+	// 	setSelectedMapping(null);
+	// };
+
+	// // Handle form submission based on whether we're editing or creating
+	// const handleFormSubmit = (data: MappingFormProps) => {
+	// 	if (isEditing) {
+	// 		handleUpdateMapping(data);
+	// 	} else {
+	// 		handleCreateMapping(data);
+	// 	}
+
+	// 	// setFormValues(defaultFormValues);
+	// 	setIsFormOpen(false);
+	// };
+
+	if (isError)
+		return (
+			<div>
+				<p>Something bad happened</p>
+			</div>
+		);
+
+	if (isLoading)
+		return (
+			<div className="size-full -mt-20 min-h-screen flex items-center justify-center">
+				<Spinner size="large" />
+			</div>
+		);
+
+	if (!mappingsResponse?.success) {
+		return (
+			<div>
+				<p>{`${mappingsResponse?.statusCode}: ${mappingsResponse?.data}:`}</p>
+			</div>
+		);
+	}
+
+	const mappings = (mappingsResponse.data as Mapping[]) || [];
 
 	return (
-		<DataTable
-			columns={columns}
-			data={merchants}
-			searchColumn="name"
-			searchPlaceholder="Search merchants..."
-		/>
+		<div className="space-y-4">
+			<div className="flex justify-end space-x-3">
+				<Button variant="outline" onClick={handleOpenCreateForm}>
+					<Plus className="mr-2 h-4 w-4" /> Create New
+				</Button>
+			</div>
+
+			<ListMappings mappings={mappings} onEdit={handleOpenEditForm} onDelete={handleOpenDeleteDialog} />
+
+			{/* Mapping Form Dialog */}
+			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+				<MappingForm
+					key={isEditing ? selectedMapping?.id : Date.now()}
+					defaultValues={formValues}
+					onSubmit={handleFormSubmit}
+					onCancel={() => setIsFormOpen(false)}
+					title={isEditing ? "Edit Mapping" : "Create New Mapping"}
+					description={
+						isEditing
+							? "Update the column mapping configuration."
+							: "Create a new column mapping for your data imports."
+					}
+					submitButtonText={isEditing ? "Update Mapping" : "Create Mapping"}
+					existingMappings={mappingsResponse.data as Mapping[]}
+					currentMappingId={selectedMapping?.id}
+					isFormOpen={isFormOpen}
+				/>
+			</Dialog>
+
+			{/* Delete Confirmation Dialog */}
+			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This will permanently delete the mapping {selectedMapping?.mappingName}. This action cannot
+							be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleDeleteMapping}
+							className="bg-destructive text-white hover:bg-destructive/90"
+						>
+							Delete
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</div>
 	);
 }

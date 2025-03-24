@@ -2,13 +2,17 @@ import {
 	columnFieldMappingSchema,
 	createCategorySchema,
 	createMappingSchema,
+	createMerchantSchema,
 	createSubcategorySchema,
 	deleteCategorySchema,
 	deleteMappingSchema,
+	deleteMerchantSchema,
 	deleteSubcategorySchema,
 	mappingFormSchema,
+	merchantFormSchema,
 	updateCategorySchema,
 	updateMappingSchema,
+	updateMerchantSchema,
 	updateSubcategorySchema
 } from "@/lib/validation";
 import { Prisma, CategoryGroup } from "@prisma/client";
@@ -75,3 +79,10 @@ export type UpdateMappingProps = z.infer<typeof updateMappingSchema>;
 export type DeleteMappingProps = z.infer<typeof deleteMappingSchema>;
 
 export type ColumnFieldMappingProps = z.infer<typeof columnFieldMappingSchema>;
+
+export type MerchantFormProps = z.infer<ReturnType<typeof merchantFormSchema>>;
+
+// props needed when calling actions
+export type CreateMerchantProps = z.infer<typeof createMerchantSchema>;
+export type UpdateMerchantProps = z.infer<typeof updateMerchantSchema>;
+export type DeleteMerchantProps = z.infer<typeof deleteMerchantSchema>;

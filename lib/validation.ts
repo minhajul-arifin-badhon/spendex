@@ -1,4 +1,4 @@
-import { CategoryGroup, Mapping } from "@prisma/client";
+import { CategoryGroup, Mapping, Merchant } from "@prisma/client";
 import { z } from "zod";
 
 // server actions
@@ -31,7 +31,6 @@ export const deleteSubcategorySchema = z.object({
 	id: z.number().int().positive()
 });
 
-// Define the Zod schema for validation
 export const columnFieldMappingSchema = z.object({
 	columnIndex: z.number(),
 	fieldName: z.string()
@@ -101,5 +100,56 @@ export const updateMappingSchema = createMappingSchema.extend({
 });
 
 export const deleteMappingSchema = z.object({
+	id: z.number().int().positive()
+});
+
+export const merchantFormSchema = (existingMerchants: Merchant[] = [], currentMerchantId?: number) => {
+	return z.object({
+		name: z
+			.string()
+			.min(3, "Merchant name must be at least 3 characters")
+			.refine((val) => val.trim().length > 0, {
+				message: "Merchant name is required"
+			})
+			.refine(
+				(name) => {
+					return !existingMerchants.some(
+						(merchant) =>
+							merchant.name.toLowerCase() === name.trim().toLowerCase() &&
+							merchant.id !== currentMerchantId
+					);
+				},
+				{
+					message: "A merchant with this name already exists"
+				}
+			),
+		includes: z.array(z.string()).nonempty("Includes cannot be empty"),
+		categorySelection: z
+			.object({
+				type: z.enum(["category", "subcategory"]),
+				id: z.number(),
+				categoryId: z.number().optional(),
+				name: z.string()
+			})
+			.nullable()
+	});
+};
+
+export const createMerchantSchema = z.object({
+	name: z.string().nonempty("Name cannot be empty"),
+	categoryId: z.number().int().positive().optional(),
+	subcategoryId: z.number().int().positive().optional(),
+	includes: z.array(z.string()).nonempty("Includes cannot be empty")
+});
+
+export const updateMerchantSchema = z.object({
+	id: z.number().int().positive(),
+	name: z.string().nonempty("Name cannot be empty"),
+	categoryId: z.number().int().positive().optional(),
+	subcategoryId: z.number().int().positive().optional(),
+	includes: z.array(z.string()).nonempty("Includes cannot be empty")
+});
+
+export const deleteMerchantSchema = z.object({
 	id: z.number().int().positive()
 });

@@ -5,18 +5,22 @@ import {
 	CategoriesWithSub,
 	CreateCategoryProps,
 	CreateMappingProps,
+	CreateMerchantProps,
 	CreateSubcategoryProps,
 	DeleteCategoryProps,
 	DeleteMappingProps,
+	DeleteMerchantProps,
 	DeleteSubcategoryProps,
 	SuccessResponse,
 	UpdateCategoryProps,
 	UpdateMappingProps,
+	UpdateMerchantProps,
 	UpdateSubcategoryProps
 } from "@/app/types";
 import { createSubcategory, deleteSubcategory, updateSubcategory } from "../actions/subcategories.actions";
 import { createMapping, deleteMapping, getMappings, updateMapping } from "../actions/mappings.actions";
-import { Mapping } from "@prisma/client";
+import { Mapping, Merchant } from "@prisma/client";
+import { createMerchant, deleteMerchant, getMerchants, updateMerchant } from "../actions/merchants.actions";
 
 // ============================================================
 // CATEGORY QUERIES
@@ -280,7 +284,7 @@ export const useDeleteSubcategory = () => {
 // };
 
 // ============================================================
-// Mapping QUERIES
+// MAPPING QUERIES
 // ============================================================
 
 const invalidateMappingsQueries = (queryClient: QueryClient) => {
@@ -381,6 +385,115 @@ export const useDeleteMapping = () => {
 		onSettled: (data, error, variables, context) => {
 			if (!data?.success || error) queryClient.setQueryData([QUERY_KEYS.GET_MAPPINGS], context?.previousMappings);
 			invalidateMappingsQueries(queryClient);
+		}
+	});
+};
+
+// ============================================================
+// MERCHANT QUERIES
+// ============================================================
+
+const invalidateMerchantsQueries = (queryClient: QueryClient) => {
+	console.log("=------------invalidating grouped categories--------------------");
+	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });
+};
+
+export const useGetMerchants = () => {
+	return useQuery({
+		queryKey: [QUERY_KEYS.GET_MERCHANTS],
+		queryFn: () => {
+			console.log("query: calling merchants................");
+			return getMerchants();
+		}
+	});
+};
+
+export const useCreateMerchant = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (props: CreateMerchantProps) => createMerchant(props),
+		onMutate: async (props: CreateMerchantProps) => {
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });
+			const previousMerchants = queryClient.getQueryData([QUERY_KEYS.GET_MERCHANTS]);
+
+			queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+				return {
+					...old,
+					["data"]: [
+						...old.data,
+						{
+							...props,
+							id: Date.now()
+						}
+					]
+				};
+			});
+
+			return { previousMerchants };
+		},
+		onSettled: (data, error, variables, context) => {
+			if (!data?.success || error)
+				queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], context?.previousMerchants);
+			invalidateMerchantsQueries(queryClient);
+		}
+	});
+};
+
+export const useUpdateMerchant = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (props: UpdateMerchantProps) => updateMerchant(props),
+		onMutate: async (props: UpdateMerchantProps) => {
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });
+
+			const previousMerchants = queryClient.getQueryData([QUERY_KEYS.GET_MERCHANTS]);
+			console.log("optimistic update");
+			queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+				return {
+					...old,
+					["data"]: old.data.map((merchant) => {
+						if (merchant.id == props.id) {
+							return {
+								...merchant,
+								...props
+							};
+						}
+						return merchant;
+					})
+				};
+			});
+
+			return { previousMerchants };
+		},
+		onSettled: (data, error, variables, context) => {
+			if (!data?.success || error)
+				queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], context?.previousMerchants);
+			invalidateMerchantsQueries(queryClient);
+		}
+	});
+};
+
+export const useDeleteMercant = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (props: DeleteMerchantProps) => deleteMerchant(props),
+		onMutate: async (props: DeleteMerchantProps) => {
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });
+			const previousMerchants = queryClient.getQueryData([QUERY_KEYS.GET_MERCHANTS]);
+
+			queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+				return { ...old, ["data"]: old.data.filter((merchant) => merchant.id !== props.id) };
+			});
+
+			return { previousMerchants };
+		},
+		onSettled: (data, error, variables, context) => {
+			if (!data?.success || error)
+				queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], context?.previousMerchants);
+			invalidateMerchantsQueries(queryClient);
 		}
 	});
 };
