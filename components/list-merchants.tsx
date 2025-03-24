@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { Merchant } from "@prisma/client";
 import { CategoriesWithSub } from "@/app/types";
@@ -36,7 +36,14 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 		() => [
 			{
 				accessorKey: "name",
-				header: "Merchant"
+				header: ({ column }) => {
+					return (
+						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Merchant
+							<ArrowUpDown className="ml-2 h-4 w-4" />
+						</Button>
+					);
+				}
 			},
 			{
 				accessorKey: "includes",
@@ -46,7 +53,7 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 					if (!includes || includes.length === 0) return <div>-</div>;
 
 					return (
-						<div className="max-w-[120px] sm:max-w-[200px] break-words">
+						<div className="max-w-[120px] sm:max-w-[200px] break-words mx-auto">
 							{includes.map((item) => (
 								<Badge key={item} variant="outline" className="mr-1 mb-1">
 									{item}
@@ -83,9 +90,10 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 			},
 			{
 				id: "actions",
+				// header: "Actions",
 				cell: ({ row }) => {
 					return (
-						<div className="flex space-x-1 sm:space-x-2">
+						<div className="flex justify-center space-x-1 sm:space-x-2">
 							<Button variant="ghost" size="icon" onClick={() => onEdit(row.original)}>
 								<Pencil className="h-4 w-4" />
 								<span className="sr-only">Edit</span>

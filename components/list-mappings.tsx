@@ -66,7 +66,7 @@ export default function ListMappings({ mappings, onEdit, onDelete }: ComponentPr
 				id: "actions",
 				cell: ({ row }) => {
 					return (
-						<div className="flex space-x-2">
+						<div className="flex justify-center space-x-2">
 							<Button variant="ghost" size="icon" onClick={() => onEdit(row.original)}>
 								<Edit className="h-4 w-4" />
 								<span className="sr-only">Edit</span>
