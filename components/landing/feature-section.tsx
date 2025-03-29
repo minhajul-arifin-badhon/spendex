@@ -20,7 +20,7 @@ export default function FeatureSection({
 	children
 }: FeatureSectionProps) {
 	return (
-		<section className="container py-24 md:py-32 mx-auto">
+		<section className="container py-12 md:py-32 mx-auto px-6">
 			<div
 				className={cn(
 					"mx-auto grid max-w-screen-xl gap-12 md:grid-cols-2 md:items-center md:gap-16",
@@ -28,7 +28,7 @@ export default function FeatureSection({
 				)}
 			>
 				<div className={cn("space-y-6", reversed && "md:col-start-2")}>
-					<h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
+					<h2 className="text-3xl font-bold tracking-tight leading-11 sm:text-4xl">{title}</h2>
 					<p className="text-lg text-muted-foreground">{description}</p>
 					{children}
 				</div>

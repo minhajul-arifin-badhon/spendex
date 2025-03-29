@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 // import { ThemeToggle } from "./theme-toggle";
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import { ThemeToggle } from "../theme/theme-toggle";
 
 export default function HeroNavbar() {
 	const [scrolled, setScrolled] = useState(false);
-	const pathname = usePathname();
+	// const pathname = usePathname();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -36,7 +36,7 @@ export default function HeroNavbar() {
 					<span className="text-xl font-bold transition-colors text-white">Spendex</span>
 				</Link>
 				<nav className="flex items-center space-x-6">
-					<Link href="/" className="text-sm transition-colors text-blue-600 font-semibold">
+					<Link href="/" className="text-sm transition-colors text-blue-500 font-semibold">
 						Home
 					</Link>
 					<ThemeToggle isLanding={true} />
