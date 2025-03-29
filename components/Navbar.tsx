@@ -18,6 +18,7 @@ import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { SignOutButton, useUser } from "@clerk/nextjs";
+import { ThemeToggle } from "./theme/theme-toggle";
 
 // Navigation items
 const navItems = [
@@ -87,7 +88,11 @@ export const Navbar = () => {
 					</div>
 
 					{/* Right side with profile */}
-					<div className="ml-auto flex items-center md:w-[200px] md:justify-end">
+					<div className="ml-auto flex items-center md:w-[200px] md:justify-end gap-2 md:gap-3">
+						<div className="">
+							<ThemeToggle isLanding={false} />
+						</div>
+
 						{/* Profile Dropdown - Only visible on desktop */}
 						<div className="hidden md:inline-flex">
 							<DropdownMenu>

@@ -7,10 +7,15 @@ const nextConfig: NextConfig = {
 			{
 				protocol: "https",
 				hostname: "cdn-icons-png.flaticon.com",
-				pathname: "/**", // Matches all images from this domain
+				pathname: "/**" // Matches all images from this domain
 			},
-		],
-	},
+			{
+				protocol: "https",
+				hostname: "images.unsplash.com",
+				pathname: "/**" // Matches all images from this domain
+			}
+		]
+	}
 };
 
 export default nextConfig;
