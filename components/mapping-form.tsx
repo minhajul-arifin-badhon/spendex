@@ -13,7 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { mappingFormSchema } from "@/lib/validation";
 import { Mapping } from "@prisma/client";
 import { MappingFormProps } from "@/app/types";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { SelectWithClear } from "./ui/select-with-clear";
 
 const fieldOptions = ["Date", "Description", "Amount", "Credit", "Debit"];

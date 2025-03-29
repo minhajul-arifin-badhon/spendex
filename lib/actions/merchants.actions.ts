@@ -6,6 +6,7 @@ import { sendErrorResponse, sendResponse } from "../response";
 import { createMerchantSchema, deleteMerchantSchema, updateMerchantSchema } from "../validation";
 import { prisma } from "../prisma";
 import { Merchant } from "@prisma/client";
+import { delay } from "../utils";
 
 export const getMerchants = async (): Promise<Response<Merchant[]>> => {
 	try {
@@ -15,14 +16,19 @@ export const getMerchants = async (): Promise<Response<Merchant[]>> => {
 			return sendErrorResponse(401, "No user is signed in.");
 		}
 
-		// await delay(5000);
+		// await delay(3000);
 
 		console.log("pulling merchants");
 		const merchants = await prisma.merchant.findMany({
 			where: { userId },
-			orderBy: {
-				id: "asc"
-			}
+			orderBy: [
+				{
+					updatedAt: "desc"
+				},
+				{
+					id: "asc"
+				}
+			]
 		});
 
 		return sendResponse(200, merchants);

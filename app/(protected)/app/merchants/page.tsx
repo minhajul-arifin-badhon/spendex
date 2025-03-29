@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import {
 	AlertDialog,
@@ -16,7 +16,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Merchant } from "@prisma/client";
-import { CategoriesWithSub, MerchantFormProps } from "@/app/types";
+import {
+	CategoriesWithSub,
+	CategorySelection,
+	CreateMerchantProps,
+	MerchantFormProps,
+	UpdateMerchantProps
+} from "@/app/types";
 import {
 	useCreateMerchant,
 	useDeleteMercant,
@@ -27,6 +33,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import ListMerchants from "@/components/list-merchants";
+import MerchantForm from "@/components/merchant-form";
 
 // Default form values
 const defaultFormValues: MerchantFormProps = {
@@ -58,24 +65,15 @@ export default function Page() {
 
 	// Open form for editing an existing mapping
 	const handleOpenEditForm = (merchant: Merchant) => {
-		// setSelectedMapping(mapping);
+		setSelectedMerchant(merchant);
 
-		// const columnFieldMapping = mapping.columnFieldMapping as ColumnFieldMappingProps[];
+		console.log("editing---------");
+		const formValues = merchantToFormValues(merchant);
+		console.log(formValues);
 
-		// console.log("editing---------");
-		console.log(merchant);
-
-		// // Set form values with existing mapping data
-		// setFormValues({
-		// 	mappingName: mapping.mappingName,
-		// 	accountName: mapping.accountName,
-		// 	includesHeader: mapping.includesHeader,
-		// 	columnCount: columnFieldMapping.length,
-		// 	columnFieldMapping: columnFieldMapping
-		// });
-
-		// setIsEditing(true);
-		// setIsFormOpen(true);
+		setFormValues(formValues);
+		setIsEditing(true);
+		setIsFormOpen(true);
 	};
 
 	// Open delete confirmation dialog
@@ -84,66 +82,69 @@ export default function Page() {
 		setIsDeleteDialogOpen(true);
 	};
 
-	// // Create new mapping
-	// const handleCreateMapping = async (data: MappingFormProps) => {
-	// 	console.log(data.columnFieldMapping);
+	// Create new mapping
+	const handleCreateMerchant = async (data: MerchantFormProps) => {
+		console.log(data);
 
-	// 	const newMapping: CreateMappingProps = {
-	// 		mappingName: data.mappingName.trim(),
-	// 		accountName: data.accountName.trim(),
-	// 		includesHeader: data.includesHeader,
-	// 		columnFieldMapping: data.columnFieldMapping
-	// 	};
+		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
-	// 	console.log(newMapping);
+		const newMerchant: CreateMerchantProps = {
+			name: data.name,
+			categoryId,
+			subcategoryId,
+			includes: data.includes
+		};
 
-	// 	try {
-	// 		const response = await createMappingMutation.mutateAsync(newMapping);
-	// 		console.log(response);
+		try {
+			const response = await createMerchantMutation.mutateAsync(newMerchant);
+			console.log(response);
 
-	// 		if (!response?.success) {
-	// 			toast.error(response?.data);
-	// 		} else {
-	// 			toast.success(response?.data);
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		toast.error("Something went wrong!");
-	// 	}
-	// };
+			if (!response?.success) {
+				toast.error(response?.data);
+			} else {
+				toast.success(response?.data);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
+	};
 
-	// // Update existing mapping
-	// const handleUpdateMapping = async (data: MappingFormProps) => {
-	// 	if (!selectedMapping) return;
+	// Update existing mapping
+	const handleUpdateMerchant = async (data: MerchantFormProps) => {
+		if (!selectedMerchant) return;
 
-	// 	console.log(data);
-	// 	const updatedMapping: UpdateMappingProps = {
-	// 		id: selectedMapping.id,
-	// 		mappingName: data.mappingName.trim(),
-	// 		accountName: data.accountName.trim(),
-	// 		includesHeader: data.includesHeader,
-	// 		columnFieldMapping: data.columnFieldMapping
-	// 	};
+		console.log(data);
 
-	// 	console.log(updatedMapping);
+		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
-	// 	try {
-	// 		const response = await updateMappingMutation.mutateAsync(updatedMapping);
-	// 		console.log(response);
+		const updatedMerchant: UpdateMerchantProps = {
+			id: selectedMerchant.id,
+			name: data.name,
+			categoryId,
+			subcategoryId,
+			includes: data.includes
+		};
 
-	// 		if (!response?.success) {
-	// 			toast.error(response?.data);
-	// 		} else {
-	// 			toast.success(response?.data);
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		toast.error("Something went wrong!");
-	// 	}
+		console.log(updatedMerchant);
 
-	// 	setIsFormOpen(false);
-	// 	setSelectedMapping(null);
-	// };
+		try {
+			const response = await updateMerchantMutation.mutateAsync(updatedMerchant);
+			console.log(response);
+
+			if (!response?.success) {
+				toast.error(response?.data);
+			} else {
+				toast.success(response?.data);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
+
+		setIsFormOpen(false);
+		setSelectedMerchant(null);
+	};
 
 	// Delete mapping
 	const handleDeleteMerchant = async () => {
@@ -169,17 +170,69 @@ export default function Page() {
 		setSelectedMerchant(null);
 	};
 
-	// // Handle form submission based on whether we're editing or creating
-	// const handleFormSubmit = (data: MappingFormProps) => {
-	// 	if (isEditing) {
-	// 		handleUpdateMapping(data);
-	// 	} else {
-	// 		handleCreateMapping(data);
-	// 	}
+	// Handle form submission based on whether we're editing or creating
+	const handleFormSubmit = (data: MerchantFormProps) => {
+		if (isEditing) {
+			handleUpdateMerchant(data);
+		} else {
+			handleCreateMerchant(data);
+		}
 
-	// 	// setFormValues(defaultFormValues);
-	// 	setIsFormOpen(false);
-	// };
+		// setFormValues(defaultFormValues);
+		setIsFormOpen(false);
+	};
+
+	// Function to convert from merchant data to form values
+	const merchantToFormValues = (merchant: Merchant): MerchantFormProps => {
+		let categorySelection: CategorySelection | null = null;
+
+		if (merchant.subcategoryId) {
+			// If there's a subcategory, find it
+			const category = categories.find((c) => c.id === merchant.categoryId);
+			const subcategory = category?.subcategories.find((s) => s.id === merchant.subcategoryId);
+
+			if (category && subcategory) {
+				categorySelection = {
+					type: "subcategory",
+					id: subcategory.id,
+					categoryId: category.id,
+					name: `${category.name} / ${subcategory.name}`
+				};
+			}
+		} else if (merchant.categoryId) {
+			// If there's only a category, find it
+			const category = categories.find((c) => c.id === merchant.categoryId);
+
+			if (category) {
+				categorySelection = {
+					type: "category",
+					id: category.id,
+					name: category.name
+				};
+			}
+		}
+
+		return {
+			name: merchant.name,
+			includes: merchant.includes,
+			categorySelection
+		};
+	};
+
+	// Function to extract category and subcategory IDs from form values
+	const extractCategoryIds = (
+		selection: CategorySelection | null
+	): { categoryId: number | null; subcategoryId: number | null } => {
+		if (!selection) {
+			return { categoryId: null, subcategoryId: null };
+		}
+
+		if (selection.type === "category") {
+			return { categoryId: selection.id, subcategoryId: null };
+		} else {
+			return { categoryId: selection.categoryId || null, subcategoryId: selection.id };
+		}
+	};
 
 	if (isErrorCategories || isErrorMerchants)
 		return (
@@ -230,24 +283,21 @@ export default function Page() {
 			/>
 
 			{/* Mapping Form Dialog */}
-			{/* <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-				<MappingForm
-					key={isEditing ? selectedMapping?.id : Date.now()}
+			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+				<MerchantForm
+					key={isEditing ? selectedMerchant?.id : Date.now()}
 					defaultValues={formValues}
+					categories={categories}
 					onSubmit={handleFormSubmit}
 					onCancel={() => setIsFormOpen(false)}
-					title={isEditing ? "Edit Mapping" : "Create New Mapping"}
-					description={
-						isEditing
-							? "Update the column mapping configuration."
-							: "Create a new column mapping for your data imports."
-					}
-					submitButtonText={isEditing ? "Update Mapping" : "Create Mapping"}
-					existingMappings={mappingsResponse.data as Mapping[]}
-					currentMappingId={selectedMapping?.id}
+					title={isEditing ? "Update Merchant" : "Add Merchant"}
+					description={isEditing ? "Edit the information of an existing merchant." : "Create a new merchant."}
+					submitButtonText={isEditing ? "Save" : "Save"}
+					existingMerchants={merchantsResponse.data as Merchant[]}
+					currentMerchantId={selectedMerchant?.id}
 					isFormOpen={isFormOpen}
 				/>
-			</Dialog> */}
+			</Dialog>
 
 			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

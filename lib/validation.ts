@@ -124,7 +124,7 @@ export const merchantFormSchema = (existingMerchants: Merchant[] = [], currentMe
 				}
 			),
 		includes: z.array(z.string()).refine((values) => values.length > 0, {
-			message: "Please, add at least one substring that define the merchant."
+			message: "Please, add at least one substring that defines the merchant."
 		}),
 		categorySelection: z
 			.object({
@@ -139,17 +139,17 @@ export const merchantFormSchema = (existingMerchants: Merchant[] = [], currentMe
 
 export const createMerchantSchema = z.object({
 	name: z.string().nonempty("Name cannot be empty"),
-	categoryId: z.number().int().positive().optional(),
-	subcategoryId: z.number().int().positive().optional(),
-	includes: z.array(z.string()).nonempty("Includes cannot be empty")
+	categoryId: z.number().int().positive().nullable(),
+	subcategoryId: z.number().int().positive().nullable(),
+	includes: z.array(z.string()).min(1, { message: "Includes cannot be empty" })
 });
 
 export const updateMerchantSchema = z.object({
 	id: z.number().int().positive(),
 	name: z.string().nonempty("Name cannot be empty"),
-	categoryId: z.number().int().positive().optional(),
-	subcategoryId: z.number().int().positive().optional(),
-	includes: z.array(z.string()).nonempty("Includes cannot be empty")
+	categoryId: z.number().int().positive().nullable(),
+	subcategoryId: z.number().int().positive().nullable(),
+	includes: z.array(z.string()).min(1, { message: "Includes cannot be empty" })
 });
 
 export const deleteMerchantSchema = z.object({

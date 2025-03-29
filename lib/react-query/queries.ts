@@ -418,14 +418,22 @@ export const useCreateMerchant = () => {
 			const previousMerchants = queryClient.getQueryData([QUERY_KEYS.GET_MERCHANTS]);
 
 			queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+				// const latestMerchants = [
+				// 	{
+				// 		...props,
+				// 		id: Date.now(),
+				// 		updatedAt: new Date().toISOString()
+				// 	},
+				// 	...old.data
+				// ];
 				return {
 					...old,
 					["data"]: [
-						...old.data,
 						{
 							...props,
 							id: Date.now()
-						}
+						},
+						...old.data
 					]
 				};
 			});
@@ -451,17 +459,11 @@ export const useUpdateMerchant = () => {
 			const previousMerchants = queryClient.getQueryData([QUERY_KEYS.GET_MERCHANTS]);
 			console.log("optimistic update");
 			queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+				const filtered = old.data.filter((merchant) => merchant.id != props.id);
+
 				return {
 					...old,
-					["data"]: old.data.map((merchant) => {
-						if (merchant.id == props.id) {
-							return {
-								...merchant,
-								...props
-							};
-						}
-						return merchant;
-					})
+					["data"]: [props, ...filtered]
 				};
 			});
 

@@ -201,7 +201,6 @@ export const initialMerchants = [
 	// Shopping - General
 	{ name: "Amazon", category: "Shopping", subcategory: null, includes: ["amazon"] },
 	{ name: "Target", category: "Shopping", subcategory: null, includes: ["target"] },
-	{ name: "Walmart", category: "Shopping", subcategory: null, includes: ["walmart"] },
 	{ name: "Best Buy", category: "Shopping", subcategory: "Electronics", includes: ["best buy"] },
 	{ name: "eBay", category: "Shopping", subcategory: null, includes: ["ebay"] },
 

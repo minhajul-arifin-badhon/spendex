@@ -34,6 +34,17 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 	// Table columns definition
 	const columns = useMemo<ColumnDef<Merchant>[]>(
 		() => [
+			// {
+			// 	accessorKey: "updatedAt",
+			// 	header: ({ column }) => {
+			// 		return (
+			// 			<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+			// 				Updated
+			// 				<ArrowUpDown className="ml-2 h-4 w-4" />
+			// 			</Button>
+			// 		);
+			// 	}
+			// },
 			{
 				accessorKey: "name",
 				header: ({ column }) => {

@@ -87,6 +87,13 @@ export type CreateMerchantProps = z.infer<typeof createMerchantSchema>;
 export type UpdateMerchantProps = z.infer<typeof updateMerchantSchema>;
 export type DeleteMerchantProps = z.infer<typeof deleteMerchantSchema>;
 
+export type CategorySelection = {
+	type: "category" | "subcategory";
+	id: number;
+	categoryId?: number;
+	name: string;
+};
+
 // export type CategoriesWithSub = Prisma.CategoryGetPayload<{
 // 	select: {
 // 		id: true;
