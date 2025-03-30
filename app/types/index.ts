@@ -4,16 +4,20 @@ import {
 	createMappingSchema,
 	createMerchantSchema,
 	createSubcategorySchema,
+	createTransactionSchema,
 	deleteCategorySchema,
 	deleteMappingSchema,
 	deleteMerchantSchema,
 	deleteSubcategorySchema,
+	deleteTransactionSchema,
 	mappingFormSchema,
 	merchantFormSchema,
+	transactionFormSchema,
 	updateCategorySchema,
 	updateMappingSchema,
 	updateMerchantSchema,
-	updateSubcategorySchema
+	updateSubcategorySchema,
+	updateTransactionSchema
 } from "@/lib/validation";
 import { Prisma, CategoryGroup } from "@prisma/client";
 import { z } from "zod";
@@ -94,16 +98,9 @@ export type CategorySelection = {
 	name: string;
 };
 
-// export type CategoriesWithSub = Prisma.CategoryGetPayload<{
-// 	select: {
-// 		id: true;
-// 		name: true;
-// 		group: true;
-// 		subcategories: {
-// 			select: {
-// 				id: true;
-// 				name: true;
-// 			};
-// 		};
-// 	};
-// }>;
+export type TransactionFormProps = z.infer<typeof transactionFormSchema>;
+
+// props needed when calling actions
+export type CreateTransactionProps = z.infer<typeof createTransactionSchema>;
+export type UpdateTransactionProps = z.infer<typeof updateTransactionSchema>;
+export type DeleteTransactionProps = z.infer<typeof deleteTransactionSchema>;

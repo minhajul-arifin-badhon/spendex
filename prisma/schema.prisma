@@ -31,18 +31,19 @@ model Transaction {
     id            Int      @id @default(autoincrement())
     amount        Float
     date          DateTime
+    accountName   String?
     description   String?
-    categoryId    Int
-    subcategoryId Int
-    merchantId    Int
+    categoryId    Int?
+    subcategoryId Int?
+    merchantId    Int?
     userId        String
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
 
-    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    category    Category    @relation(fields: [categoryId], references: [id])
-    subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
-    merchant    Merchant    @relation(fields: [merchantId], references: [id])
+    user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    category    Category?    @relation(fields: [categoryId], references: [id])
+    subcategory Subcategory? @relation(fields: [subcategoryId], references: [id])
+    merchant    Merchant?    @relation(fields: [merchantId], references: [id])
 
     @@map("transactions")
 }

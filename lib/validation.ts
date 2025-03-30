@@ -155,3 +155,49 @@ export const updateMerchantSchema = z.object({
 export const deleteMerchantSchema = z.object({
 	id: z.number().int().positive()
 });
+
+export const transactionFormSchema = z.object({
+	date: z.date({
+		required_error: "A date is required"
+	}),
+	amount: z.number().refine((value) => value !== undefined && value !== null, {
+		message: "Amount is required"
+	}),
+	merchant: z.string().min(3, { message: "Merchant name must be at least 3 characters" }).optional(),
+	categorySelection: z
+		.object({
+			type: z.enum(["category", "subcategory"]),
+			id: z.number(),
+			categoryId: z.number().optional(),
+			name: z.string()
+		})
+		.nullable(),
+	description: z.string().optional(),
+	accountName: z.string().optional()
+});
+
+const transactionBaseSchema = {
+	date: z.date({
+		required_error: "A date is required."
+	}),
+	amount: z.number({ message: "An amount is required." }),
+	categoryId: z.number().int().positive().nullable(),
+	subcategoryId: z.number().int().positive().nullable(),
+	merchantId: z.number().int().positive().nullable(),
+	description: z.string().nullable(),
+	accountName: z.string().nullable(),
+	includes: z.array(z.string()).min(1, { message: "Includes cannot be empty" })
+};
+
+export const createTransactionSchema = z.object({
+	...transactionBaseSchema
+});
+
+export const updateTransactionSchema = z.object({
+	id: z.number().int().positive(),
+	...transactionBaseSchema
+});
+
+export const deleteTransactionSchema = z.object({
+	id: z.number().int().positive()
+});
