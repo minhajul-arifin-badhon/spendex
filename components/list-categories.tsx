@@ -18,13 +18,15 @@ import { CategoriesWithSub, CategoryDialogProps, CategoryMutationProps, GroupedC
 import { CategoryGroup } from "@prisma/client";
 import {
 	useCreateCategory,
-	useCreateSubcategory,
 	useDeleteCategory,
-	useDeleteSubcategory,
 	useGetCategories,
-	useUpdateCategory,
+	useUpdateCategory
+} from "@/lib/react-query/categories.queries";
+import {
+	useCreateSubcategory,
+	useDeleteSubcategory,
 	useUpdateSubcategory
-} from "@/lib/react-query/queries";
+} from "@/lib/react-query/subcategories.queries";
 import { toast } from "sonner";
 import { Spinner } from "./ui/spinner";
 

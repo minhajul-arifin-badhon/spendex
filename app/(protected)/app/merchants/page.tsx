@@ -26,14 +26,14 @@ import {
 import {
 	useCreateMerchant,
 	useDeleteMercant,
-	useGetCategories,
 	useGetMerchants,
 	useUpdateMerchant
-} from "@/lib/react-query/queries";
+} from "@/lib/react-query/merchant.queries";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import ListMerchants from "@/components/list-merchants";
 import MerchantForm from "@/components/merchant-form";
+import { useGetCategories } from "@/lib/react-query/categories.queries";
 
 // Default form values
 const defaultFormValues: MerchantFormProps = {

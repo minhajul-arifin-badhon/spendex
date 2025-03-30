@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import {
 	AlertDialog,
@@ -18,11 +18,15 @@ import { Plus } from "lucide-react";
 import { Mapping } from "@prisma/client";
 import { ColumnFieldMappingProps, CreateMappingProps, MappingFormProps, UpdateMappingProps } from "@/app/types";
 import MappingForm from "@/components/mapping-form";
-import { useCreateMapping, useDeleteMapping, useGetMappings, useUpdateMapping } from "@/lib/react-query/queries";
+import {
+	useCreateMapping,
+	useDeleteMapping,
+	useGetMappings,
+	useUpdateMapping
+} from "@/lib/react-query/mappings.queries";
 import { Spinner } from "@/components/ui/spinner";
 import ListMappings from "@/components/list-mappings";
 import { toast } from "sonner";
-import { randomUUID } from "crypto";
 
 // Default form values
 const defaultFormValues: MappingFormProps = {
