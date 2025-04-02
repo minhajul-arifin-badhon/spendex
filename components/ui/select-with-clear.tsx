@@ -6,14 +6,12 @@ export const SelectWithClear = ({
 	value,
 	onChange,
 	options,
-	placeholder,
-	index
+	placeholder
 }: {
-	value: string;
+	value: string | undefined;
 	onChange: (value: string) => void;
 	options: string[];
 	placeholder: string;
-	index: number;
 }) => {
 	return (
 		// <Select value={value} onValueChange={onChange}>

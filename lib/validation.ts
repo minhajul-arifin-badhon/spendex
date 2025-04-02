@@ -160,10 +160,10 @@ export const transactionFormSchema = z.object({
 	date: z.date({
 		required_error: "A date is required"
 	}),
-	amount: z.number().refine((value) => value !== undefined && value !== null, {
+	amount: z.coerce.number().refine((value) => value !== undefined && value !== null, {
 		message: "Amount is required"
 	}),
-	merchant: z.string().min(3, { message: "Merchant name must be at least 3 characters" }).optional(),
+	merchant: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
 	categorySelection: z
 		.object({
 			type: z.enum(["category", "subcategory"]),
@@ -172,8 +172,8 @@ export const transactionFormSchema = z.object({
 			name: z.string()
 		})
 		.nullable(),
-	description: z.string().optional(),
-	accountName: z.string().optional()
+	description: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
+	accountName: z.string().min(3, "Please enter at least 3 characters").or(z.literal(""))
 });
 
 const transactionBaseSchema = {
@@ -183,10 +183,9 @@ const transactionBaseSchema = {
 	amount: z.number({ message: "An amount is required." }),
 	categoryId: z.number().int().positive().nullable(),
 	subcategoryId: z.number().int().positive().nullable(),
-	merchantId: z.number().int().positive().nullable(),
-	description: z.string().nullable(),
-	accountName: z.string().nullable(),
-	includes: z.array(z.string()).min(1, { message: "Includes cannot be empty" })
+	merchant: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
+	description: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
+	accountName: z.string().min(3, "Please enter at least 3 characters").or(z.literal(""))
 };
 
 export const createTransactionSchema = z.object({

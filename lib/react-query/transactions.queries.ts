@@ -1,7 +1,7 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./query-keys";
 import { CreateTransactionProps, DeleteTransactionProps, SuccessResponse, UpdateTransactionProps } from "@/app/types";
-import { Transaction } from "@prisma/client";
+import { Merchant, Transaction } from "@prisma/client";
 import {
 	createTransaction,
 	deleteTransaction,
@@ -44,11 +44,26 @@ export const useCreateTransaction = () => {
 						{
 							...props,
 							id: Date.now()
+							// merchantId: 0
 						},
 						...old.data
 					]
 				};
 			});
+
+			// queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+			// 	return {
+			// 		...old,
+			// 		["data"]: [
+			// 			{
+			// 				id: 0,
+			//                 name: props.merchant
+			// 				merchantId: 0
+			// 			},
+			// 			...old.data
+			// 		]
+			// 	};
+			// });
 
 			return { previousTransactions };
 		},

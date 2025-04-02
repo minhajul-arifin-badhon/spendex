@@ -12,63 +12,73 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-// import MappingsList from "./components/mappings-list";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Merchant } from "@prisma/client";
+import { Merchant, Transaction } from "@prisma/client";
 import {
 	CategoriesWithSub,
 	CategorySelection,
-	CreateMerchantProps,
-	MerchantFormProps,
-	UpdateMerchantProps
+	CreateTransactionProps,
+	TransactionFormProps,
+	UpdateTransactionProps
 } from "@/app/types";
-import {
-	useCreateMerchant,
-	useDeleteMercant,
-	useGetMerchants,
-	useUpdateMerchant
-} from "@/lib/react-query/merchant.queries";
+import { useGetMerchants } from "@/lib/react-query/merchant.queries";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import ListMerchants from "@/components/list-merchants";
-import MerchantForm from "@/components/merchant-form";
 import { useGetCategories } from "@/lib/react-query/categories.queries";
+import ListTransactions from "./list-transactions";
+import TransactionForm from "./transaction-form";
+import {
+	useCreateTransaction,
+	useDeleteTransaction,
+	useGetTransactions,
+	useUpdateTransaction
+} from "@/lib/react-query/transactions.queries";
 
 // Default form values
-const defaultFormValues: MerchantFormProps = {
-	name: "",
-	includes: [],
+const defaultFormValues: TransactionFormProps = {
+	date: new Date(),
+	amount: 0,
+	merchant: "",
+	description: "",
+	accountName: "",
 	categorySelection: null
 };
 
-export default function Page() {
+export default function Transactions() {
 	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
+	const {
+		data: transactionsResponse,
+		isLoading: isLoadingTransactions,
+		isError: isErrorTransactions
+	} = useGetTransactions();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
-	const [formValues, setFormValues] = useState<MerchantFormProps>(defaultFormValues);
+	const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+	const [formValues, setFormValues] = useState<TransactionFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
 
-	const createMerchantMutation = useCreateMerchant();
-	const updateMerchantMutation = useUpdateMerchant();
-	const deleteMerchantMutation = useDeleteMercant();
+	// const createMerchantMutation = useCreateMerchant();
+	// const updateMerchantMutation = useUpdateMerchant();
+	// const deleteMerchantMutation = useDeleteMercant();
 
-	// Open form for creating a new mapping
+	const createTransactionMutation = useCreateTransaction();
+	const updateTransactionMutation = useUpdateTransaction();
+	const deleteTransactionMutation = useDeleteTransaction();
+
 	const handleOpenCreateForm = () => {
 		setFormValues(defaultFormValues);
 		setIsEditing(false);
 		setIsFormOpen(true);
 	};
 
-	// Open form for editing an existing mapping
-	const handleOpenEditForm = (merchant: Merchant) => {
-		setSelectedMerchant(merchant);
+	const handleOpenEditForm = (transaction: Transaction) => {
+		setSelectedTransaction(transaction);
 
 		console.log("editing---------");
-		const formValues = merchantToFormValues(merchant);
+		const formValues = transactionToFormValues(transaction);
 		console.log(formValues);
 
 		setFormValues(formValues);
@@ -76,27 +86,32 @@ export default function Page() {
 		setIsFormOpen(true);
 	};
 
-	// Open delete confirmation dialog
-	const handleOpenDeleteDialog = (merchant: Merchant) => {
-		setSelectedMerchant(merchant);
+	// // Open delete confirmation dialog
+	const handleOpenDeleteDialog = (transaction: Transaction) => {
+		setSelectedTransaction(transaction);
 		setIsDeleteDialogOpen(true);
 	};
 
-	// Create new mapping
-	const handleCreateMerchant = async (data: MerchantFormProps) => {
+	const handleCreateTransaction = async (data: TransactionFormProps) => {
 		console.log(data);
 
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
+		console.log(categoryId, subcategoryId);
 
-		const newMerchant: CreateMerchantProps = {
-			name: data.name,
-			categoryId,
-			subcategoryId,
-			includes: data.includes
+		const newTransaction: CreateTransactionProps = {
+			date: data.date,
+			amount: data.amount,
+			categoryId: categoryId,
+			subcategoryId: subcategoryId,
+			merchant: data.merchant,
+			description: data.description,
+			accountName: data.accountName
 		};
 
+		console.log(newTransaction);
+
 		try {
-			const response = await createMerchantMutation.mutateAsync(newMerchant);
+			const response = await createTransactionMutation.mutateAsync(newTransaction);
 			console.log(response);
 
 			if (!response?.success) {
@@ -110,26 +125,26 @@ export default function Page() {
 		}
 	};
 
-	// Update existing mapping
-	const handleUpdateMerchant = async (data: MerchantFormProps) => {
-		if (!selectedMerchant) return;
-
-		console.log(data);
+	const handleUpdateTransaction = async (data: TransactionFormProps) => {
+		if (!selectedTransaction) return;
 
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
-		const updatedMerchant: UpdateMerchantProps = {
-			id: selectedMerchant.id,
-			name: data.name,
-			categoryId,
-			subcategoryId,
-			includes: data.includes
+		const updatedTransaction: UpdateTransactionProps = {
+			id: selectedTransaction.id,
+			date: data.date,
+			amount: data.amount,
+			categoryId: categoryId,
+			subcategoryId: subcategoryId,
+			merchant: data.merchant,
+			description: data.description,
+			accountName: data.accountName
 		};
 
-		console.log(updatedMerchant);
+		console.log(updatedTransaction);
 
 		try {
-			const response = await updateMerchantMutation.mutateAsync(updatedMerchant);
+			const response = await updateTransactionMutation.mutateAsync(updatedTransaction);
 			console.log(response);
 
 			if (!response?.success) {
@@ -143,14 +158,13 @@ export default function Page() {
 		}
 	};
 
-	// Delete mapping
-	const handleDeleteMerchant = async () => {
-		if (!selectedMerchant) return;
+	const handleDeleteTransaction = async () => {
+		if (!selectedTransaction) return;
 
-		console.log(selectedMerchant);
+		console.log(selectedTransaction);
 
 		try {
-			const response = await deleteMerchantMutation.mutateAsync({ id: selectedMerchant.id });
+			const response = await deleteTransactionMutation.mutateAsync({ id: selectedTransaction.id });
 			console.log(response);
 
 			if (!response?.success) {
@@ -164,30 +178,30 @@ export default function Page() {
 		}
 
 		setIsDeleteDialogOpen(false);
-		setSelectedMerchant(null);
+		setSelectedTransaction(null);
 	};
 
 	// Handle form submission based on whether we're editing or creating
-	const handleFormSubmit = (data: MerchantFormProps) => {
+	const handleFormSubmit = (data: TransactionFormProps) => {
 		if (isEditing) {
-			handleUpdateMerchant(data);
+			handleUpdateTransaction(data);
 		} else {
-			handleCreateMerchant(data);
+			handleCreateTransaction(data);
 		}
 
-		// setFormValues(defaultFormValues);
 		setIsFormOpen(false);
-		setSelectedMerchant(null);
+		setSelectedTransaction(null);
 	};
 
 	// Function to convert from merchant data to form values
-	const merchantToFormValues = (merchant: Merchant): MerchantFormProps => {
+	const transactionToFormValues = (transaction: Transaction): TransactionFormProps => {
 		let categorySelection: CategorySelection | null = null;
+		let merchantName: string = "";
 
-		if (merchant.subcategoryId) {
+		if (transaction.subcategoryId) {
 			// If there's a subcategory, find it
-			const category = categories.find((c) => c.id === merchant.categoryId);
-			const subcategory = category?.subcategories.find((s) => s.id === merchant.subcategoryId);
+			const category = categories.find((c) => c.id === transaction.categoryId);
+			const subcategory = category?.subcategories.find((s) => s.id === transaction.subcategoryId);
 
 			if (category && subcategory) {
 				categorySelection = {
@@ -197,9 +211,9 @@ export default function Page() {
 					name: `${category.name} / ${subcategory.name}`
 				};
 			}
-		} else if (merchant.categoryId) {
+		} else if (transaction.categoryId) {
 			// If there's only a category, find it
-			const category = categories.find((c) => c.id === merchant.categoryId);
+			const category = categories.find((c) => c.id === transaction.categoryId);
 
 			if (category) {
 				categorySelection = {
@@ -210,10 +224,18 @@ export default function Page() {
 			}
 		}
 
+		if (transaction.merchantId) {
+			const merchant = merchants.find((c) => c.id === transaction.merchantId);
+			if (merchant) merchantName = merchant.name;
+		}
+
 		return {
-			name: merchant.name,
-			includes: merchant.includes,
-			categorySelection
+			date: new Date(transaction.date),
+			amount: transaction.amount,
+			merchant: merchantName,
+			description: transaction.description ?? "",
+			accountName: transaction.accountName ?? "",
+			categorySelection: categorySelection
 		};
 	};
 
@@ -232,14 +254,14 @@ export default function Page() {
 		}
 	};
 
-	if (isErrorCategories || isErrorMerchants)
+	if (isErrorCategories || isErrorMerchants || isErrorTransactions)
 		return (
 			<div>
 				<p>Something bad happened</p>
 			</div>
 		);
 
-	if (isLoadingMerchants || isLoadingCategories)
+	if (isLoadingMerchants || isLoadingCategories || isLoadingTransactions)
 		return (
 			<div className="size-full -mt-20 min-h-screen flex items-center justify-center">
 				<Spinner size="large" />
@@ -262,8 +284,19 @@ export default function Page() {
 		);
 	}
 
+	if (!transactionsResponse?.success) {
+		return (
+			<div>
+				<p>{`${transactionsResponse?.statusCode}: ${transactionsResponse?.data}:`}</p>
+			</div>
+		);
+	}
+
 	const merchants = (merchantsResponse.data as Merchant[]) || [];
 	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
+	const transactions = (transactionsResponse.data as Transaction[]) || [];
+
+	console.log(transactions);
 
 	return (
 		<div className="space-y-4">
@@ -273,26 +306,29 @@ export default function Page() {
 				</Button>
 			</div>
 
-			<ListMerchants
+			<ListTransactions
+				transactions={transactions}
 				merchants={merchants}
 				categories={categories}
 				onEdit={handleOpenEditForm}
 				onDelete={handleOpenDeleteDialog}
 			/>
 
-			{/* Mapping Form Dialog */}
 			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-				<MerchantForm
-					key={isEditing ? selectedMerchant?.id : Date.now()}
+				<TransactionForm
+					key={isEditing ? selectedTransaction?.id : Date.now()}
 					defaultValues={formValues}
 					categories={categories}
+					merchants={merchants}
 					onSubmit={handleFormSubmit}
 					onCancel={() => setIsFormOpen(false)}
-					title={isEditing ? "Update Merchant" : "Add Merchant"}
-					description={isEditing ? "Edit the information of an existing merchant." : "Create a new merchant."}
+					title={isEditing ? "Update Transaction" : "Add Transaction"}
+					description={
+						isEditing ? "Edit the information of an existing transaction." : "Create a new transaction."
+					}
 					submitButtonText={isEditing ? "Save" : "Save"}
-					existingMerchants={merchantsResponse.data as Merchant[]}
-					currentMerchantId={selectedMerchant?.id}
+					// existingMerchants={merchantsResponse.data as Merchant[]}
+					// currentTransactionId={selectedTransaction?.id}
 					isFormOpen={isFormOpen}
 				/>
 			</Dialog>
@@ -303,14 +339,13 @@ export default function Page() {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
-							This will permanently delete the mapping {selectedMerchant?.name}. This action cannot be
-							undone.
+							This will permanently delete the transaction. This action cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={handleDeleteMerchant}
+							onClick={handleDeleteTransaction}
 							className="bg-destructive text-white hover:bg-destructive/90"
 						>
 							Delete

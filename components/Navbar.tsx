@@ -23,7 +23,8 @@ import { ThemeToggle } from "./theme/theme-toggle";
 // Navigation items
 const navItems = [
 	// { name: "Home", href: "/", icon: <Home className="h-4 w-4 mr-2" /> },
-	{ name: "Transactions", href: "/app/dashboard", icon: null },
+	{ name: "Dashboard", href: "/app/dashboard", icon: null },
+	{ name: "Transactions", href: "/app/transactions", icon: null },
 	{ name: "Merchants", href: "/app/merchants", icon: null },
 	{ name: "Categories", href: "/app/categories", icon: null },
 	{ name: "Mappings", href: "/app/mappings", icon: null }

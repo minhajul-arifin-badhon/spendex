@@ -209,7 +209,7 @@ export default function MappingForm({
 															onChange={formField.onChange}
 															options={getAvailableFieldOptions(index)}
 															placeholder="Select field"
-															index={index}
+															// index={index}
 														/>
 													</div>
 												</FormControl>

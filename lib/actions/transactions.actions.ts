@@ -38,33 +38,55 @@ export const getTransactions = async (): Promise<Response<Transaction[]>> => {
 	}
 };
 
+async function getMerchantId(merchantName: string, userId: string): Promise<number | null> {
+	let merchantId: number | null = null;
+
+	if (merchantName) {
+		// Try to find the merchant by name
+		const merchant = await prisma.merchant.findFirst({
+			where: {
+				name: merchantName
+			}
+		});
+
+		if (merchant) {
+			// If the merchant exists, return its id
+			merchantId = merchant.id;
+		} else {
+			// If the merchant does not exist, create a new one
+			const newMerchant = await prisma.merchant.create({
+				data: {
+					name: merchantName,
+					includes: [merchantName],
+					userId: userId
+				}
+			});
+
+			// Return the id of the newly created merchant
+			if (newMerchant) merchantId = newMerchant.id;
+		}
+	}
+
+	return merchantId;
+}
+
 export const createTransaction = async (data: CreateTransactionProps): Promise<Response<string>> => {
 	try {
 		const { userId } = await auth();
 		// await delay(5000);
 
-		if (!userId) {
-			return sendErrorResponse(401, "No user is signed in.");
-		}
+		if (!userId) return sendErrorResponse(401, "No user is signed in.");
 
 		const result = createTransactionSchema.safeParse(data);
 
-		if (!result.success) {
-			return sendErrorResponse(400, JSON.stringify(result.error.errors));
-		}
+		if (!result.success) return sendErrorResponse(400, JSON.stringify(result.error.errors));
 
-		// const isItem = await prisma.transaction.findFirst({
-		// where: {
-		// name: data.name
-		// }
-		// });
-
-		// if (isItem) {
-		// return sendErrorResponse(400, "A transaction with that name already exists.");
-		// }
+		const merchantId = await getMerchantId(data.merchant, userId);
+		const { merchant, ...newTransaction } = data;
+		console.log(merchant);
 
 		const newItem = await prisma.transaction.create({
-			data: { ...data, userId }
+			data: { ...newTransaction, userId, merchantId }
 		});
 
 		console.log(newItem);
@@ -91,9 +113,13 @@ export const updateTransaction = async (data: UpdateTransactionProps): Promise<R
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
 		}
 
+		const merchantId = await getMerchantId(data.merchant, userId);
+		const { merchant, ...transactionData } = data;
+		console.log(merchant);
+
 		await prisma.transaction.update({
 			where: { id: data.id },
-			data: data
+			data: { ...transactionData, merchantId }
 		});
 
 		return sendResponse(200, "Transaction is successfully updated.");
