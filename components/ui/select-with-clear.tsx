@@ -10,7 +10,10 @@ export const SelectWithClear = ({
 }: {
 	value: string | undefined;
 	onChange: (value: string) => void;
-	options: string[];
+	options: {
+		id: string;
+		value: string;
+	}[];
 	placeholder: string;
 }) => {
 	return (
@@ -33,8 +36,8 @@ export const SelectWithClear = ({
 				</SelectTrigger>
 				<SelectContent>
 					{options.map((option) => (
-						<SelectItem key={option || "none"} value={option || "None"}>
-							{option || "None"}
+						<SelectItem key={option.id} value={option.id}>
+							{option.value}
 						</SelectItem>
 					))}
 				</SelectContent>

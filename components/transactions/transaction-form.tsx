@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { transactionFormSchema } from "@/lib/validation";
@@ -201,7 +201,13 @@ export default function TransactionForm({
 							name="amount"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Amount*</FormLabel>
+									<FormLabel>
+										Amount*
+										<FormDescription className="font-normal">
+											(Enter a postive (+) number for credit and a negative (-) number for debit.)
+										</FormDescription>
+									</FormLabel>
+
 									<FormControl>
 										<Input
 											placeholder="0.00"

@@ -1,12 +1,19 @@
 "use server";
 
-import { CreateTransactionProps, DeleteTransactionProps, Response, UpdateTransactionProps } from "@/app/types";
+import {
+	CreateTransactionProps,
+	DeleteTransactionProps,
+	Response,
+	TransactionWithRelations,
+	UpdateTransactionProps
+} from "@/app/types";
 import { auth } from "@clerk/nextjs/server";
 import { sendErrorResponse, sendResponse } from "../response";
 import { createTransactionSchema, deleteTransactionSchema, updateTransactionSchema } from "../validation";
 import { prisma } from "../prisma";
 import { Transaction } from "@prisma/client";
 import { delay } from "../utils";
+import { z } from "zod";
 
 export const getTransactions = async (): Promise<Response<Transaction[]>> => {
 	try {
@@ -21,6 +28,68 @@ export const getTransactions = async (): Promise<Response<Transaction[]>> => {
 		console.log("pulling transactions");
 		const transactions = await prisma.transaction.findMany({
 			where: { userId },
+			orderBy: [
+				{
+					updatedAt: "desc"
+				},
+				{
+					id: "asc"
+				}
+			]
+		});
+
+		return sendResponse(200, transactions);
+	} catch (error) {
+		console.error("Error fetching transactions:", error);
+		return sendErrorResponse(500, "Internal Server Error");
+	}
+};
+
+export const getTransactionsWithRelations = async (): Promise<Response<TransactionWithRelations[]>> => {
+	try {
+		const { userId } = await auth();
+
+		if (!userId) {
+			return sendErrorResponse(401, "No user is signed in.");
+		}
+
+		// await delay(3000);
+
+		console.log("pulling transactions");
+		const transactions = await prisma.transaction.findMany({
+			where: { userId },
+			select: {
+				id: true,
+				amount: true,
+				date: true,
+				accountName: true,
+				description: true,
+				categoryId: true,
+				subcategoryId: true,
+				merchantId: true,
+				userId: true,
+				createdAt: true,
+				updatedAt: true,
+				category: {
+					select: {
+						id: true,
+						name: true,
+						group: true
+					}
+				},
+				subcategory: {
+					select: {
+						id: true,
+						name: true
+					}
+				},
+				merchant: {
+					select: {
+						id: true,
+						name: true
+					}
+				}
+			},
 			orderBy: [
 				{
 					updatedAt: "desc"
@@ -92,6 +161,47 @@ export const createTransaction = async (data: CreateTransactionProps): Promise<R
 		console.log(newItem);
 
 		return sendResponse(200, "The transaction is created successfully.");
+	} catch (error) {
+		console.error("Error creating transaction:", error);
+		return sendErrorResponse(500, "Failed To Create. \nInternal Server Error");
+	}
+};
+
+export const createManyTransactions = async (data: CreateTransactionProps[]): Promise<Response<string>> => {
+	try {
+		const { userId } = await auth();
+
+		if (!userId) return sendErrorResponse(401, "No user is signed in.");
+
+		const result = z.array(createTransactionSchema).safeParse(data);
+
+		if (!result.success) return sendErrorResponse(400, JSON.stringify(result.error.errors));
+
+		const merchants = await prisma.merchant.findMany({
+			where: { userId }
+		});
+
+		const transactions = data.map(({ merchant, ...transaction }) => {
+			const matchedMerchant = merchants.find((m) =>
+				m.includes.some((substr) => transaction.description.toLowerCase().includes(substr.toLowerCase()))
+			);
+
+			return {
+				...transaction,
+				merchantId: matchedMerchant?.id ?? null,
+				categoryId: matchedMerchant?.categoryId ?? null,
+				subcategoryId: matchedMerchant?.subcategoryId ?? null,
+				userId: userId
+			};
+		});
+
+		console.log(transactions);
+
+		await prisma.transaction.createMany({
+			data: transactions
+		});
+
+		return sendResponse(200, "The transactions are imported successfully.");
 	} catch (error) {
 		console.error("Error creating transaction:", error);
 		return sendErrorResponse(500, "Failed To Create. \nInternal Server Error");

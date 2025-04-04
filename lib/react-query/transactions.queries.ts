@@ -3,6 +3,7 @@ import { QUERY_KEYS } from "./query-keys";
 import { CreateTransactionProps, DeleteTransactionProps, SuccessResponse, UpdateTransactionProps } from "@/app/types";
 import { Merchant, Transaction } from "@prisma/client";
 import {
+	createManyTransactions,
 	createTransaction,
 	deleteTransaction,
 	getTransactions,
@@ -70,6 +71,53 @@ export const useCreateTransaction = () => {
 		onSettled: (data, error, variables, context) => {
 			if (!data?.success || error)
 				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], context?.previousTransactions);
+			invalidateTransactionsQueries(queryClient);
+		}
+	});
+};
+
+export const useCreateManyTransactions = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (props: CreateTransactionProps[]) => createManyTransactions(props),
+		// onMutate: async (props: CreateTransactionProps[]) => {
+		// 	await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS] });
+		// 	const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS]);
+
+		// 	queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], (old: SuccessResponse<Transaction[]>) => {
+		// 		return {
+		// 			...old,
+		// 			["data"]: [
+		// 				{
+		// 					...props,
+		// 					id: Date.now()
+		// 					// merchantId: 0
+		// 				},
+		// 				...old.data
+		// 			]
+		// 		};
+		// 	});
+
+		// 	// queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
+		// 	// 	return {
+		// 	// 		...old,
+		// 	// 		["data"]: [
+		// 	// 			{
+		// 	// 				id: 0,
+		// 	//                 name: props.merchant
+		// 	// 				merchantId: 0
+		// 	// 			},
+		// 	// 			...old.data
+		// 	// 		]
+		// 	// 	};
+		// 	// });
+
+		// 	return { previousTransactions };
+		// },
+		onSettled: (data, error, variables, context) => {
+			// if (!data?.success || error)
+			// 	queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], context?.previousTransactions);
 			invalidateTransactionsQueries(queryClient);
 		}
 	});

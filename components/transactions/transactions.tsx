@@ -13,7 +13,7 @@ import {
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { Merchant, Transaction } from "@prisma/client";
 import {
 	CategoriesWithSub,
@@ -29,20 +29,22 @@ import { useGetCategories } from "@/lib/react-query/categories.queries";
 import ListTransactions from "./list-transactions";
 import TransactionForm from "./transaction-form";
 import {
+	useCreateManyTransactions,
 	useCreateTransaction,
 	useDeleteTransaction,
 	useGetTransactions,
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
+import { ImportTransactionsModal } from "./import-transactions-modal";
 
 // Default form values
 const defaultFormValues: TransactionFormProps = {
-	date: new Date(),
-	amount: 0,
-	merchant: "",
-	description: "",
 	accountName: "",
-	categorySelection: null
+	amount: 0,
+	categorySelection: null,
+	date: new Date(),
+	description: "",
+	merchant: ""
 };
 
 export default function Transactions() {
@@ -59,12 +61,14 @@ export default function Transactions() {
 	const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 	const [formValues, setFormValues] = useState<TransactionFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
+	const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
 	// const createMerchantMutation = useCreateMerchant();
 	// const updateMerchantMutation = useUpdateMerchant();
 	// const deleteMerchantMutation = useDeleteMercant();
 
 	const createTransactionMutation = useCreateTransaction();
+	const createManyTransactionsMutation = useCreateManyTransactions();
 	const updateTransactionMutation = useUpdateTransaction();
 	const deleteTransactionMutation = useDeleteTransaction();
 
@@ -99,13 +103,13 @@ export default function Transactions() {
 		console.log(categoryId, subcategoryId);
 
 		const newTransaction: CreateTransactionProps = {
-			date: data.date,
+			accountName: data.accountName,
 			amount: data.amount,
 			categoryId: categoryId,
-			subcategoryId: subcategoryId,
-			merchant: data.merchant,
+			date: data.date,
 			description: data.description,
-			accountName: data.accountName
+			merchant: data.merchant,
+			subcategoryId: subcategoryId
 		};
 
 		console.log(newTransaction);
@@ -131,14 +135,14 @@ export default function Transactions() {
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const updatedTransaction: UpdateTransactionProps = {
-			id: selectedTransaction.id,
-			date: data.date,
+			accountName: data.accountName,
 			amount: data.amount,
 			categoryId: categoryId,
-			subcategoryId: subcategoryId,
-			merchant: data.merchant,
+			date: data.date,
 			description: data.description,
-			accountName: data.accountName
+			id: selectedTransaction.id,
+			merchant: data.merchant,
+			subcategoryId: subcategoryId
 		};
 
 		console.log(updatedTransaction);
@@ -254,6 +258,27 @@ export default function Transactions() {
 		}
 	};
 
+	// Handle import transactions
+	const handleImportTransactions = async (importedTransactions: CreateTransactionProps[]) => {
+		console.log(importedTransactions);
+
+		try {
+			const response = await createManyTransactionsMutation.mutateAsync(importedTransactions);
+			console.log(response);
+
+			if (!response?.success) {
+				toast.error(response?.data);
+			} else {
+				toast.success(response?.data);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
+
+		setIsImportModalOpen(false);
+	};
+
 	if (isErrorCategories || isErrorMerchants || isErrorTransactions)
 		return (
 			<div>
@@ -301,6 +326,10 @@ export default function Transactions() {
 	return (
 		<div className="space-y-4">
 			<div className="flex justify-end space-x-3">
+				<Button variant="outline" className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
+					<Upload className="mr-2 h-4 w-4" /> Import
+				</Button>
+
 				<Button variant="outline" onClick={handleOpenCreateForm}>
 					<Plus className="mr-2 h-4 w-4" /> Create New
 				</Button>
@@ -332,6 +361,12 @@ export default function Transactions() {
 					isFormOpen={isFormOpen}
 				/>
 			</Dialog>
+
+			<ImportTransactionsModal
+				open={isImportModalOpen}
+				onOpenChange={setIsImportModalOpen}
+				onImport={handleImportTransactions}
+			/>
 
 			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

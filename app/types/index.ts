@@ -10,7 +10,9 @@ import {
 	deleteMerchantSchema,
 	deleteSubcategorySchema,
 	deleteTransactionSchema,
+	importFormSchema,
 	mappingFormSchema,
+	mappingFormSchemaWithFilePreview,
 	merchantFormSchema,
 	transactionFormSchema,
 	updateCategorySchema,
@@ -104,3 +106,41 @@ export type TransactionFormProps = z.infer<typeof transactionFormSchema>;
 export type CreateTransactionProps = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionProps = z.infer<typeof updateTransactionSchema>;
 export type DeleteTransactionProps = z.infer<typeof deleteTransactionSchema>;
+
+export type ImportFormProps = z.infer<typeof importFormSchema>;
+export type MappingFormWithFilePreviewProps = z.infer<ReturnType<typeof mappingFormSchemaWithFilePreview>>;
+
+export type TransactionWithRelations = Prisma.TransactionGetPayload<{
+	select: {
+		id: true;
+		amount: true;
+		date: true;
+		accountName: true;
+		description: true;
+		categoryId: true;
+		subcategoryId: true;
+		merchantId: true;
+		userId: true;
+		createdAt: true;
+		updatedAt: true;
+		category: {
+			select: {
+				id: true;
+				name: true;
+				group: true;
+			};
+		};
+		subcategory: {
+			select: {
+				id: true;
+				name: true;
+			};
+		};
+		merchant: {
+			select: {
+				id: true;
+				name: true;
+			};
+		};
+	};
+}>;

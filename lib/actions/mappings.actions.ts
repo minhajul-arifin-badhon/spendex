@@ -6,6 +6,7 @@ import { sendErrorResponse, sendResponse } from "../response";
 import { createMappingSchema, deleteMappingSchema, updateMappingSchema } from "../validation";
 import { prisma } from "../prisma";
 import { Mapping } from "@prisma/client";
+import { delay } from "../utils";
 
 export const getMappings = async (): Promise<Response<Mapping[]>> => {
 	try {

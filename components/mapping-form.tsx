@@ -7,16 +7,15 @@ import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFoot
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { AlertCircle, Asterisk } from "lucide-react";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { AlertCircle, ArrowRight, Asterisk } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { mappingFormSchema } from "@/lib/validation";
 import { Mapping } from "@prisma/client";
 import { MappingFormProps } from "@/app/types";
 import { useEffect } from "react";
 import { SelectWithClear } from "./ui/select-with-clear";
-
-const fieldOptions = ["Date", "Description", "Amount", "Credit", "Debit"];
+import { fieldOptions } from "@/lib/constants";
 
 interface ComponentProps {
 	defaultValues: MappingFormProps;
@@ -56,6 +55,7 @@ export default function MappingForm({
 		name: "columnFieldMapping"
 	});
 
+	// const isAmount = form.watch("columnFieldMapping").some((field) => field.fieldName == "Account");
 	const formErrors = form.formState.errors;
 
 	const handleColumnCountChange = (value: string) => {
@@ -78,9 +78,9 @@ export default function MappingForm({
 		}
 	};
 
-	const getAvailableFieldOptions = (columnIndex: number) => {
-		return [...fieldOptions];
-	};
+	// const getAvailableFieldOptions = (columnIndex: number) => {
+	// 	return [...fieldOptions];
+	// };
 
 	const getColumnMappingErrors = () => {
 		console.log("CHECKING FIELD ERRORS--------------");
@@ -191,9 +191,15 @@ export default function MappingForm({
 							)}
 						/>
 
-						<div className="pt-2">
-							<h3 className="font-medium">Column Mappings</h3>
-							<div className="space-y-3 my-4">
+						<div className="space-y-1">
+							<FormLabel>Column Mappings</FormLabel>
+							<FormDescription>
+								- Each column must map to a unique field or leave unassigned.
+								<br /> - Mapping to the Date, Description, and Amount fields (or both Credit and Debit)
+								is required.
+								<br /> - Description field should contain merchant information.
+							</FormDescription>
+							<div className="space-y-3 py-1">
 								{fields.map((field, index) => (
 									<FormField
 										key={field.id}
@@ -207,7 +213,11 @@ export default function MappingForm({
 														<SelectWithClear
 															value={formField.value}
 															onChange={formField.onChange}
-															options={getAvailableFieldOptions(index)}
+															// options={getAvailableFieldOptions(index)}
+															options={fieldOptions.map((item) => ({
+																id: item,
+																value: item
+															}))}
 															placeholder="Select field"
 															// index={index}
 														/>
@@ -219,7 +229,7 @@ export default function MappingForm({
 									/>
 								))}
 							</div>
-
+							{/* 
 							<Alert>
 								<Asterisk className="h-4 w-4" />
 								<AlertTitle>Each column must map to a unique field or leave unassigned</AlertTitle>
@@ -227,21 +237,43 @@ export default function MappingForm({
 									Mapping to the Date, Description, and Amount fields (or both Credit and Debit) is
 									required.
 								</AlertDescription>
-							</Alert>
-
-							{formErrors.columnFieldMapping && formErrors.columnFieldMapping.root && (
-								<Alert variant="destructive" className="mt-4 flex align-middle">
-									<AlertCircle className="h-4 w-4" />
-									<AlertDescription>
-										<ul className="list-none">
-											{getColumnMappingErrors().map((error, index) => (
-												<li key={index}>{error}</li>
-											))}
-										</ul>
-									</AlertDescription>
-								</Alert>
-							)}
+							</Alert> */}
 						</div>
+
+						{form.watch("columnFieldMapping").some((field) => field.fieldName == "Amount") && (
+							<FormField
+								control={form.control}
+								name="negativeAmountMeans"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Interpret Negative (-) Amount As*</FormLabel>
+										<SelectWithClear
+											value={field.value ? field.value.toString() : ""}
+											onChange={field.onChange}
+											options={["Debit", "Credit"].map((m) => ({
+												id: m,
+												value: m
+											}))}
+											placeholder="Select a type"
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
+
+						{formErrors.columnFieldMapping && formErrors.columnFieldMapping.root && (
+							<Alert variant="destructive" className="flex align-middle">
+								<AlertCircle className="h-4 w-4" />
+								<AlertDescription>
+									<ul className="list-none">
+										{getColumnMappingErrors().map((error, index) => (
+											<li key={index}>{error}</li>
+										))}
+									</ul>
+								</AlertDescription>
+							</Alert>
+						)}
 					</div>
 
 					<DialogFooter>

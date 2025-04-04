@@ -37,7 +37,8 @@ const defaultFormValues: MappingFormProps = {
 	columnFieldMapping: Array.from({ length: 4 }, (_, i) => ({
 		columnIndex: i,
 		fieldName: ""
-	}))
+	})),
+	negativeAmountMeans: ""
 };
 
 export default function Page() {
@@ -74,7 +75,8 @@ export default function Page() {
 			accountName: mapping.accountName,
 			includesHeader: mapping.includesHeader,
 			columnCount: columnFieldMapping.length,
-			columnFieldMapping: columnFieldMapping
+			columnFieldMapping: columnFieldMapping,
+			negativeAmountMeans: mapping.negativeAmountMeans ?? ""
 		});
 
 		setIsEditing(true);
@@ -95,7 +97,8 @@ export default function Page() {
 			mappingName: data.mappingName.trim(),
 			accountName: data.accountName.trim(),
 			includesHeader: data.includesHeader,
-			columnFieldMapping: data.columnFieldMapping
+			columnFieldMapping: data.columnFieldMapping,
+			negativeAmountMeans: data.negativeAmountMeans ?? ""
 		};
 
 		console.log(newMapping);
@@ -125,7 +128,8 @@ export default function Page() {
 			mappingName: data.mappingName.trim(),
 			accountName: data.accountName.trim(),
 			includesHeader: data.includesHeader,
-			columnFieldMapping: data.columnFieldMapping
+			columnFieldMapping: data.columnFieldMapping,
+			negativeAmountMeans: data.negativeAmountMeans ?? ""
 		};
 
 		console.log(updatedMapping);
