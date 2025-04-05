@@ -1,9 +1,8 @@
 "use client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useDashboard } from "./dashboard-context";
 import { getMonthlyData } from "@/lib/utils";
-import { Button } from "../ui/button";
 import {
 	ChartConfig,
 	ChartContainer,
@@ -12,17 +11,16 @@ import {
 	ChartTooltip,
 	ChartTooltipContent
 } from "../ui/chart";
-import { format } from "date-fns";
 import { TimePeriodDescription } from "./time-period-description";
 // import { getMonthlyData } from "@/lib/chart-utils";
 
 const monthlyChartConfig = {
 	income: {
-		label: "Income",
+		label: "Money In",
 		color: "#22c55e"
 	},
 	expenses: {
-		label: "Expense",
+		label: "Money Out",
 		color: "#ef4444"
 	}
 } satisfies ChartConfig;
@@ -34,8 +32,7 @@ export function MonthlyChart() {
 		setSelectedMonth,
 		selectedExpenseCategory,
 		selectedIncomeCategory,
-		selectedSubcategory,
-		dateRange
+		selectedSubcategory
 	} = useDashboard();
 
 	const monthlyData = getMonthlyData(
@@ -54,64 +51,36 @@ export function MonthlyChart() {
 		}
 	};
 
-	// Calculate optimal bar size based on number of months
-	// const getBarSize = () => {
-	// 	const count = monthlyData.length;
-	// 	if (count <= 3) return 60;
-	// 	if (count <= 6) return 40;
-	// 	return 20;
-	// };
-
 	return (
-		<Card className="flex flex-col mb-6">
-			<CardHeader className="flex justify-between items-center">
-				<div className="space-y-2">
-					<CardTitle>
-						Monthly Income vs Expenses
-						{/* {showSubcategories
-								? `${subcategoryTitle}${selectedSubcategory ? ` / ${selectedSubcategory}` : ""}`
-								: "Expense Breakdown by Category"} */}
-					</CardTitle>
-					<CardDescription>
-						{/* {dateRange.from ? (
-							dateRange.to ? (
-								<>
-									{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
-								</>
-							) : (
-								format(dateRange.from, "LLL dd, y")
-							)
-						) : (
-							<span>Pick a date range</span>
-						)} */}
-						<TimePeriodDescription></TimePeriodDescription>
-
-						{/* {`${format(dateRange.from!, "MMM d, yyyy")} - ${format(dateRange.to!, "MMM d, yyyy")}`} */}
-					</CardDescription>
-				</div>
+		<Card className="flex flex-col mb-2 lg:mb-6 rounded-md size-full lg:py-6 lg:pb-1 pb-3 pt-3">
+			<CardHeader className="lg:px-6 px-4 gap-1">
+				<CardTitle className="text-sm lg:text-base">Money In vs Money Out</CardTitle>
+				<CardDescription className="text-xs lg:text-sm">
+					<TimePeriodDescription></TimePeriodDescription>
+				</CardDescription>
 			</CardHeader>
-			<CardContent className="flex-1">
-				<div className="h-[300px]">
+			<CardContent className="flex-1 px-1 lg:px-6">
+				<div className="h-[240px]">
 					<ChartContainer config={monthlyChartConfig} className="size-full">
 						<BarChart
 							accessibilityLayer
 							data={monthlyData}
-							margin={{ right: 30, top: 20 }}
-							barSize={30}
+							margin={{ right: 24, top: 0, bottom: 0 }}
+							barSize={24}
 							maxBarSize={30}
 						>
 							<CartesianGrid vertical={false} />
 							<ChartTooltip content={<ChartTooltipContent />} />
-							<ChartLegend content={<ChartLegendContent className="text-sm" />} />
+							<ChartLegend content={<ChartLegendContent className="text-xs lg:text-sm" />} />
 
-							<XAxis type="category" dataKey="month" axisLine={false} className="text-sm" />
+							<XAxis type="category" dataKey="month" axisLine={false} className="text-xs lg:text-sm" />
 							<YAxis
 								tickLine={false}
 								axisLine={false}
 								tickFormatter={(value) => `$${value.toLocaleString()}`}
 							/>
 							<Bar
-								name="Income"
+								name="Money In"
 								dataKey="income"
 								fill="#22c55e"
 								radius={[4, 4, 0, 0]}
@@ -119,7 +88,7 @@ export function MonthlyChart() {
 								onClick={(data) => handleMonthClick(data.month)}
 							></Bar>
 							<Bar
-								name="Expenses"
+								name="Money Out"
 								dataKey="expenses"
 								fill="#ef4444"
 								radius={[4, 4, 0, 0]}
@@ -130,9 +99,9 @@ export function MonthlyChart() {
 					</ChartContainer>
 				</div>
 			</CardContent>
-			<CardFooter className="text-sm flex-center">
+			{/* <CardFooter className="text-sm flex-center">
 				<div className="leading-none text-muted-foreground">Note: Click on the bars to drill down.</div>
-			</CardFooter>
+			</CardFooter> */}
 		</Card>
 	);
 }

@@ -144,3 +144,10 @@ export type TransactionWithRelations = Prisma.TransactionGetPayload<{
 		};
 	};
 }>;
+
+export type BarSizeResult<T> = {
+	barSize: number;
+	chartData: T[];
+	isTrimmed: boolean;
+	height: number;
+};

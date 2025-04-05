@@ -37,8 +37,8 @@ interface DashboardContextType {
 	setHoverMerchantIndex: (index: number | undefined) => void;
 	hoverAccountIndex: number | undefined;
 	setHoverAccountIndex: (index: number | undefined) => void;
-	selectedExpenseIndex: number | undefined;
-	setSelectedExpenseIndex: (index: number | undefined) => void;
+	// selectedExpenseIndex: number | undefined;
+	// setSelectedExpenseIndex: (index: number | undefined) => void;
 	selectedIncomeIndex: number | undefined;
 	setSelectedIncomeIndex: (index: number | undefined) => void;
 	selectedMerchantIndex: number | undefined;

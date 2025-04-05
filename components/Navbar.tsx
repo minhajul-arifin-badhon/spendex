@@ -53,13 +53,13 @@ export const Navbar = () => {
 	};
 
 	return (
-		<div className="">
+		<div className="sticky top-0 z-50">
 			{/* Main Navbar */}
 			<nav className="bg-gray-900">
 				<div className="flex h-18 items-center px-4 container mx-auto">
 					{/* Logo and App Name */}
 					<Link className="flex items-center md:w-[200px]" href="/">
-						<div className="relative h-8 w-8 mr-4">
+						{/* <div className="relative h-8 w-8 mr-4">
 							<Image
 								src="https://cdn-icons-png.flaticon.com/512/7892/7892621.png"
 								className="h-8"
@@ -67,7 +67,7 @@ export const Navbar = () => {
 								width={36}
 								height={40}
 							/>
-						</div>
+						</div> */}
 						<span className="text-xl text-white">Spendex</span>
 					</Link>
 

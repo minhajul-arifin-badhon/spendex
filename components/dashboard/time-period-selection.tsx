@@ -3,84 +3,88 @@
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useDashboard } from "./dashboard-context";
 import { timePeriods } from "@/lib/constants";
-import { TabsContent } from "@radix-ui/react-tabs";
 import { cn } from "@/lib/utils";
+import { Select } from "@radix-ui/react-select";
+import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export function TimePeriodSelector() {
 	const { timePeriod, dateRange, setDateRange, handleTimePeriodChange } = useDashboard();
 
 	return (
-		<div className="mb-6 flex gap-2 justify-end">
+		<div
+			className={cn(
+				"mb-2 lg:mb-6 flex gap-2 flex-1 flex-row lg:flex-none justify-end",
+				timePeriod === "custom" && "justify-between"
+			)}
+		>
 			{timePeriod === "custom" && (
-				// <div className="bg-white p-4 rounded-lg border shadow-sm">
-				<Popover>
-					<PopoverTrigger asChild>
-						<Button variant="outline" className="w-[240px] justify-start text-left font-normal rounded">
-							<CalendarIcon className="mr-2 h-4 w-4" />
-							{dateRange.from ? (
-								dateRange.to ? (
-									<>
-										{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
-									</>
+				<div className="">
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button variant="outline" className="w-full md:w-[240px] text-left font-normal rounded-md">
+								<CalendarIcon className="mr-2 h-4 w-4" />
+								{dateRange.from ? (
+									dateRange.to ? (
+										<>
+											{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
+										</>
+									) : (
+										format(dateRange.from, "LLL dd, y")
+									)
 								) : (
-									format(dateRange.from, "LLL dd, y")
-								)
-							) : (
-								<span>Pick a date range</span>
-							)}
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="w-auto p-0" align="start">
-						<Calendar
-							mode="range"
-							selected={dateRange}
-							onSelect={(range) => range && setDateRange(range)}
-							initialFocus
-						/>
-					</PopoverContent>
-				</Popover>
-				// </div>
+									<span>Pick a date range</span>
+								)}
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-auto p-0" align="start">
+							<Calendar
+								mode="range"
+								selected={dateRange}
+								onSelect={(range) => range && setDateRange(range)}
+								initialFocus
+							/>
+						</PopoverContent>
+					</Popover>
+				</div>
 			)}
 
-			<div className="flex flex-wrap bg-muted rounded p-1">
-				{/* {timePeriods.map((option) => (
-					<button
-						key={option.value}
-						onClick={() => handleTimePeriodChange(option.value)}
-						className={cn(
-							"inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ease-in-out",
-							timePeriod === option.value
-								? "bg-blue-500 text-white shadow-md"
-								: "bg-white text-gray-700 hover:bg-gray-50 border"
-						)}
-					>
-						{option.value === "custom" && <CalendarIcon className="w-4 h-4" />}
-						{option.label}
-					</button>
-				))} */}
-
+			<div className="lg:flex-wrap lg:gap-2 lg:flex hidden">
 				{timePeriods.map((option) => (
 					<Button
 						key={option.value}
 						onClick={() => handleTimePeriodChange(option.value)}
-						size="sm"
-						variant="ghost"
+						// size="sm"
+						variant="outline"
 						className={cn(
-							"transition-all bg-muted focus-visible:outline-none duration-200 ease-in rounded text-muted-foreground h-7.25",
-							timePeriod === option.value
-								? "bg-background text-foreground shadow-sm hover:bg-background"
-								: ""
+							"border transition-colors focus-visible:outline-none duration-200 ease-in rounded-md bg-transparent hover:dark:bg-white hover:dark:text-gray-900 hover:bg-gray-900 hover:text-white",
+							timePeriod === option.value && "dark:bg-white dark:text-gray-900 bg-gray-900 text-white"
 						)}
 					>
 						{/* {option.value === "custom" && <CalendarIcon className="w-4 h-4" />} */}
 						{option.label}
 					</Button>
 				))}
+			</div>
+
+			<div className="lg:hidden">
+				<Select value={timePeriod} onValueChange={handleTimePeriodChange}>
+					<SelectTrigger className="w-full lg:w-[180px] rounded-md">
+						<SelectValue placeholder="Select a time" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							{timePeriods.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</SelectGroup>
+					</SelectContent>
+				</Select>
 			</div>
 		</div>
 	);

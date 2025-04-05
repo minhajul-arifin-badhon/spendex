@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format } from "date-fns";
-import { TransactionWithRelations } from "@/app/types";
+import { BarSizeResult, TransactionWithRelations } from "@/app/types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -49,6 +49,20 @@ export const generateColorGradient = (
 		const l = from.l + (to.l - from.l) * t;
 		return `hsl(${h.toFixed(0)}, ${s.toFixed(0)}%, ${l.toFixed(0)}%)`;
 	});
+};
+
+export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 20, maxBarSize = 40): BarSizeResult<T> => {
+	const maxItems = Math.floor(maxHeight / minBarSize);
+	const isTrimmed = data.length > maxItems;
+	const trimmedData = isTrimmed ? data.slice(0, maxItems) : data;
+	const barSize = Math.min(Math.max(Math.floor(maxHeight / trimmedData.length), minBarSize), maxBarSize);
+
+	return {
+		barSize,
+		chartData: trimmedData,
+		isTrimmed,
+		height: trimmedData.length * barSize
+	};
 };
 
 // Prepare monthly data for bar chart

@@ -12,8 +12,10 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { TimePeriodSelector } from "@/components/dashboard/time-period-selection";
 import { DateRange } from "react-day-picker";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { CategoryCharts } from "@/components/dashboard/category-charts";
+import { ExpenseByCategoryChart } from "@/components/dashboard/expense-by-category-chart";
 import { MonthlyChart } from "@/components/dashboard/monthly-chart";
+import { IncomeByCategoryChart } from "@/components/dashboard/income-by-category-chart";
+import { ExpenseByMerchantChart } from "@/components/dashboard/expense-by-merchant-chart";
 // import { SummaryCards } from "@/components/dashboard/summary-cards";
 // import { MonthlyChart } from "@/components/dashboard/monthly-chart";
 // import { CategoryCharts } from "@/components/dashboard/category-charts";
@@ -21,39 +23,39 @@ import { MonthlyChart } from "@/components/dashboard/monthly-chart";
 // import { TransactionsTable } from "@/components/dashboard/transactions-table";
 // import { mockTransactions } from "@/lib/mock-data";
 
-// Define subcategories for each category
-const categorySubcategories = {
-	Food: ["Groceries", "Restaurants", "Fast Food", "Coffee"],
-	Transport: ["Fuel", "Public Transport", "Taxi", "Car Maintenance"],
-	Entertainment: ["Movies", "Games", "Concerts", "Subscriptions"],
-	Utilities: ["Electricity", "Water", "Internet", "Phone"],
-	Salary: ["Regular", "Bonus", "Overtime"],
-	Freelance: ["Design Work", "Development", "Consulting", "Writing"],
-	Gifts: ["Received", "Given"]
-};
+// // Define subcategories for each category
+// const categorySubcategories = {
+// 	Food: ["Groceries", "Restaurants", "Fast Food", "Coffee"],
+// 	Transport: ["Fuel", "Public Transport", "Taxi", "Car Maintenance"],
+// 	Entertainment: ["Movies", "Games", "Concerts", "Subscriptions"],
+// 	Utilities: ["Electricity", "Water", "Internet", "Phone"],
+// 	Salary: ["Regular", "Bonus", "Overtime"],
+// 	Freelance: ["Design Work", "Development", "Consulting", "Writing"],
+// 	Gifts: ["Received", "Given"]
+// };
 
-// Time period options
-const timePeriods = [
-	{ value: "today", label: "Today" },
-	{ value: "week", label: "This Week" },
-	{ value: "month", label: "This Month" },
-	{ value: "3months", label: "Last 3 Months" },
-	{ value: "6months", label: "Last 6 Months" },
-	{ value: "year", label: "This Year" },
-	{ value: "custom", label: "Custom" }
-];
+// // Time period options
+// const timePeriods = [
+// 	{ value: "today", label: "Today" },
+// 	{ value: "week", label: "This Week" },
+// 	{ value: "month", label: "This Month" },
+// 	{ value: "3months", label: "Last 3 Months" },
+// 	{ value: "6months", label: "Last 6 Months" },
+// 	{ value: "year", label: "This Year" },
+// 	{ value: "custom", label: "Custom" }
+// ];
 
-// Colors for charts
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82ca9d", "#ffc658"];
+// // Colors for charts
+// const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82ca9d", "#ffc658"];
 
 const initialRange: DateRange = {
-	from: subMonths(new Date(), 3),
-	to: new Date()
+	to: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+	from: new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1)
 };
 
 export default function Page() {
 	// State for filters
-	const [timePeriod, setTimePeriod] = useState("3months");
+	const [timePeriod, setTimePeriod] = useState("6months");
 	const [dateRange, setDateRange] = useState(initialRange);
 	const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 	const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function Page() {
 	const [hoverIncomeIndex, setHoverIncomeIndex] = useState<number | undefined>(undefined);
 	const [hoverMerchantIndex, setHoverMerchantIndex] = useState<number | undefined>(undefined);
 	const [hoverAccountIndex, setHoverAccountIndex] = useState<number | undefined>(undefined);
-	const [selectedExpenseIndex, setSelectedExpenseIndex] = useState<number | undefined>(undefined);
+	// const [selectedExpenseIndex, setSelectedExpenseIndex] = useState<number | undefined>(undefined);
 	const [selectedIncomeIndex, setSelectedIncomeIndex] = useState<number | undefined>(undefined);
 	const [selectedMerchantIndex, setSelectedMerchantIndex] = useState<number | undefined>(undefined);
 	const [selectedAccountIndex, setSelectedAccountIndex] = useState<number | undefined>(undefined);
@@ -256,7 +258,7 @@ export default function Page() {
 		setSelectedSubcategory(null);
 		setSelectedMerchant(null);
 		setSelectedAccount(null);
-		setSelectedExpenseIndex(undefined);
+		// setSelectedExpenseIndex(undefined);
 		setSelectedIncomeIndex(undefined);
 		setSelectedMerchantIndex(undefined);
 		setSelectedAccountIndex(undefined);
@@ -267,7 +269,7 @@ export default function Page() {
 	const resetOtherSelections = (type: "expense" | "income" | "merchant" | "account") => {
 		if (type !== "expense") {
 			setSelectedExpenseCategory(null);
-			setSelectedExpenseIndex(undefined);
+			// setSelectedExpenseIndex(undefined);
 			setSelectedSubcategory(null);
 			setShowSubcategories(false);
 		}
@@ -325,8 +327,8 @@ export default function Page() {
 				setHoverMerchantIndex,
 				hoverAccountIndex,
 				setHoverAccountIndex,
-				selectedExpenseIndex,
-				setSelectedExpenseIndex,
+				// selectedExpenseIndex,
+				// setSelectedExpenseIndex,
 				selectedIncomeIndex,
 				setSelectedIncomeIndex,
 				selectedMerchantIndex,
@@ -348,20 +350,40 @@ export default function Page() {
 				balance
 			}}
 		>
-			<div className="container mx-auto">
-				<div className="flex justify-between items-center">
-					<DashboardHeader />
-					<TimePeriodSelector />
-				</div>
-				<SummaryCards />
-				<MonthlyChart />
-
-				<CategoryCharts />
-
-				{/* <AdditionalCharts /> */}
-
-				{/* <TransactionsTable /> */}
+			<div className="flex items-center lg:justify-between flex-wrap">
+				<DashboardHeader />
+				<TimePeriodSelector />
 			</div>
+
+			{/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"> */}
+			{/* </div> */}
+
+			<div className="grid grid-cols-1 lg:grid-cols-5 gap-2 mb-2 lg:gap-6 lg:mb-6">
+				<div className="col-span-1 gap-2 lg:gap-6">
+					<div className="flex flex-row lg:flex-col lg:h-full gap-2 lg:gap-6">
+						<SummaryCards />
+					</div>
+				</div>
+				<div className="col-span-1 lg:col-span-4">
+					<MonthlyChart />
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
+				<ExpenseByCategoryChart></ExpenseByCategoryChart>
+				<ExpenseByMerchantChart></ExpenseByMerchantChart>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
+				<ExpenseByCategoryChart></ExpenseByCategoryChart>
+				<IncomeByCategoryChart></IncomeByCategoryChart>
+			</div>
+
+			{/* <CategoryCharts /> */}
+
+			{/* <AdditionalCharts /> */}
+
+			{/* <TransactionsTable /> */}
 		</DashboardProvider>
 	);
 }
