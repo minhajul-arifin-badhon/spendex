@@ -17,12 +17,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	searchColumn?: string;
 	searchPlaceholder?: string;
+}
+
+declare module "@tanstack/react-table" {
+	interface ColumnMeta<TData, TValue> {
+		placeholder?: string;
+		_TData?: TData;
+		_TValue?: TValue;
+	}
 }
 
 export function DataTable<TData, TValue>({
@@ -76,7 +85,7 @@ export function DataTable<TData, TValue>({
 									return (
 										<TableHead
 											key={header.id}
-											className={`${index == 0 ? "text-left" : "text-center"}`}
+											className={`${index == 0 ? "border-r text-left" : "border-r text-center"}`}
 										>
 											{header.isPlaceholder
 												? null
@@ -87,6 +96,40 @@ export function DataTable<TData, TValue>({
 							</TableRow>
 						))}
 					</TableHeader>
+
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header, index) => {
+									return (
+										<TableHead
+											key={header.id}
+											colSpan={header.colSpan}
+											// className={`${index == 0 ? "border-r text-left" : "border-r text-center"}`}
+											className="border-r"
+										>
+											{header.column.getCanFilter() ? (
+												<Input
+													placeholder={
+														header.column.columnDef.meta?.placeholder || "Search..."
+													}
+													value={(header.column.getFilterValue() as string) ?? ""}
+													onChange={(event) =>
+														header.column.setFilterValue(event.target.value)
+													}
+													className={cn(
+														"w-full border-0 text-center shadow-none focus-visible:ring-0",
+														index == 0 && "text-left"
+													)}
+												/>
+											) : null}
+										</TableHead>
+									);
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+
 					<TableBody>
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (

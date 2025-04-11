@@ -122,3 +122,25 @@ export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 25, maxBa
 		height: trimmedData.length * barSize
 	};
 };
+
+export const filterByAmount = (amount: number, filterValue: string): boolean => {
+	if (filterValue.includes(":")) {
+		const [minStr, maxStr] = filterValue.split(":").map((s) => s.trim());
+		const min = parseFloat(minStr);
+		const max = parseFloat(maxStr);
+
+		if (!isNaN(min) && !isNaN(max)) {
+			return amount >= min && amount <= max;
+		}
+		if (!isNaN(min) && isNaN(max)) {
+			return amount >= min;
+		}
+		if (isNaN(min) && !isNaN(max)) {
+			return amount <= max;
+		}
+
+		return false;
+	}
+
+	return amount.toFixed(2).toLowerCase().includes(filterValue.toLowerCase());
+};

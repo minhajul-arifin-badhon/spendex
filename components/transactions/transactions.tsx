@@ -14,12 +14,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
-import { Merchant, Transaction } from "@prisma/client";
+import { Merchant } from "@prisma/client";
 import {
 	CategoriesWithSub,
 	CategorySelection,
 	CreateTransactionProps,
 	TransactionFormProps,
+	TransactionWithRelations,
 	UpdateTransactionProps
 } from "@/app/types";
 import { useGetMerchants } from "@/lib/react-query/merchant.queries";
@@ -32,7 +33,7 @@ import {
 	useCreateManyTransactions,
 	useCreateTransaction,
 	useDeleteTransaction,
-	useGetTransactions,
+	useGetTransactionsWithRelations,
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
 import { ImportTransactionsModal } from "./import-transactions-modal";
@@ -54,11 +55,11 @@ export default function Transactions() {
 		data: transactionsResponse,
 		isLoading: isLoadingTransactions,
 		isError: isErrorTransactions
-	} = useGetTransactions();
+	} = useGetTransactionsWithRelations();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+	const [selectedTransaction, setSelectedTransaction] = useState<TransactionWithRelations | null>(null);
 	const [formValues, setFormValues] = useState<TransactionFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -78,7 +79,7 @@ export default function Transactions() {
 		setIsFormOpen(true);
 	};
 
-	const handleOpenEditForm = (transaction: Transaction) => {
+	const handleOpenEditForm = (transaction: TransactionWithRelations) => {
 		setSelectedTransaction(transaction);
 
 		console.log("editing---------");
@@ -91,7 +92,7 @@ export default function Transactions() {
 	};
 
 	// // Open delete confirmation dialog
-	const handleOpenDeleteDialog = (transaction: Transaction) => {
+	const handleOpenDeleteDialog = (transaction: TransactionWithRelations) => {
 		setSelectedTransaction(transaction);
 		setIsDeleteDialogOpen(true);
 	};
@@ -197,8 +198,9 @@ export default function Transactions() {
 		setSelectedTransaction(null);
 	};
 
+	// NEED TO MODIFY THIS AS WE HAVE CATEGORY AND MERCHANT DATA INSIDE ALREADY
 	// Function to convert from merchant data to form values
-	const transactionToFormValues = (transaction: Transaction): TransactionFormProps => {
+	const transactionToFormValues = (transaction: TransactionWithRelations): TransactionFormProps => {
 		let categorySelection: CategorySelection | null = null;
 		let merchantName: string = "";
 
@@ -319,7 +321,7 @@ export default function Transactions() {
 
 	const merchants = (merchantsResponse.data as Merchant[]) || [];
 	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
-	const transactions = (transactionsResponse.data as Transaction[]) || [];
+	const transactions = (transactionsResponse.data as TransactionWithRelations[]) || [];
 
 	console.log(transactions);
 
@@ -337,8 +339,6 @@ export default function Transactions() {
 
 			<ListTransactions
 				transactions={transactions}
-				merchants={merchants}
-				categories={categories}
 				onEdit={handleOpenEditForm}
 				onDelete={handleOpenDeleteDialog}
 			/>

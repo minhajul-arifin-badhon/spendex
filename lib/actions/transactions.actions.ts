@@ -58,51 +58,51 @@ export const getTransactionsWithRelations = async (): Promise<Response<Transacti
 
 		console.log("pulling transactions");
 
-		const transactions = mockTransactions;
+		// const transactions = mockTransactions;
 
-		// const transactions = await prisma.transaction.findMany({
-		// 	where: { userId },
-		// 	select: {
-		// 		id: true,
-		// 		amount: true,
-		// 		date: true,
-		// 		accountName: true,
-		// 		description: true,
-		// 		categoryId: true,
-		// 		subcategoryId: true,
-		// 		merchantId: true,
-		// 		userId: true,
-		// 		createdAt: true,
-		// 		updatedAt: true,
-		// 		category: {
-		// 			select: {
-		// 				id: true,
-		// 				name: true,
-		// 				group: true
-		// 			}
-		// 		},
-		// 		subcategory: {
-		// 			select: {
-		// 				id: true,
-		// 				name: true
-		// 			}
-		// 		},
-		// 		merchant: {
-		// 			select: {
-		// 				id: true,
-		// 				name: true
-		// 			}
-		// 		}
-		// 	},
-		// 	orderBy: [
-		// 		{
-		// 			updatedAt: "desc"
-		// 		},
-		// 		{
-		// 			id: "asc"
-		// 		}
-		// 	]
-		// });
+		const transactions = await prisma.transaction.findMany({
+			where: { userId },
+			select: {
+				id: true,
+				amount: true,
+				date: true,
+				accountName: true,
+				description: true,
+				categoryId: true,
+				subcategoryId: true,
+				merchantId: true,
+				userId: true,
+				createdAt: true,
+				updatedAt: true,
+				category: {
+					select: {
+						id: true,
+						name: true,
+						group: true
+					}
+				},
+				subcategory: {
+					select: {
+						id: true,
+						name: true
+					}
+				},
+				merchant: {
+					select: {
+						id: true,
+						name: true
+					}
+				}
+			},
+			orderBy: [
+				{
+					updatedAt: "desc"
+				},
+				{
+					id: "asc"
+				}
+			]
+		});
 
 		return sendResponse(200, transactions);
 	} catch (error) {

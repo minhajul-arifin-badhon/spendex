@@ -146,6 +146,10 @@ export type TransactionWithRelations = Prisma.TransactionGetPayload<{
 	};
 }>;
 
+export type MerchantMinimal = TransactionWithRelations["merchant"];
+export type CategoryMinimal = TransactionWithRelations["category"];
+export type SubcategoryMinimal = TransactionWithRelations["subcategory"];
+
 export type BarSizeResult<T> = {
 	barSize: number;
 	chartData: T[];
