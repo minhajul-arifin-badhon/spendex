@@ -172,9 +172,12 @@ export default function Page() {
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
 				<CategoryChart cashFlowType="moneyOut"></CategoryChart>
 				<CategoryChart cashFlowType="moneyIn"></CategoryChart>
-
-				{/* <MoneyoutByMerchantChart></MoneyoutByMerchantChart> */}
 			</div>
+
+			{/* <div className="flex gap-2 lg:gap-6 mb-2 lg:mb-6 ">
+				<CategoryChart cashFlowType="moneyOut"></CategoryChart>
+				<CategoryChart cashFlowType="moneyIn"></CategoryChart>
+			</div> */}
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
 				<MerchantChart cashFlowType="moneyOut"></MerchantChart>

@@ -216,14 +216,8 @@
 
 @layer base {
 	* {
-		@apply border-border ring-0;
+		@apply border-border ring-0 focus-visible:ring-0 focus:ring-0;
 	}
-
-	/* *:focus,
-	*:focus-visible,
-	*:active {
-		@apply ring-0 outline-none shadow-none;
-	} */
 
 	body {
 		@apply bg-background text-foreground;
@@ -275,11 +269,11 @@
 	@apply bg-white text-blue-500 transition-all duration-300;
 }
 
-@layer base {
+/* @layer base {
 	* {
 		@apply border-border outline-ring/50;
 	}
 	body {
 		@apply bg-background text-foreground;
 	}
-}
+} */

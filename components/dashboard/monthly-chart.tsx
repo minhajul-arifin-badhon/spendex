@@ -13,9 +13,10 @@ import {
 } from "../ui/chart";
 import { TimePeriodDescription } from "./time-period-description";
 import { DateRange } from "react-day-picker";
-import { getMonthlyData } from "@/lib/chart_utils";
+import { getAccountData, getMonthlyData } from "@/lib/chart_utils";
 import { isEqual } from "date-fns";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 // import { getMonthlyData } from "@/lib/chart-utils";
 
 const monthlyChartConfig = {
@@ -29,9 +30,23 @@ const monthlyChartConfig = {
 	}
 } satisfies ChartConfig;
 
+const chartTypes = [
+	{
+		label: "By Month",
+		value: "month"
+	},
+	{
+		label: "By Account",
+		value: "account"
+	}
+];
+
 export function MonthlyChart() {
 	const { filters, filteredTransactions, timePeriod, customDateRange, handleFilterChange } = useDashboard();
+	const [chartType, setChartType] = useState("account");
+
 	const monthlyData = React.useMemo(() => getMonthlyData(filteredTransactions), [filteredTransactions]);
+	const accountData = React.useMemo(() => getAccountData(filteredTransactions), [filteredTransactions]);
 
 	const handleMonthClick = (month: string) => {
 		const dateRange = getDateRangeOfMonth(month);
@@ -49,20 +64,51 @@ export function MonthlyChart() {
 		}
 	};
 
+	const handleAccountClick = (account: string) => {
+		handleFilterChange("accountName", filters.accountName == account ? "" : account);
+	};
+
+	useEffect(() => {
+		if (chartType == "month") handleFilterChange("accountName", "");
+		else
+			handleFilterChange(
+				"dateRange",
+				timePeriod == "custom" ? customDateRange : (getDateRange(timePeriod) as DateRange)
+			);
+	}, [chartType]);
+
 	return (
 		<Card className="flex flex-col mb-2 lg:mb-6 rounded-md size-full lg:py-6 lg:pb-1 pb-3 pt-3">
-			<CardHeader className="lg:px-6 px-4 gap-1">
-				<CardTitle className="text-sm lg:text-base">Money In vs Money Out</CardTitle>
-				<CardDescription className="text-xs lg:text-sm">
-					<TimePeriodDescription></TimePeriodDescription>
-				</CardDescription>
+			<CardHeader className="flex justify-between items-center lg:px-6 px-4 gap-1">
+				<div className="space-y-1">
+					<CardTitle className="text-sm lg:text-base">Money In vs Money Out</CardTitle>
+					<CardDescription className="text-xs lg:text-sm">
+						<TimePeriodDescription></TimePeriodDescription>
+					</CardDescription>
+				</div>
+				<div>
+					<Select value={chartType} onValueChange={setChartType}>
+						<SelectTrigger className="w-full lg:w-[120px] rounded-md">
+							<SelectValue placeholder="Select type" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								{chartTypes.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
 			</CardHeader>
 			<CardContent className="flex-1 px-1 lg:px-6">
 				<div className="h-[240px]">
 					<ChartContainer config={monthlyChartConfig} className="size-full">
 						<BarChart
 							accessibilityLayer
-							data={monthlyData}
+							data={chartType == "month" ? monthlyData : accountData}
 							margin={{ right: 24, top: 0, bottom: 0 }}
 							barSize={24}
 							maxBarSize={30}
@@ -71,7 +117,7 @@ export function MonthlyChart() {
 							<ChartTooltip content={<ChartTooltipContent />} />
 							<ChartLegend content={<ChartLegendContent className="text-xs lg:text-sm" />} />
 
-							<XAxis type="category" dataKey="month" axisLine={false} className="text-xs lg:text-sm" />
+							<XAxis type="category" dataKey="name" axisLine={false} className="text-xs lg:text-sm" />
 							<YAxis
 								tickLine={false}
 								axisLine={false}
@@ -83,7 +129,10 @@ export function MonthlyChart() {
 								fill={monthlyChartConfig.moneyIn.color}
 								radius={[4, 4, 0, 0]}
 								className="cursor-pointer"
-								onClick={(data) => handleMonthClick(data.month)}
+								onClick={(data) => {
+									if (chartType == "month") handleMonthClick(data.name);
+									else handleAccountClick(data.name);
+								}}
 							></Bar>
 							<Bar
 								name="Money Out"
@@ -91,7 +140,10 @@ export function MonthlyChart() {
 								fill={monthlyChartConfig.moneyOut.color}
 								radius={[4, 4, 0, 0]}
 								className="cursor-pointer"
-								onClick={(data) => handleMonthClick(data.month)}
+								onClick={(data) => {
+									if (chartType == "month") return handleMonthClick(data.name);
+									else return handleAccountClick(data.name);
+								}}
 							></Bar>
 						</BarChart>
 					</ChartContainer>

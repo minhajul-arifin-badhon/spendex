@@ -1,15 +1,14 @@
 import { Filters, TransactionWithRelations } from "@/app/types";
 import { format } from "date-fns";
 
-// Prepare monthly data for bar chart
 export const getMonthlyData = (transactions: TransactionWithRelations[]) => {
-	const months: Record<string, { month: string; moneyIn: number; moneyOut: number }> = {};
+	const months: Record<string, { name: string; moneyIn: number; moneyOut: number }> = {};
 
 	transactions.forEach((transaction) => {
 		const month = format(new Date(transaction.date), "MMM yyyy");
 
 		if (!months[month]) {
-			months[month] = { month, moneyIn: 0, moneyOut: 0 };
+			months[month] = { name: month, moneyIn: 0, moneyOut: 0 };
 		}
 
 		if (transaction.amount > 0) {
@@ -20,7 +19,31 @@ export const getMonthlyData = (transactions: TransactionWithRelations[]) => {
 	});
 
 	return Object.values(months).sort((a, b) => {
-		return new Date(a.month).getTime() - new Date(b.month).getTime();
+		return new Date(a.name).getTime() - new Date(b.name).getTime();
+	});
+};
+
+export const getAccountData = (transactions: TransactionWithRelations[]) => {
+	const accounts: Record<string, { name: string; moneyIn: number; moneyOut: number }> = {};
+
+	transactions.forEach((transaction) => {
+		const accountName = transaction.accountName;
+
+		if (accountName) {
+			if (!accounts[accountName]) {
+				accounts[accountName] = { name: accountName, moneyIn: 0, moneyOut: 0 };
+			}
+
+			if (transaction.amount > 0) {
+				accounts[accountName].moneyIn += transaction.amount;
+			} else {
+				accounts[accountName].moneyOut += Math.abs(transaction.amount);
+			}
+		}
+	});
+
+	return Object.values(accounts).sort((a, b) => {
+		return a.name.localeCompare(b.name);
 	});
 };
 
@@ -65,26 +88,6 @@ export const getCategoryData = (
 		.sort((a, b) => b.value - a.value);
 };
 
-// Prepare category data for pie charts
-// export const getCategoryData = (transactions: TransactionWithRelations[], isIncome: boolean) => {
-// 	const categories: Record<string, number> = {};
-
-// 	transactions
-// 		.filter((t) => (isIncome ? t.amount > 0 : t.amount < 0))
-// 		.forEach((transaction) => {
-// 			const categoryName = transaction.category?.name;
-// 			if (categoryName) {
-// 				if (!categories[categoryName]) {
-// 					categories[categoryName] = 0;
-// 				}
-// 				categories[categoryName] += Math.abs(transaction.amount);
-// 			}
-// 		});
-
-// 	return Object.entries(categories).map(([name, value]) => ({ name, value }));
-// };
-
-// Prepare merchant data for pie chart
 export const getMerchantData = (transactions: TransactionWithRelations[], isMoneyIn: boolean) => {
 	const merchants: Record<string, number> = {};
 
@@ -106,20 +109,20 @@ export const getMerchantData = (transactions: TransactionWithRelations[], isMone
 };
 
 // Prepare account data for pie chart
-export const getAccountData = (transactions: TransactionWithRelations[]) => {
-	const accounts: Record<string, number> = {};
+// export const getAccountData = (transactions: TransactionWithRelations[]) => {
+// 	const accounts: Record<string, number> = {};
 
-	transactions
-		.filter((t) => t.amount < 0) // Only expenses
-		.forEach((transaction) => {
-			const accountName = transaction.accountName;
-			if (accountName) {
-				if (!accounts[accountName]) {
-					accounts[accountName] = 0;
-				}
-				accounts[accountName] += Math.abs(transaction.amount);
-			}
-		});
+// 	transactions
+// 		.filter((t) => t.amount < 0) // Only expenses
+// 		.forEach((transaction) => {
+// 			const accountName = transaction.accountName;
+// 			if (accountName) {
+// 				if (!accounts[accountName]) {
+// 					accounts[accountName] = 0;
+// 				}
+// 				accounts[accountName] += Math.abs(transaction.amount);
+// 			}
+// 		});
 
-	return Object.entries(accounts).map(([name, value]) => ({ name, value }));
-};
+// 	return Object.entries(accounts).map(([name, value]) => ({ name, value }));
+// };
