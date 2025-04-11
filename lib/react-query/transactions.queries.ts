@@ -7,6 +7,7 @@ import {
 	createTransaction,
 	deleteTransaction,
 	getTransactions,
+	getTransactionsWithRelations,
 	updateTransaction
 } from "../actions/transactions.actions";
 
@@ -25,6 +26,16 @@ export const useGetTransactions = () => {
 		queryFn: () => {
 			console.log("query: calling transactions................");
 			return getTransactions();
+		}
+	});
+};
+
+export const useGetTransactionsWithRelations = () => {
+	return useQuery({
+		queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
+		queryFn: () => {
+			console.log("query: calling transactions................");
+			return getTransactionsWithRelations();
 		}
 	});
 };

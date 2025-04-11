@@ -2,51 +2,70 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboard } from "./dashboard-context";
-import { getBarSize, getMerchantData } from "@/lib/utils";
+import { getBarSize } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import React from "react";
 import { TimePeriodDescription } from "./time-period-description";
+import { getMerchantData } from "@/lib/chart_utils";
+import { Button } from "../ui/button";
+import { ArrowLeft } from "lucide-react";
 
-export function ExpenseByMerchantChart() {
-	const { baseFilteredTransactions, selectedMerchant, setSelectedMerchant, resetOtherSelections } = useDashboard();
+export function MerchantChart({ cashFlowType }: { cashFlowType: string }) {
+	const { filters, filteredTransactions, handleFilterChange } = useDashboard();
+	const barColor = cashFlowType == "moneyIn" ? "var(--chart-green)" : "var(--chart-red)";
+	const cashFlowTitle = cashFlowType == "moneyIn" ? "Money In" : "Money Out";
+	const merchantKey = cashFlowType == "moneyIn" ? "moneyInMerchant" : "moneyOutMerchant";
 
-	const expenseMerchantData = React.useMemo(
-		() => getMerchantData(baseFilteredTransactions).sort((a, b) => b.value - a.value),
-		[baseFilteredTransactions]
+	const chartData = React.useMemo(
+		() => getMerchantData(filteredTransactions, cashFlowType == "moneyIn"),
+		[filteredTransactions, cashFlowType]
 	);
 
 	const handleMerchantClick = (merchant: string) => {
-		const isSame = selectedMerchant === merchant;
-		setSelectedMerchant(isSame ? null : merchant);
-		resetOtherSelections("merchant");
+		const isSame = filters[merchantKey] === merchant;
+		handleFilterChange(merchantKey, isSame ? "" : merchant);
+		// resetOtherSelections("merchant");
 	};
 
 	const {
 		barSize,
-		chartData: expenseChartData,
-		isTrimmed: isTrimmedExpenseData,
-		height: expenseChartHeight
-	} = getBarSize(expenseMerchantData);
+		chartData: processedChartData,
+		isTrimmed: isTrimmedData,
+		height: chartHeight
+	} = getBarSize(chartData);
 
 	return (
 		<Card className="flex flex-col rounded-md py-3 lg:py-6">
-			<CardHeader className="lg:px-6 px-4 gap-1">
-				<CardTitle className="text-sm lg:text-base">
-					{isTrimmedExpenseData
-						? `Expense by Top ${expenseChartData.length} Merchants`
-						: "Expense by Merchant"}
-					{selectedMerchant ? ` - ${selectedMerchant}` : ""}
-				</CardTitle>
-				<CardDescription className="text-xs lg:text-sm">
-					<TimePeriodDescription></TimePeriodDescription>
-				</CardDescription>
+			<CardHeader className="flex justify-between items-center lg:px-6 px-4">
+				<div className="space-y-1">
+					<CardTitle className="text-sm lg:text-base">
+						{isTrimmedData
+							? `${cashFlowTitle} by Top ${processedChartData.length} Merchants`
+							: `${cashFlowTitle} by Merchant`}
+						{filters[merchantKey] ? ` - ${filters[merchantKey]}` : ""}
+					</CardTitle>
+					<CardDescription className="text-xs lg:text-sm">
+						<TimePeriodDescription></TimePeriodDescription>
+					</CardDescription>
+				</div>
+				{filters[merchantKey] && (
+					<Button
+						variant="outline"
+						size="icon"
+						onClick={() => {
+							handleFilterChange(merchantKey, "");
+						}}
+					>
+						<ArrowLeft></ArrowLeft>
+					</Button>
+				)}
 			</CardHeader>
 			<CardContent className="flex flex-1 px-2 lg:px-6">
-				<ChartContainer config={{}} className="w-full" style={{ minHeight: `${expenseChartHeight}px` }}>
+				<ChartContainer config={{}} className="w-full" style={{ minHeight: `${chartHeight}px` }}>
 					<BarChart
 						accessibilityLayer
-						data={expenseChartData}
+						data={processedChartData}
 						layout="vertical"
 						margin={{
 							left: 25,
@@ -72,7 +91,7 @@ export function ExpenseByMerchantChart() {
 						<Bar
 							dataKey="value"
 							layout="vertical"
-							fill="var(--chart-1)"
+							fill={barColor}
 							barSize={barSize}
 							radius={[1, 4, 4, 1]}
 							className="cursor-pointer"

@@ -17,50 +17,50 @@ export const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#
 
 // Define subcategories for each category
 export const categorySubcategories = {
-	// Food: {
-	// 	group: "expense",
-	// 	subcategories: ["Groceries", "Restaurants", "Fast Food", "Coffee", "Snacks", "Takeout"]
-	// },
-	// Transport: {
-	// 	group: "expense",
-	// 	subcategories: ["Fuel", "Public Transport", "Taxi", "Car Maintenance", "Parking", "Tolls"]
-	// },
-	// Entertainment: {
-	// 	group: "expense",
-	// 	subcategories: ["Movies", "Games", "Concerts", "Subscriptions", "Streaming", "Books"]
-	// },
-	// Utilities: {
-	// 	group: "expense",
-	// 	subcategories: ["Electricity", "Water", "Internet", "Phone", "Gas", "Trash Collection"]
-	// },
-	// Pets: {
-	// 	group: "expense",
-	// 	subcategories: ["Food", "Vet", "Toys", "Grooming"]
-	// },
-	// Insurance: {
-	// 	group: "expense",
-	// 	subcategories: ["Health", "Car", "Home", "Life"]
-	// },
-	// Investments: {
-	// 	group: "expense",
-	// 	subcategories: ["Stocks", "Crypto", "Real Estate", "Savings"]
-	// },
-	// Personal: {
-	// 	group: "expense",
-	// 	subcategories: ["Haircut", "Salon", "Spa", "Therapy", "Self-care"]
-	// },
-	// Kids: {
-	// 	group: "expense",
-	// 	subcategories: ["Toys", "School Fees", "Clothes", "Childcare"]
-	// },
-	// Health: {
-	// 	group: "expense",
-	// 	subcategories: ["Doctor", "Medicine", "Dental", "Vision", "Insurance", "Gym"]
-	// },
-	// Education: {
-	// 	group: "expense",
-	// 	subcategories: ["Tuition", "Books", "Courses", "Workshops", "Supplies"]
-	// },
+	Food: {
+		group: "expense",
+		subcategories: ["Groceries", "Restaurants", "Fast Food", "Coffee", "Snacks", "Takeout"]
+	},
+	Transport: {
+		group: "expense",
+		subcategories: ["Fuel", "Public Transport", "Taxi", "Car Maintenance", "Parking", "Tolls"]
+	},
+	Entertainment: {
+		group: "expense",
+		subcategories: ["Movies", "Games", "Concerts", "Subscriptions", "Streaming", "Books"]
+	},
+	Utilities: {
+		group: "expense",
+		subcategories: ["Electricity", "Water", "Internet", "Phone", "Gas", "Trash Collection"]
+	},
+	Pets: {
+		group: "expense",
+		subcategories: ["Food", "Vet", "Toys", "Grooming"]
+	},
+	Insurance: {
+		group: "expense",
+		subcategories: ["Health", "Car", "Home", "Life"]
+	},
+	Investments: {
+		group: "expense",
+		subcategories: ["Stocks", "Crypto", "Real Estate", "Savings"]
+	},
+	Personal: {
+		group: "expense",
+		subcategories: ["Haircut", "Salon", "Spa", "Therapy", "Self-care"]
+	},
+	Kids: {
+		group: "expense",
+		subcategories: ["Toys", "School Fees", "Clothes", "Childcare"]
+	},
+	Health: {
+		group: "expense",
+		subcategories: ["Doctor", "Medicine", "Dental", "Vision", "Insurance", "Gym"]
+	},
+	Education: {
+		group: "expense",
+		subcategories: ["Tuition", "Books", "Courses", "Workshops", "Supplies"]
+	},
 	Home: {
 		group: "expense",
 		subcategories: ["Rent", "Mortgage", "Maintenance", "Furniture", "Decor"]
@@ -164,7 +164,7 @@ export const mockTransactions: TransactionWithRelations[] = Array.from({ length:
 			categoryName = incomeCategoryPool[localIndex];
 		}
 	} else {
-		categoryName = categories[Math.floor(Math.random() * categories.length)];
+		categoryName = categories[Math.floor(Math.random() * (categories.length - 4))];
 	}
 
 	// Get subcategories for this category

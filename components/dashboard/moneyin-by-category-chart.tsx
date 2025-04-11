@@ -9,7 +9,7 @@ import { PieSectorDataItem } from "recharts/types/polar/Pie";
 import React from "react";
 import { TimePeriodDescription } from "./time-period-description";
 
-export function IncomeByCategoryChart() {
+export function MoneyinByCategoryChart() {
 	const {
 		baseFilteredTransactions,
 		selectedIncomeCategory,

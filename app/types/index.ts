@@ -22,6 +22,7 @@ import {
 	updateTransactionSchema
 } from "@/lib/validation";
 import { Prisma, CategoryGroup } from "@prisma/client";
+import { DateRange } from "react-day-picker";
 import { z } from "zod";
 
 export type BaseResponse = {
@@ -150,4 +151,15 @@ export type BarSizeResult<T> = {
 	chartData: T[];
 	isTrimmed: boolean;
 	height: number;
+};
+
+export type Filters = {
+	moneyInCategory: string;
+	moneyInSubcategory: string;
+	moneyOutCategory: string;
+	moneyOutSubcategory: string;
+	moneyInMerchant: string;
+	moneyOutMerchant: string;
+	accountName: string;
+	dateRange: DateRange;
 };

@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useDashboard } from "./dashboard-context";
-import { getMonthlyData } from "@/lib/utils";
+import { getDateRange, getDateRangeOfMonth } from "@/lib/utils";
 import {
 	ChartConfig,
 	ChartContainer,
@@ -12,42 +12,40 @@ import {
 	ChartTooltipContent
 } from "../ui/chart";
 import { TimePeriodDescription } from "./time-period-description";
+import { DateRange } from "react-day-picker";
+import { getMonthlyData } from "@/lib/chart_utils";
+import { isEqual } from "date-fns";
+import React from "react";
 // import { getMonthlyData } from "@/lib/chart-utils";
 
 const monthlyChartConfig = {
-	income: {
+	moneyIn: {
 		label: "Money In",
-		color: "#22c55e"
+		color: "var(--chart-green)"
 	},
-	expenses: {
+	moneyOut: {
 		label: "Money Out",
-		color: "#ef4444"
+		color: "var(--chart-red)"
 	}
 } satisfies ChartConfig;
 
 export function MonthlyChart() {
-	const {
-		baseFilteredTransactions,
-		selectedMonth,
-		setSelectedMonth,
-		selectedExpenseCategory,
-		selectedIncomeCategory,
-		selectedSubcategory
-	} = useDashboard();
+	const { filters, filteredTransactions, timePeriod, customDateRange, handleFilterChange } = useDashboard();
+	const monthlyData = React.useMemo(() => getMonthlyData(filteredTransactions), [filteredTransactions]);
 
-	const monthlyData = getMonthlyData(
-		baseFilteredTransactions,
-		selectedExpenseCategory,
-		selectedIncomeCategory,
-		selectedSubcategory
-	);
-
-	// Handle month click in bar chart
 	const handleMonthClick = (month: string) => {
-		if (selectedMonth === month) {
-			setSelectedMonth(null);
+		const dateRange = getDateRangeOfMonth(month);
+
+		if (
+			isEqual(filters.dateRange.from as Date, dateRange.from as Date) &&
+			isEqual(filters.dateRange.to as Date, dateRange.to as Date)
+		) {
+			handleFilterChange(
+				"dateRange",
+				timePeriod == "custom" ? customDateRange : (getDateRange(timePeriod) as DateRange)
+			);
 		} else {
-			setSelectedMonth(month);
+			handleFilterChange("dateRange", dateRange);
 		}
 	};
 
@@ -81,16 +79,16 @@ export function MonthlyChart() {
 							/>
 							<Bar
 								name="Money In"
-								dataKey="income"
-								fill="#22c55e"
+								dataKey="moneyIn"
+								fill={monthlyChartConfig.moneyIn.color}
 								radius={[4, 4, 0, 0]}
 								className="cursor-pointer"
 								onClick={(data) => handleMonthClick(data.month)}
 							></Bar>
 							<Bar
 								name="Money Out"
-								dataKey="expenses"
-								fill="#ef4444"
+								dataKey="moneyOut"
+								fill={monthlyChartConfig.moneyOut.color}
 								radius={[4, 4, 0, 0]}
 								className="cursor-pointer"
 								onClick={(data) => handleMonthClick(data.month)}

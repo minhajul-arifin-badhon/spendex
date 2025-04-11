@@ -3,93 +3,73 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboard } from "./dashboard-context";
-import { getBarSize, getCategoryData } from "@/lib/utils";
+import { getBarSize } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
 import { TimePeriodDescription } from "./time-period-description";
+import { getCategoryData } from "@/lib/chart_utils";
 
-export function ExpenseByCategoryChart() {
-	const {
-		baseFilteredTransactions,
-		selectedExpenseCategory,
-		setSelectedExpenseCategory,
-		selectedSubcategory,
-		setSelectedSubcategory,
-		// setSelectedExpenseIndex,
-		subcategoryData,
-		showSubcategories,
-		subcategoryTitle,
-		setShowSubcategories,
-		resetOtherSelections
-	} = useDashboard();
+export function CategoryChart({ cashFlowType }: { cashFlowType: string }) {
+	const { filters, filteredTransactions, handleFilterChange } = useDashboard();
 
-	const expenseCategoryData = React.useMemo(
-		() => getCategoryData(baseFilteredTransactions, false),
-		[baseFilteredTransactions]
+	const cashFlowTitle = cashFlowType == "moneyIn" ? "Money In" : "Money Out";
+	const categoryKey = cashFlowType == "moneyIn" ? "moneyInCategory" : "moneyOutCategory";
+	const subcategoryKey = cashFlowType == "moneyIn" ? "moneyInSubcategory" : "moneyOutSubcategory";
+	const isShowingCategoryChart = filters[subcategoryKey] === "" && filters[categoryKey] === "";
+
+	// console.log(filters);
+	// console.log(categoryKey, subcategoryKey);
+	// console.log("is showing category chart:  ", isShowingCategoryChart);
+
+	const barColor = cashFlowType == "moneyIn" ? "var(--chart-green)" : "var(--chart-red)";
+	// console.log(barColor);
+
+	const chartData = React.useMemo(
+		() => getCategoryData(filteredTransactions, filters, cashFlowType == "moneyIn"),
+		[filteredTransactions, filters, cashFlowType]
 	);
 
-	const expenseCategoryDataSorted = React.useMemo(() => {
-		return expenseCategoryData.sort((a, b) => b.value - a.value);
-	}, [expenseCategoryData]);
-
-	const subcategoryDataSorted = React.useMemo(() => {
-		return subcategoryData.sort((a, b) => b.value - a.value);
-	}, [subcategoryData]);
-
-	const handleExpenseCategoryClick = (category: string) => {
-		setSelectedSubcategory(null);
-
-		if (selectedExpenseCategory === category) {
-			setSelectedExpenseCategory(null);
-			// setSelectedExpenseIndex(undefined);
-			resetOtherSelections("expense");
-		} else {
-			setSelectedExpenseCategory(category);
-			// setSelectedExpenseIndex(index);
-			resetOtherSelections("expense");
-		}
+	const handleCategoryClick = (category: string) => {
+		handleFilterChange(subcategoryKey, "");
+		handleFilterChange(categoryKey, filters[categoryKey] === category ? "" : category);
 	};
 
 	const handleSubcategoryClick = (subcategory: string) => {
-		if (selectedSubcategory === subcategory) {
-			setSelectedSubcategory(null);
-		} else {
-			setSelectedSubcategory(subcategory);
-		}
+		handleFilterChange(subcategoryKey, filters[subcategoryKey] === subcategory ? "" : subcategory);
 	};
 
 	const {
 		barSize,
-		chartData: expenseChartData,
-		isTrimmed: isTrimmedExpenseData,
-		height: expenseChartHeight
-	} = getBarSize(showSubcategories ? subcategoryDataSorted : expenseCategoryDataSorted);
+		chartData: processedChartData,
+		isTrimmed: isTrimmedData,
+		height: chartHeight
+	} = getBarSize(chartData);
 
 	return (
 		<Card className="flex flex-col rounded-md py-3 lg:py-6">
 			<CardHeader className="flex justify-between items-center lg:px-6 px-4">
 				<div className="space-y-1">
 					<CardTitle className="text-sm lg:text-base">
-						{showSubcategories
-							? `${subcategoryTitle}${selectedSubcategory ? ` / ${selectedSubcategory}` : ""}`
-							: "Expense Breakdown by Category"}
-						{isTrimmedExpenseData ? ` (Top ${expenseChartData.length})` : ""}
+						{!isShowingCategoryChart
+							? `${cashFlowTitle} by Category - ${filters[categoryKey]} ${
+									filters[subcategoryKey] ? ` / ${filters[subcategoryKey]}` : ""
+							  }`
+							: `${cashFlowTitle} by Category`}
+						{isTrimmedData ? ` (Top ${processedChartData.length})` : ""}
 					</CardTitle>
 					<CardDescription className="text-xs lg:text-sm">
 						<TimePeriodDescription></TimePeriodDescription>
 					</CardDescription>
 				</div>
-				{showSubcategories && (
+				{!isShowingCategoryChart && (
 					<Button
 						variant="outline"
 						size="icon"
 						onClick={() => {
-							setShowSubcategories(false);
-							setSelectedExpenseCategory(null);
-							setSelectedSubcategory(null);
-							// setSelectedExpenseIndex(undefined);
+							handleFilterChange(categoryKey, "");
+							handleFilterChange(subcategoryKey, "");
 						}}
 					>
 						<ArrowLeft></ArrowLeft>
@@ -97,10 +77,10 @@ export function ExpenseByCategoryChart() {
 				)}
 			</CardHeader>
 			<CardContent className="flex flex-1 px-2 lg:px-6">
-				<ChartContainer config={{}} className="w-full" style={{ minHeight: `${expenseChartHeight}px` }}>
+				<ChartContainer config={{}} className="w-full" style={{ minHeight: `${chartHeight}px` }}>
 					<BarChart
 						accessibilityLayer
-						data={expenseChartData}
+						data={processedChartData}
 						layout="vertical"
 						margin={{
 							left: 25,
@@ -126,15 +106,15 @@ export function ExpenseByCategoryChart() {
 						<Bar
 							dataKey="value"
 							layout="vertical"
-							fill="var(--chart-1)"
+							fill={barColor}
 							barSize={barSize}
 							radius={[1, 4, 4, 1]}
 							className="cursor-pointer"
 							onClick={(data) => {
-								if (showSubcategories) {
+								if (!isShowingCategoryChart) {
 									handleSubcategoryClick(data.name);
 								} else {
-									handleExpenseCategoryClick(data.name);
+									handleCategoryClick(data.name);
 								}
 							}}
 						>

@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { format } from "date-fns";
 import { BarSizeResult, TransactionWithRelations } from "@/app/types";
+import { DateRange } from "react-day-picker";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -51,7 +52,64 @@ export const generateColorGradient = (
 	});
 };
 
-export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 20, maxBarSize = 40): BarSizeResult<T> => {
+export const getDateRange = (timePeriod: string): DateRange | null => {
+	const now = new Date();
+	let from = now;
+	let to = now;
+
+	switch (timePeriod) {
+		case "today":
+			from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			to = now;
+			break;
+
+		case "week": {
+			const dayOfWeek = now.getDay(); // 0 = Sunday
+			from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek);
+			to = now;
+			break;
+		}
+
+		case "month":
+			from = new Date(now.getFullYear(), now.getMonth(), 1);
+			to = now;
+			break;
+
+		case "3months":
+			to = new Date(now.getFullYear(), now.getMonth(), 0);
+			from = new Date(to.getFullYear(), to.getMonth() - 2, 1);
+			break;
+
+		case "6months":
+			to = new Date(now.getFullYear(), now.getMonth(), 0);
+			from = new Date(to.getFullYear(), to.getMonth() - 5, 1);
+			break;
+
+		case "year":
+			from = new Date(now.getFullYear(), 0, 1);
+			to = now;
+			break;
+
+		case "custom":
+			return null;
+	}
+
+	return { from, to };
+};
+
+export const getDateRangeOfMonth = (monthYear: string): DateRange => {
+	const [monthStr, yearStr] = monthYear.split(" ");
+
+	const monthIndex = new Date(`${monthStr} 1, ${yearStr}`).getMonth();
+	const year = parseInt(yearStr, 10);
+
+	const firstDate = new Date(year, monthIndex, 1);
+	const lastDate = new Date(year, monthIndex + 1, 0);
+
+	return { from: firstDate, to: lastDate };
+};
+
+export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 25, maxBarSize = 40): BarSizeResult<T> => {
 	const maxItems = Math.floor(maxHeight / minBarSize);
 	const isTrimmed = data.length > maxItems;
 	const trimmedData = isTrimmed ? data.slice(0, maxItems) : data;
@@ -63,99 +121,4 @@ export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 20, maxBa
 		isTrimmed,
 		height: trimmedData.length * barSize
 	};
-};
-
-// Prepare monthly data for bar chart
-export const getMonthlyData = (
-	transactions: TransactionWithRelations[],
-	selectedExpenseCategory: string | null,
-	selectedIncomeCategory: string | null,
-	selectedSubcategory: string | null
-) => {
-	const months: Record<string, { month: string; income: number; expenses: number }> = {};
-
-	transactions.forEach((transaction) => {
-		const month = format(new Date(transaction.date), "MMM yyyy");
-
-		if (!months[month]) {
-			months[month] = { month, income: 0, expenses: 0 };
-		}
-
-		// Apply category filters for the monthly chart
-		if (transaction.amount > 0) {
-			// Only include income transactions that match the selected income category (if any)
-			if (!selectedIncomeCategory || transaction.category?.name === selectedIncomeCategory) {
-				months[month].income += transaction.amount;
-			}
-		} else {
-			// Only include expense transactions that match the selected expense category (if any)
-			if (!selectedExpenseCategory || transaction.category?.name === selectedExpenseCategory) {
-				// Further filter by subcategory if selected
-				if (!selectedSubcategory || transaction.subcategory?.name === selectedSubcategory) {
-					months[month].expenses += Math.abs(transaction.amount);
-				}
-			}
-		}
-	});
-
-	return Object.values(months).sort((a, b) => {
-		return new Date(a.month).getTime() - new Date(b.month).getTime();
-	});
-};
-
-// Prepare category data for pie charts
-export const getCategoryData = (transactions: TransactionWithRelations[], isIncome: boolean) => {
-	const categories: Record<string, number> = {};
-
-	transactions
-		.filter((t) => (isIncome ? t.amount > 0 : t.amount < 0))
-		.forEach((transaction) => {
-			const categoryName = transaction.category?.name;
-			if (categoryName) {
-				if (!categories[categoryName]) {
-					categories[categoryName] = 0;
-				}
-				categories[categoryName] += Math.abs(transaction.amount);
-			}
-		});
-
-	return Object.entries(categories).map(([name, value]) => ({ name, value }));
-};
-
-// Prepare merchant data for pie chart
-export const getMerchantData = (transactions: TransactionWithRelations[]) => {
-	const merchants: Record<string, number> = {};
-
-	transactions
-		.filter((t) => t.amount < 0) // Only expenses
-		.forEach((transaction) => {
-			const merchantName = transaction.merchant?.name;
-			if (merchantName) {
-				if (!merchants[merchantName]) {
-					merchants[merchantName] = 0;
-				}
-				merchants[merchantName] += Math.abs(transaction.amount);
-			}
-		});
-
-	return Object.entries(merchants).map(([name, value]) => ({ name, value }));
-};
-
-// Prepare account data for pie chart
-export const getAccountData = (transactions: TransactionWithRelations[]) => {
-	const accounts: Record<string, number> = {};
-
-	transactions
-		.filter((t) => t.amount < 0) // Only expenses
-		.forEach((transaction) => {
-			const accountName = transaction.accountName;
-			if (accountName) {
-				if (!accounts[accountName]) {
-					accounts[accountName] = 0;
-				}
-				accounts[accountName] += Math.abs(transaction.amount);
-			}
-		});
-
-	return Object.entries(accounts).map(([name, value]) => ({ name, value }));
 };

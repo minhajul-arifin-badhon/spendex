@@ -14,6 +14,7 @@ import { prisma } from "../prisma";
 import { Transaction } from "@prisma/client";
 import { delay } from "../utils";
 import { z } from "zod";
+import { mockTransactions } from "../constants";
 
 export const getTransactions = async (): Promise<Response<Transaction[]>> => {
 	try {
@@ -56,49 +57,52 @@ export const getTransactionsWithRelations = async (): Promise<Response<Transacti
 		// await delay(3000);
 
 		console.log("pulling transactions");
-		const transactions = await prisma.transaction.findMany({
-			where: { userId },
-			select: {
-				id: true,
-				amount: true,
-				date: true,
-				accountName: true,
-				description: true,
-				categoryId: true,
-				subcategoryId: true,
-				merchantId: true,
-				userId: true,
-				createdAt: true,
-				updatedAt: true,
-				category: {
-					select: {
-						id: true,
-						name: true,
-						group: true
-					}
-				},
-				subcategory: {
-					select: {
-						id: true,
-						name: true
-					}
-				},
-				merchant: {
-					select: {
-						id: true,
-						name: true
-					}
-				}
-			},
-			orderBy: [
-				{
-					updatedAt: "desc"
-				},
-				{
-					id: "asc"
-				}
-			]
-		});
+
+		const transactions = mockTransactions;
+
+		// const transactions = await prisma.transaction.findMany({
+		// 	where: { userId },
+		// 	select: {
+		// 		id: true,
+		// 		amount: true,
+		// 		date: true,
+		// 		accountName: true,
+		// 		description: true,
+		// 		categoryId: true,
+		// 		subcategoryId: true,
+		// 		merchantId: true,
+		// 		userId: true,
+		// 		createdAt: true,
+		// 		updatedAt: true,
+		// 		category: {
+		// 			select: {
+		// 				id: true,
+		// 				name: true,
+		// 				group: true
+		// 			}
+		// 		},
+		// 		subcategory: {
+		// 			select: {
+		// 				id: true,
+		// 				name: true
+		// 			}
+		// 		},
+		// 		merchant: {
+		// 			select: {
+		// 				id: true,
+		// 				name: true
+		// 			}
+		// 		}
+		// 	},
+		// 	orderBy: [
+		// 		{
+		// 			updatedAt: "desc"
+		// 		},
+		// 		{
+		// 			id: "asc"
+		// 		}
+		// 	]
+		// });
 
 		return sendResponse(200, transactions);
 	} catch (error) {

@@ -12,7 +12,7 @@ import { Select } from "@radix-ui/react-select";
 import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export function TimePeriodSelector() {
-	const { timePeriod, dateRange, setDateRange, handleTimePeriodChange } = useDashboard();
+	const { timePeriod, customDateRange, setCustomDateRange, handleTimePeriodChange } = useDashboard();
 
 	return (
 		<div
@@ -27,13 +27,14 @@ export function TimePeriodSelector() {
 						<PopoverTrigger asChild>
 							<Button variant="outline" className="w-full md:w-[240px] text-left font-normal rounded-md">
 								<CalendarIcon className="mr-2 h-4 w-4" />
-								{dateRange.from ? (
-									dateRange.to ? (
+								{customDateRange.from ? (
+									customDateRange.to ? (
 										<>
-											{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
+											{format(customDateRange.from, "LLL dd, y")} -{" "}
+											{format(customDateRange.to, "LLL dd, y")}
 										</>
 									) : (
-										format(dateRange.from, "LLL dd, y")
+										format(customDateRange.from, "LLL dd, y")
 									)
 								) : (
 									<span>Pick a date range</span>
@@ -43,8 +44,8 @@ export function TimePeriodSelector() {
 						<PopoverContent className="w-auto p-0" align="start">
 							<Calendar
 								mode="range"
-								selected={dateRange}
-								onSelect={(range) => range && setDateRange(range)}
+								selected={customDateRange}
+								onSelect={(range) => range && setCustomDateRange(range)}
 								initialFocus
 							/>
 						</PopoverContent>

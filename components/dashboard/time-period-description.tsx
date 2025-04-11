@@ -3,13 +3,11 @@ import { useDashboard } from "./dashboard-context";
 import { format } from "date-fns";
 
 export function TimePeriodDescription() {
-	const { selectedMonth, dateRange } = useDashboard();
-
+	const { filters } = useDashboard();
+	const { dateRange } = filters;
 	return (
 		<>
-			{selectedMonth ? (
-				selectedMonth
-			) : dateRange.from ? (
+			{dateRange.from ? (
 				dateRange.to ? (
 					<>
 						{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}
