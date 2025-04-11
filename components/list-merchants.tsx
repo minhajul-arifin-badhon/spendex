@@ -72,6 +72,9 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 							))}
 						</div>
 					);
+				},
+				filterFn: (row, columnId, filterValue) => {
+					return row.original.includes.some((v) => v.toLowerCase().includes(filterValue.toLowerCase()));
 				}
 				// meta: {
 				// 	className: "hidden sm:table-cell" // Hide on mobile
@@ -83,6 +86,10 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 				cell: ({ row }) => {
 					const categoryName = getCategoryName(row.original.categoryId);
 					return <div>{categoryName || "-"}</div>;
+				},
+				filterFn: (row, columnId, filterValue) => {
+					const categoryName = getCategoryName(row.original.categoryId);
+					return categoryName?.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
 				}
 				// meta: {
 				// 	className: "hidden sm:table-cell" // Hide on mobile
@@ -94,6 +101,10 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 				cell: ({ row }) => {
 					const subcategoryName = getSubcategoryName(row.original.categoryId, row.original.subcategoryId);
 					return <div>{subcategoryName || "-"}</div>;
+				},
+				filterFn: (row, columnId, filterValue) => {
+					const subcategoryName = getSubcategoryName(row.original.categoryId, row.original.subcategoryId);
+					return subcategoryName?.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
 				}
 				// meta: {
 				// 	className: "hidden md:table-cell" // Hide on smaller screens

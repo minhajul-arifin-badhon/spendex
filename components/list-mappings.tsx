@@ -55,12 +55,22 @@ export default function ListMappings({ mappings, onEdit, onDelete }: ComponentPr
 					<div className="max-w-[150px] sm:max-w-max mx-auto truncate">
 						{formatColumnMappings(row.original.columnFieldMapping as ColumnFieldMappingProps[])}
 					</div>
-				)
+				),
+				filterFn: (row, columnId, filterValue) => {
+					const formatted = formatColumnMappings(
+						row.original.columnFieldMapping as ColumnFieldMappingProps[]
+					);
+					return formatted.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
+				}
 			},
 			{
 				accessorKey: "includesHeader",
 				header: "Includes Header",
-				cell: ({ row }) => <div>{row.original.includesHeader ? "Yes" : "No"}</div>
+				cell: ({ row }) => <div>{row.original.includesHeader ? "Yes" : "No"}</div>,
+				filterFn: (row, columnId, filterValue) => {
+					const formatted = row.original.includesHeader ? "Yes" : "No";
+					return formatted.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
+				}
 			},
 			{
 				id: "actions",
