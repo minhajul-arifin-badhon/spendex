@@ -5,27 +5,18 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { CategoryMinimal, MerchantMinimal, SubcategoryMinimal, TransactionWithRelations } from "@/app/types";
 import { format } from "date-fns";
 import { filterByAmount } from "@/lib/utils";
+import { Transaction } from "@prisma/client";
 
 interface ComponentProps {
-	transactions: TransactionWithRelations[];
-	onEdit: (transaction: TransactionWithRelations) => void;
-	onDelete: (transaction: TransactionWithRelations) => void;
+	transactions: Transaction[];
+	onEdit: (transaction: Transaction) => void;
+	onDelete: (transaction: Transaction) => void;
 }
 
 export default function ListTransactions({ transactions, onEdit, onDelete }: ComponentProps) {
-	const getFormattedCategory = (category: CategoryMinimal, subcategory: SubcategoryMinimal) => {
-		const formattedCategory = category
-			? subcategory
-				? `${category.name} / ${subcategory.name}`
-				: category.name
-			: "-";
-		return formattedCategory;
-	};
-
-	const columns = useMemo<ColumnDef<TransactionWithRelations>[]>(
+	const columns = useMemo<ColumnDef<Transaction>[]>(
 		() => [
 			{
 				accessorKey: "date",
@@ -70,14 +61,6 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 							<ArrowUpDown className="ml-2 h-4 w-4" />
 						</Button>
 					);
-				},
-				cell: ({ getValue }) => {
-					const merchant = getValue<MerchantMinimal>();
-					return <div>{merchant?.name || "-"}</div>;
-				},
-				filterFn: (row, columnId, filterValue) => {
-					const merchant = row.getValue<MerchantMinimal>(columnId);
-					return merchant?.name.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
 				}
 			},
 			{
@@ -90,12 +73,9 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 						</Button>
 					);
 				}
-				// meta: {
-				// 	className: "hidden md:table-cell" // Hide on mobile and small tablets
-				// }
 			},
 			{
-				accessorKey: "categoryFormatted",
+				accessorKey: "category",
 				header: ({ column }) => {
 					return (
 						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -103,17 +83,18 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 							<ArrowUpDown className="ml-2 h-4 w-4" />
 						</Button>
 					);
-				},
-				cell: ({ row }) => {
-					return getFormattedCategory(row.original.category, row.original.subcategory);
-				},
-				filterFn: (row, columnId, filterValue) => {
-					const formattedCategory = getFormattedCategory(row.original.category, row.original.subcategory);
-					return formattedCategory.toLowerCase().includes(filterValue.toLowerCase());
 				}
-				// meta: {
-				// 	className: "hidden sm:table-cell" // Hide on mobile
-				// }
+			},
+			{
+				accessorKey: "subcategory",
+				header: ({ column }) => {
+					return (
+						<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+							Subcategory
+							<ArrowUpDown className="ml-2 h-4 w-4" />
+						</Button>
+					);
+				}
 			},
 			{
 				accessorKey: "amount",

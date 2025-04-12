@@ -1,5 +1,4 @@
 @import "tailwindcss";
-/* @plugin "tailwindcss-animate"; */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -7,9 +6,6 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
-	/* --font-primary: var(--font-lustria);
-	--font-secondary: var(--font-lato); */
-	/* --font-serif: var(--font-source-sans-3); */
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -229,17 +225,6 @@
 	}
 }
 
-/* .bg-grid-pattern {
-	background-image: linear-gradient(to right, rgba(127, 127, 127, 0.1) 1px, transparent 1px),
-		linear-gradient(to bottom, rgba(127, 127, 127, 0.1) 1px, transparent 1px);
-	background-size: 40px 40px;
-}
-
-.dark .bg-grid-pattern {
-	background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-		linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-} */
-
 /* Remove ring/outline from Select components */
 .select-no-ring [data-radix-select-trigger] {
 	@apply ring-0 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none;
@@ -268,12 +253,3 @@
 .button-ghost:hover {
 	@apply bg-white text-blue-500 transition-all duration-300;
 }
-
-/* @layer base {
-	* {
-		@apply border-border outline-ring/50;
-	}
-	body {
-		@apply bg-background text-foreground;
-	}
-} */

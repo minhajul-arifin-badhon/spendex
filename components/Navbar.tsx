@@ -14,21 +14,13 @@ import {
 import { ChevronRight, LogOut, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 import { ThemeToggle } from "./theme/theme-toggle";
 
 // Navigation items
-const navItems = [
-	// { name: "Home", href: "/", icon: <Home className="h-4 w-4 mr-2" /> },
-	{ name: "Dashboard", href: "/app/dashboard", icon: null },
-	{ name: "Transactions", href: "/app/transactions", icon: null },
-	{ name: "Merchants", href: "/app/merchants", icon: null },
-	{ name: "Categories", href: "/app/categories", icon: null },
-	{ name: "Mappings", href: "/app/mappings", icon: null }
-];
+const navItems = [{ name: "Transactions", href: "/app/transactions", icon: null }];
 
 export const Navbar = () => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -57,17 +49,8 @@ export const Navbar = () => {
 			{/* Main Navbar */}
 			<nav className="bg-gray-900">
 				<div className="flex h-18 items-center px-4 container mx-auto">
-					{/* Logo and App Name */}
+					{/* App Name */}
 					<Link className="flex items-center md:w-[200px]" href="/">
-						{/* <div className="relative h-8 w-8 mr-4">
-							<Image
-								src="https://cdn-icons-png.flaticon.com/512/7892/7892621.png"
-								className="h-8"
-								alt="Spendex Logo"
-								width={36}
-								height={40}
-							/>
-						</div> */}
 						<span className="text-xl text-white">Spendex</span>
 					</Link>
 
@@ -112,14 +95,9 @@ export const Navbar = () => {
 											<p className="text-xs leading-none text-muted-foreground">{user.email}</p>
 										</div>
 									</DropdownMenuLabel>
-									{/* <DropdownMenuSeparator />
-									<DropdownMenuGroup>
-										<DropdownMenuItem className="cursor-pointer">
-											<User className="mr-2 h-4 w-4" />
-											<span>Profile</span>
-										</DropdownMenuItem>
-									</DropdownMenuGroup> */}
+
 									<DropdownMenuSeparator />
+
 									<SignOutButton>
 										<DropdownMenuItem className="cursor-pointer">
 											<LogOut className="mr-2 h-4 w-4" />

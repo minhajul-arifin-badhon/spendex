@@ -1,8 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { format } from "date-fns";
-import { BarSizeResult, TransactionWithRelations } from "@/app/types";
-import { DateRange } from "react-day-picker";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -26,101 +23,6 @@ export const truncateText = (text: string, maxLength = 30) => {
 	}
 
 	return processedText.length > maxLength ? `${processedText.substring(0, maxLength)}...` : processedText;
-};
-
-export const generateHSLColors = (count: number, saturation = 86, lightness = 55): string[] => {
-	const colors: string[] = [];
-	for (let i = 0; i < count; i++) {
-		// const hue = Math.round((360 / count) * i); // even spacing
-		const hue = Math.round((i + 1) * 20) % 360; // golden angle for good separation
-		colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
-	}
-	return colors;
-};
-
-export const generateColorGradient = (
-	count: number,
-	to: { h: number; s: number; l: number },
-	from: { h: number; s: number; l: number }
-): string[] => {
-	return Array.from({ length: count }, (_, i) => {
-		const t = i / Math.max(count - 1, 1);
-		const h = from.h + (to.h - from.h) * t;
-		const s = from.s + (to.s - from.s) * t;
-		const l = from.l + (to.l - from.l) * t;
-		return `hsl(${h.toFixed(0)}, ${s.toFixed(0)}%, ${l.toFixed(0)}%)`;
-	});
-};
-
-export const getDateRange = (timePeriod: string): DateRange | null => {
-	const now = new Date();
-	let from = now;
-	let to = now;
-
-	switch (timePeriod) {
-		case "today":
-			from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-			to = now;
-			break;
-
-		case "week": {
-			const dayOfWeek = now.getDay(); // 0 = Sunday
-			from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek);
-			to = now;
-			break;
-		}
-
-		case "month":
-			from = new Date(now.getFullYear(), now.getMonth(), 1);
-			to = now;
-			break;
-
-		case "3months":
-			to = new Date(now.getFullYear(), now.getMonth(), 0);
-			from = new Date(to.getFullYear(), to.getMonth() - 2, 1);
-			break;
-
-		case "6months":
-			to = new Date(now.getFullYear(), now.getMonth(), 0);
-			from = new Date(to.getFullYear(), to.getMonth() - 5, 1);
-			break;
-
-		case "year":
-			from = new Date(now.getFullYear(), 0, 1);
-			to = now;
-			break;
-
-		case "custom":
-			return null;
-	}
-
-	return { from, to };
-};
-
-export const getDateRangeOfMonth = (monthYear: string): DateRange => {
-	const [monthStr, yearStr] = monthYear.split(" ");
-
-	const monthIndex = new Date(`${monthStr} 1, ${yearStr}`).getMonth();
-	const year = parseInt(yearStr, 10);
-
-	const firstDate = new Date(year, monthIndex, 1);
-	const lastDate = new Date(year, monthIndex + 1, 0);
-
-	return { from: firstDate, to: lastDate };
-};
-
-export const getBarSize = <T>(data: T[], maxHeight = 300, minBarSize = 25, maxBarSize = 40): BarSizeResult<T> => {
-	const maxItems = Math.floor(maxHeight / minBarSize);
-	const isTrimmed = data.length > maxItems;
-	const trimmedData = isTrimmed ? data.slice(0, maxItems) : data;
-	const barSize = Math.min(Math.max(Math.floor(maxHeight / trimmedData.length), minBarSize), maxBarSize);
-
-	return {
-		barSize,
-		chartData: trimmedData,
-		isTrimmed,
-		height: trimmedData.length * barSize
-	};
 };
 
 export const filterByAmount = (amount: number, filterValue: string): boolean => {
