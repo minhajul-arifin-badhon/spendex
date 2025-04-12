@@ -152,48 +152,48 @@ export default function Page() {
 				resetAllFilters
 			}}
 		>
-			<div className="flex items-center lg:justify-between flex-wrap">
-				<DashboardHeader />
-				<TimePeriodSelector />
-			</div>
+			<>
+				<div className="flex items-center lg:justify-between flex-wrap">
+					<DashboardHeader />
+					<TimePeriodSelector />
+				</div>
 
-			{/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"> */}
-			{/* </div> */}
-
-			<div className="grid grid-cols-1 lg:grid-cols-5 gap-2 mb-2 lg:gap-6 lg:mb-6">
-				<div className="col-span-1 gap-2 lg:gap-6">
-					<div className="flex flex-row lg:flex-col lg:h-full gap-2 lg:gap-6">
-						<SummaryCards />
+				<div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:gap-6">
+					<div className="col-span-1 gap-2 lg:gap-6">
+						<div className="flex flex-row lg:flex-col lg:h-full gap-3 lg:gap-6">
+							<SummaryCards />
+						</div>
+					</div>
+					<div className="col-span-1 lg:col-span-4">
+						<MonthlyChart />
 					</div>
 				</div>
-				<div className="col-span-1 lg:col-span-4">
-					<MonthlyChart />
-				</div>
-			</div>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
-				<CategoryChart cashFlowType="moneyOut"></CategoryChart>
-				<CategoryChart cashFlowType="moneyIn"></CategoryChart>
-			</div>
 
-			{/* <div className="flex gap-2 lg:gap-6 mb-2 lg:mb-6 ">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-6">
+					<CategoryChart cashFlowType="moneyOut"></CategoryChart>
+					<CategoryChart cashFlowType="moneyIn"></CategoryChart>
+				</div>
+
+				{/* <div className="flex gap-2 lg:gap-6 mb-2 lg:mb-6 ">
 				<CategoryChart cashFlowType="moneyOut"></CategoryChart>
 				<CategoryChart cashFlowType="moneyIn"></CategoryChart>
 			</div> */}
 
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-6 mb-2 lg:mb-6 ">
-				<MerchantChart cashFlowType="moneyOut"></MerchantChart>
-				<MerchantChart cashFlowType="moneyIn"></MerchantChart>
-				{/* <ExpenseByCategoryChart></ExpenseByCategoryChart>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-6">
+					<MerchantChart cashFlowType="moneyOut"></MerchantChart>
+					<MerchantChart cashFlowType="moneyIn"></MerchantChart>
+					{/* <ExpenseByCategoryChart></ExpenseByCategoryChart>
 				<IncomeByCategoryChart></IncomeByCategoryChart> */}
-			</div>
+				</div>
 
-			{/* <CategoryCharts /> */}
+				{/* <CategoryCharts /> */}
 
-			{/* <AdditionalCharts /> */}
+				{/* <AdditionalCharts /> */}
 
-			{/* <TransactionsTable /> */}
+				{/* <TransactionsTable /> */}
 
-			<Transactions transactions={filteredTransactions}></Transactions>
+				<Transactions transactions={filteredTransactions}></Transactions>
+			</>
 		</DashboardProvider>
 	);
 }

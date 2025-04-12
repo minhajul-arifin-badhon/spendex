@@ -191,7 +191,7 @@ function HeroGeometric({
 							<Link href="/sign-up">
 								<Button
 									size="lg"
-									className="px-8 text-white bg-blue-600 hover:bg-blue-800 transition-all"
+									className="px-8 text-white bg-blue-600 hover:bg-blue-800 transition-colors"
 								>
 									Start Tracking
 									{/* <ArrowRight className="ml-2 h-4 w-4" /> */}
@@ -201,7 +201,7 @@ function HeroGeometric({
 								<Button
 									variant="outline"
 									size="lg"
-									className="bg-white hover:bg-slate-300 text-blue-600 hover:text-blue-800 transition-all"
+									className="bg-white hover:bg-slate-300 text-blue-600 dark:text-white hover:text-blue-600 transition-colors"
 								>
 									Sign In
 								</Button>

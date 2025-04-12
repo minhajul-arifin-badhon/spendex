@@ -266,7 +266,7 @@ export default function Page() {
 	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
 
 	return (
-		<div className="space-y-4">
+		<>
 			<div className="flex justify-end space-x-3">
 				<Button variant="outline" onClick={handleOpenCreateForm}>
 					<Plus className="mr-2 h-4 w-4" /> Create New
@@ -318,6 +318,6 @@ export default function Page() {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</div>
+		</>
 	);
 }

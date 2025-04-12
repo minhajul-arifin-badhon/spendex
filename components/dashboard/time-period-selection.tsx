@@ -17,7 +17,7 @@ export function TimePeriodSelector() {
 	return (
 		<div
 			className={cn(
-				"mb-2 lg:mb-6 flex gap-2 flex-1 flex-row lg:flex-none justify-end",
+				"flex gap-2 flex-1 flex-row lg:flex-none justify-end",
 				timePeriod === "custom" && "justify-between"
 			)}
 		>

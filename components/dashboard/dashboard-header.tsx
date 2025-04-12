@@ -3,16 +3,7 @@
 import { useDashboard } from "./dashboard-context";
 
 export function DashboardHeader() {
-	const {
-		selectedMonth,
-		setSelectedMonth,
-		selectedExpenseCategory,
-		selectedIncomeCategory,
-		selectedMerchant,
-		selectedAccount,
-		selectedSubcategory,
-		resetAllSelections
-	} = useDashboard();
+	const {} = useDashboard();
 
 	return (
 		<div className="hidden lg:block">
@@ -25,8 +16,8 @@ export function DashboardHeader() {
 				</div>
 			)} */}
 
-			{(selectedExpenseCategory || selectedIncomeCategory || selectedMerchant || selectedAccount) && (
-				<div className="flex items-center gap-2 mb-4">
+			{/* {(selectedExpenseCategory || selectedIncomeCategory || selectedMerchant || selectedAccount) && (
+				<div className="flex items-center gap-2">
 					<span className="text-sm font-medium">
 						Selected Filter:{" "}
 						{selectedExpenseCategory || selectedIncomeCategory || selectedMerchant || selectedAccount}
@@ -36,7 +27,7 @@ export function DashboardHeader() {
 						Clear All Filters
 					</button>
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }

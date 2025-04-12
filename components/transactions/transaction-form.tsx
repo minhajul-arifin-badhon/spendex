@@ -201,13 +201,10 @@ export default function TransactionForm({
 							name="amount"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>
-										Amount*
-										<FormDescription className="font-normal">
-											(Enter a postive (+) number for credit and a negative (-) number for debit.)
-										</FormDescription>
-									</FormLabel>
-
+									<FormLabel>Amount*</FormLabel>
+									<FormDescription className="font-normal">
+										Enter a postive (+) number for money in and a negative (-) number for money out.
+									</FormDescription>
 									<FormControl>
 										<Input placeholder="0.00" {...field} type="number" step="1" className="h-10" />
 									</FormControl>

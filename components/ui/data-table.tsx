@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
 											key={header.id}
 											colSpan={header.colSpan}
 											// className={`${index == 0 ? "border-r text-left" : "border-r text-center"}`}
-											className="border-r"
+											className="border-r p-0"
 										>
 											{header.column.getCanFilter() ? (
 												<Input
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
 														header.column.setFilterValue(event.target.value)
 													}
 													className={cn(
-														"w-full border-0 text-center shadow-none focus-visible:ring-0",
+														"size-full border-0 rounded-none text-center shadow-none focus-visible:ring-0",
 														index == 0 && "text-left"
 													)}
 												/>

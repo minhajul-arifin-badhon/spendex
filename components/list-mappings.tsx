@@ -98,12 +98,5 @@ export default function ListMappings({ mappings, onEdit, onDelete }: ComponentPr
 		[onEdit, onDelete]
 	);
 
-	return (
-		<DataTable
-			columns={columns}
-			data={mappings}
-			searchColumn="mappingName"
-			searchPlaceholder="Search mappings..."
-		/>
-	);
+	return <DataTable columns={columns} data={mappings} />;
 }

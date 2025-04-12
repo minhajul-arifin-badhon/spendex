@@ -137,5 +137,5 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 		[categories]
 	);
 
-	return <DataTable columns={columns} data={merchants} searchColumn="name" searchPlaceholder="Search merchants..." />;
+	return <DataTable columns={columns} data={merchants} />;
 }

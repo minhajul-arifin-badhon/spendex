@@ -300,7 +300,7 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	// console.log(transactions);
 
 	return (
-		<div className="space-y-4">
+		<>
 			<div className="flex justify-end space-x-3">
 				<Button variant="outline" className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
 					<Upload className="mr-2 h-4 w-4" /> Import
@@ -362,6 +362,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-		</div>
+		</>
 	);
 }

@@ -87,53 +87,6 @@ export default function ListCategories() {
 		}
 	};
 
-	// const removeFromGroupCategories = (data: CategoryMutationProps) => {
-	// 	const { type, operation, group, categoryId, subcategoryId, name } = data;
-	// 	console.log(type, operation, group, categoryId, subcategoryId, name);
-
-	// 	if (type == "category") {
-	// 		setGroupedCategories((prev) => {
-	// 			return {
-	// 				...prev,
-	// 				[group]: prev[group]?.filter((category) => (category.id != categoryId)
-	// 			};
-	// 		});
-	// 	} else {
-	// 		setGroupedCategories((prev) => {
-	// 			return {
-	// 				...prev,
-	// 				[group]: prev[group]?.map((category) => {
-	// 					if (category.id == categoryId) {
-	// 						category.subcategories = category.subcategories.filter(
-	// 							(subcategory) => subcategory.id != subcategoryId
-	// 						);
-	// 					}
-	// 					return category;
-	// 				})
-	// 			};
-	// 		});
-	// 	}
-	// };
-
-	// const isDuplicate = (data: CategoryMutationProps): boolean => {
-	// 	const { type, operation, group, categoryId, subcategoryId, name } = data;
-	// 	console.log(type, operation, group, categoryId, subcategoryId, name);
-
-	// 	if (operation === "delete") return false;
-
-	// 	// Check for duplicate category
-	// 	if (type === "category") {
-	// 		return Object.values(groupedCategories).some((categories) =>
-	// 			categories.some((category) => category.name === name)
-	// 		);
-	// 	}
-
-	// 	// Check for duplicate subcategory
-	// 	return Object.values(groupedCategories).some((categories) =>
-	// 		categories.some((category) => category.subcategories?.some((subcategory) => subcategory.name === name))
-	// 	);
-	// };
-
 	const handleMutation = async (data: CategoryMutationProps) => {
 		const { type, operation, group, categoryId, subcategoryId, name } = data;
 		console.log(type, operation, group, categoryId, subcategoryId, name);
@@ -312,168 +265,163 @@ export default function ListCategories() {
 
 	return (
 		<>
-			<div className="space-y-8">
-				{Object.keys(groupedCategories).map((group) => (
-					<div key={group} className="border rounded-lg overflow-hidden dark:border-gray-700">
-						<div className="bg-muted p-3 sm:p-4 font-semibold text-base sm:text-lg dark:bg-gray-800 capitalize">
-							{group}
-						</div>
-						<div className="divide-y dark:divide-gray-700">
-							{groupedCategories[group as CategoryGroup]!.map((category) => (
-								<div key={category.id} className="p-2 sm:p-4">
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2 flex-grow">
-											<button
-												onClick={() => toggleCategory(category.id)}
-												className="flex-shrink-0"
-											>
-												{expandedCategories[category.id.toString()] ? (
-													<ChevronDown className="h-5 w-5" />
-												) : (
-													<ChevronRight className="h-5 w-5" />
-												)}
-											</button>
-
-											{editingItem?.type === "category" &&
-											editingItem.categoryId === category.id ? (
-												<Input
-													value={editingItem.name}
-													onChange={handleNameChange}
-													onKeyDown={(e) => {
-														if (e.key === "Enter") {
-															saveEdit();
-														} else if (e.key === "Escape") {
-															cancelEdit();
-														}
-													}}
-													className="h-8 py-1 px-2 text-base font-medium"
-													autoFocus
-												/>
+			{Object.keys(groupedCategories).map((group) => (
+				<div key={group} className="border rounded-md overflow-hidden dark:border-gray-700">
+					<div className="bg-muted px-3 py-2 sm:px-4 sm:py-2 font-semibold text-base dark:bg-gray-800 capitalize">
+						{group}
+					</div>
+					<div className="divide-y dark:divide-gray-700">
+						{groupedCategories[group as CategoryGroup]!.map((category) => (
+							<div key={category.id} className="px-2 py-2 sm:px-4">
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-2 flex-grow">
+										<button onClick={() => toggleCategory(category.id)} className="flex-shrink-0">
+											{expandedCategories[category.id.toString()] ? (
+												<ChevronDown className="h-4 w-4" />
 											) : (
-												<span
-													className="font-medium text-sm sm:text-base cursor-text"
-													onClick={() =>
-														startEditing({
-															type: "category",
-															operation: "edit",
-															name: category.name,
-															group: group as CategoryGroup,
-															categoryId: category.id
-														})
-													}
-												>
-													{category.name}
-												</span>
+												<ChevronRight className="h-4 w-4" />
 											)}
-										</div>
-										<Button
-											variant="ghost"
-											size="icon"
-											onClick={() =>
-												openDeleteDialog({
-													isOpen: true,
-													type: "category",
-													operation: "delete",
-													name: category.name,
-													group: group as CategoryGroup,
-													categoryId: category.id
-												})
-											}
-											className="h-8 w-8 text-destructive hover:text-destructive/90 cursor-pointer"
-										>
-											<Trash2 className="h-4 w-4" />
-											<span className="sr-only">Delete {category.name}</span>
-										</Button>
+										</button>
+
+										{editingItem?.type === "category" && editingItem.categoryId === category.id ? (
+											<Input
+												value={editingItem.name}
+												onChange={handleNameChange}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") {
+														saveEdit();
+													} else if (e.key === "Escape") {
+														cancelEdit();
+													}
+												}}
+												className="h-6 py-1 px-2 text-sm font-medium rounded"
+												autoFocus
+											/>
+										) : (
+											<span
+												className="font-medium text-sm cursor-text"
+												onClick={() =>
+													startEditing({
+														type: "category",
+														operation: "edit",
+														name: category.name,
+														group: group as CategoryGroup,
+														categoryId: category.id
+													})
+												}
+											>
+												{category.name}
+											</span>
+										)}
 									</div>
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() =>
+											openDeleteDialog({
+												isOpen: true,
+												type: "category",
+												operation: "delete",
+												name: category.name,
+												group: group as CategoryGroup,
+												categoryId: category.id
+											})
+										}
+										className="text-destructive hover:text-destructive/90 cursor-pointer"
+									>
+										<Trash2 />
+										<span className="sr-only">Delete {category.name}</span>
+									</Button>
+								</div>
 
-									{expandedCategories[category.id.toString()] && (
-										<div className="mt-2 mx-6">
-											{category.subcategories.map((subcategory) => (
-												<div
-													key={subcategory.id}
-													className="flex items-center justify-between p-1 sm:p-2 rounded-md hover:bg-muted/50 dark:hover:bg-gray-700"
-												>
-													{editingItem?.type === "subcategory" &&
-													editingItem.subcategoryId === subcategory.id ? (
-														<Input
-															value={editingItem.name}
-															onChange={handleNameChange}
-															onKeyDown={(e) => {
-																if (e.key === "Enter") {
-																	saveEdit();
-																} else if (e.key === "Escape") {
-																	cancelEdit();
-																}
-															}}
-															className="h-7 py-1 px-2 text-sm"
-															autoFocus
-														/>
-													) : (
-														<span
-															className="text-sm cursor-text"
-															onClick={() =>
-																startEditing({
-																	type: "subcategory",
-																	operation: "edit",
-																	name: subcategory.name,
-																	group: group as CategoryGroup,
-																	categoryId: category.id,
-																	subcategoryId: subcategory.id
-																})
+								{expandedCategories[category.id.toString()] && (
+									<div className="mt-1 mx-6">
+										{category.subcategories.map((subcategory) => (
+											<div
+												key={subcategory.id}
+												className="flex items-center justify-between p-1 sm:px-2 sm:py-1 rounded hover:bg-muted/50 dark:hover:bg-gray-700"
+											>
+												{editingItem?.type === "subcategory" &&
+												editingItem.subcategoryId === subcategory.id ? (
+													<Input
+														value={editingItem.name}
+														onChange={handleNameChange}
+														onKeyDown={(e) => {
+															if (e.key === "Enter") {
+																saveEdit();
+															} else if (e.key === "Escape") {
+																cancelEdit();
 															}
-														>
-															{subcategory.name}
-														</span>
-													)}
-
-													<Button
-														variant="ghost"
-														size="icon"
+														}}
+														className="h-6 py-1 px-2 text-sm rounded"
+														autoFocus
+													/>
+												) : (
+													<span
+														className="text-sm cursor-text"
 														onClick={() =>
-															openDeleteDialog({
-																isOpen: true,
+															startEditing({
 																type: "subcategory",
-																operation: "delete",
+																operation: "edit",
 																name: subcategory.name,
 																group: group as CategoryGroup,
 																categoryId: category.id,
 																subcategoryId: subcategory.id
 															})
 														}
-														className="h-7 w-7 text-destructive hover:text-destructive/90 cursor-pointer"
 													>
-														<Trash2 className="h-3.5 w-3.5" />
-														<span className="sr-only">Delete {subcategory.name}</span>
-													</Button>
-												</div>
-											))}
-											<Button
-												variant="ghost"
-												// size="default"
-												onClick={() => addNewSubcategory(group as CategoryGroup, category.id)}
-												className="w-full justify-start text-muted-foreground p-1 sm:p-5 hover:text-primary transition-all duration-300 cursor-pointer"
-											>
-												<Plus className="h-4 w-4 mr-2" />
-												Add Subcategory
-											</Button>
-										</div>
-									)}
-								</div>
-							))}
-							<div className="p-2 sm:p-4">
-								<Button
-									variant="ghost"
-									onClick={() => addNewCategory(group as CategoryGroup)}
-									className="w-full justify-start text-muted-foreground hover:text-primary transition-all duration-300 cursor-pointer"
-								>
-									<Plus className="h-4 w-4 mr-2" />
-									Add Category
-								</Button>
+														{subcategory.name}
+													</span>
+												)}
+
+												<Button
+													variant="ghost"
+													size="sm"
+													onClick={() =>
+														openDeleteDialog({
+															isOpen: true,
+															type: "subcategory",
+															operation: "delete",
+															name: subcategory.name,
+															group: group as CategoryGroup,
+															categoryId: category.id,
+															subcategoryId: subcategory.id
+														})
+													}
+													className="text-destructive hover:text-destructive/90 cursor-pointer"
+												>
+													<Trash2 />
+													<span className="sr-only">Delete {subcategory.name}</span>
+												</Button>
+											</div>
+										))}
+										<Button
+											variant="ghost"
+											// size="default"
+											onClick={() => addNewSubcategory(group as CategoryGroup, category.id)}
+											className="w-full justify-start text-muted-foreground p-1 sm:px-5 sm:py-2 hover:text-primary transition-all duration-300 cursor-pointer"
+										>
+											<Plus className="h-3 w-3 mr-2" />
+											Add Subcategory
+										</Button>
+									</div>
+								)}
 							</div>
+						))}
+						<div className="p-2">
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => addNewCategory(group as CategoryGroup)}
+								className="w-full justify-start text-muted-foreground hover:text-primary transition-all duration-300 cursor-pointer"
+							>
+								<Plus className="h-4 w-4 mr-2" />
+								Add Category
+							</Button>
 						</div>
 					</div>
-				))}
-			</div>
+				</div>
+			))}
 
 			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={deleteDialog.isOpen} onOpenChange={closeDeleteDialog}>
@@ -501,32 +449,3 @@ export default function ListCategories() {
 		</>
 	);
 }
-
-// const firstCategoryId = useMemo(() => {
-// 	let firstId: number | null = null;
-// 	console.log("calculating first category id");
-// 	for (const groupKey of Object.keys(categories)) {
-// 		const group = categories[groupKey as CategoryGroup];
-
-// 		if (group && group.length > 0) {
-// 			firstId = group[0].id;
-// 			break;
-// 		}
-// 	}
-
-// 	console.log(firstId);
-// 	return firstId;
-// }, [categories]);
-
-// Set expanded categories state when firstCategoryId is determined
-// useEffect(() => {
-// 	console.log("firstCategory id has changed");
-// 	if (firstCategoryId !== null) {
-// 		console.log("firstCategory id has changed, setting");
-
-// 		setExpandedCategories((prev) => ({
-// 			...prev,
-// 			[firstCategoryId.toString()]: true
-// 		}));
-// 	}
-// }, [firstCategoryId]); // This will run when `firstCategoryId` is updated
