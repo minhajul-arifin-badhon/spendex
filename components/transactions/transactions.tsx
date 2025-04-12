@@ -33,7 +33,7 @@ import {
 	useCreateManyTransactions,
 	useCreateTransaction,
 	useDeleteTransaction,
-	useGetTransactionsWithRelations,
+	// useGetTransactionsWithRelations,
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
 import { ImportTransactionsModal } from "./import-transactions-modal";
@@ -48,14 +48,15 @@ const defaultFormValues: TransactionFormProps = {
 	merchant: ""
 };
 
-export default function Transactions() {
+export default function Transactions({ transactions }: { transactions: TransactionWithRelations[] }) {
+	console.log("Transactions component re-rendering", transactions);
 	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
-	const {
-		data: transactionsResponse,
-		isLoading: isLoadingTransactions,
-		isError: isErrorTransactions
-	} = useGetTransactionsWithRelations();
+	// const {
+	// 	data: transactionsResponse,
+	// 	isLoading: isLoadingTransactions,
+	// 	isError: isErrorTransactions
+	// } = useGetTransactionsWithRelations();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -98,8 +99,6 @@ export default function Transactions() {
 	};
 
 	const handleCreateTransaction = async (data: TransactionFormProps) => {
-		console.log(data);
-
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 		console.log(categoryId, subcategoryId);
 
@@ -133,6 +132,7 @@ export default function Transactions() {
 	const handleUpdateTransaction = async (data: TransactionFormProps) => {
 		if (!selectedTransaction) return;
 
+		console.log(data);
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const updatedTransaction: UpdateTransactionProps = {
@@ -198,49 +198,31 @@ export default function Transactions() {
 		setSelectedTransaction(null);
 	};
 
-	// NEED TO MODIFY THIS AS WE HAVE CATEGORY AND MERCHANT DATA INSIDE ALREADY
 	// Function to convert from merchant data to form values
 	const transactionToFormValues = (transaction: TransactionWithRelations): TransactionFormProps => {
 		let categorySelection: CategorySelection | null = null;
-		let merchantName: string = "";
 
-		if (transaction.subcategoryId) {
-			// If there's a subcategory, find it
-			const category = categories.find((c) => c.id === transaction.categoryId);
-			const subcategory = category?.subcategories.find((s) => s.id === transaction.subcategoryId);
-
-			if (category && subcategory) {
-				categorySelection = {
-					type: "subcategory",
-					id: subcategory.id,
-					categoryId: category.id,
-					name: `${category.name} / ${subcategory.name}`
-				};
-			}
-		} else if (transaction.categoryId) {
-			// If there's only a category, find it
-			const category = categories.find((c) => c.id === transaction.categoryId);
-
-			if (category) {
-				categorySelection = {
-					type: "category",
-					id: category.id,
-					name: category.name
-				};
-			}
-		}
-
-		if (transaction.merchantId) {
-			const merchant = merchants.find((c) => c.id === transaction.merchantId);
-			if (merchant) merchantName = merchant.name;
+		if (transaction.subcategory) {
+			categorySelection = {
+				type: "subcategory",
+				id: transaction.subcategory?.id as number,
+				categoryId: transaction.category?.id as number,
+				name: `${transaction.category?.name} / ${transaction.subcategory.name}`
+			};
+		} else if (transaction.category) {
+			categorySelection = {
+				type: "category",
+				id: transaction.category.id,
+				name: transaction.category.name
+			};
 		}
 
 		return {
 			date: new Date(transaction.date),
 			amount: transaction.amount,
-			merchant: merchantName,
-			description: transaction.description ?? "",
-			accountName: transaction.accountName ?? "",
+			merchant: transaction.merchant?.name || "",
+			description: transaction.description || "",
+			accountName: transaction.accountName || "",
 			categorySelection: categorySelection
 		};
 	};
@@ -281,14 +263,14 @@ export default function Transactions() {
 		setIsImportModalOpen(false);
 	};
 
-	if (isErrorCategories || isErrorMerchants || isErrorTransactions)
+	if (isErrorCategories || isErrorMerchants)
 		return (
 			<div>
 				<p>Something bad happened</p>
 			</div>
 		);
 
-	if (isLoadingMerchants || isLoadingCategories || isLoadingTransactions)
+	if (isLoadingMerchants || isLoadingCategories)
 		return (
 			<div className="size-full -mt-20 min-h-screen flex items-center justify-center">
 				<Spinner size="large" />
@@ -311,19 +293,11 @@ export default function Transactions() {
 		);
 	}
 
-	if (!transactionsResponse?.success) {
-		return (
-			<div>
-				<p>{`${transactionsResponse?.statusCode}: ${transactionsResponse?.data}:`}</p>
-			</div>
-		);
-	}
-
 	const merchants = (merchantsResponse.data as Merchant[]) || [];
 	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
-	const transactions = (transactionsResponse.data as TransactionWithRelations[]) || [];
+	// const transactions = (transactionsResponse.data as TransactionWithRelations[]) || [];
 
-	console.log(transactions);
+	// console.log(transactions);
 
 	return (
 		<div className="space-y-4">

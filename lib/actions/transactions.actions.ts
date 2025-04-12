@@ -214,6 +214,7 @@ export const createManyTransactions = async (data: CreateTransactionProps[]): Pr
 
 export const updateTransaction = async (data: UpdateTransactionProps): Promise<Response<string>> => {
 	try {
+		console.log("updating transactions in server");
 		const { userId } = await auth();
 		// await delay(3000);
 
@@ -227,6 +228,7 @@ export const updateTransaction = async (data: UpdateTransactionProps): Promise<R
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
 		}
 
+		console.log(data);
 		const merchantId = await getMerchantId(data.merchant, userId);
 		const { merchant, ...transactionData } = data;
 		console.log(merchant);

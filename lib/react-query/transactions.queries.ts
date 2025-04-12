@@ -1,12 +1,18 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./query-keys";
-import { CreateTransactionProps, DeleteTransactionProps, SuccessResponse, UpdateTransactionProps } from "@/app/types";
+import {
+	CreateTransactionProps,
+	DeleteTransactionProps,
+	SuccessResponse,
+	TransactionWithRelations,
+	UpdateTransactionProps
+} from "@/app/types";
 import { Merchant, Transaction } from "@prisma/client";
 import {
 	createManyTransactions,
 	createTransaction,
 	deleteTransaction,
-	getTransactions,
+	// getTransactions,
 	getTransactionsWithRelations,
 	updateTransaction
 } from "../actions/transactions.actions";
@@ -16,19 +22,19 @@ import {
 // ============================================================
 
 const invalidateTransactionsQueries = (queryClient: QueryClient) => {
-	console.log("=------------invalidating grouped categories--------------------");
-	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS] });
+	console.log("=------------invalidating transactions--------------------");
+	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
 };
 
-export const useGetTransactions = () => {
-	return useQuery({
-		queryKey: [QUERY_KEYS.GET_TRANSACTIONS],
-		queryFn: () => {
-			console.log("query: calling transactions................");
-			return getTransactions();
-		}
-	});
-};
+// export const useGetTransactions = () => {
+// 	return useQuery({
+// 		queryKey: [QUERY_KEYS.GET_TRANSACTIONS],
+// 		queryFn: () => {
+// 			console.log("query: calling transactions................");
+// 			return getTransactions();
+// 		}
+// 	});
+// };
 
 export const useGetTransactionsWithRelations = () => {
 	return useQuery({
@@ -46,22 +52,47 @@ export const useCreateTransaction = () => {
 	return useMutation({
 		mutationFn: (props: CreateTransactionProps) => createTransaction(props),
 		onMutate: async (props: CreateTransactionProps) => {
-			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS] });
-			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS]);
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
+			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS]);
 
-			queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], (old: SuccessResponse<Transaction[]>) => {
-				return {
-					...old,
-					["data"]: [
-						{
-							...props,
-							id: Date.now()
-							// merchantId: 0
-						},
-						...old.data
-					]
-				};
-			});
+			queryClient.setQueryData(
+				[QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
+				(old: SuccessResponse<TransactionWithRelations[]>) => {
+					return {
+						...old,
+						["data"]: [
+							{
+								...props,
+								id: Date.now()
+								// merchantId: props.merchant ? 0 : null,
+								// merchant: props.merchant
+								// 	? {
+								// 			id: 0,
+								// 			name: props.merchant
+								// 	  }
+								// 	: null,
+								// category: props.categoryId
+								// 	? {
+								// 			id: 0,
+								// 			name: "Category",
+								// 			group: "expense"
+								// 	  }
+								// 	: null,
+								// subcategory: props.subcategoryId
+								// 	? {
+								// 			id: 0,
+								// 			name: "Subcategory"
+								// 	  }
+								// 	: null,
+								// createdAt: new Date(),
+								// updatedAt: new Date(),
+								// userId: "user0"
+							},
+							...old.data
+						]
+					};
+				}
+			);
 
 			// queryClient.setQueryData([QUERY_KEYS.GET_MERCHANTS], (old: SuccessResponse<Merchant[]>) => {
 			// 	return {
@@ -81,7 +112,7 @@ export const useCreateTransaction = () => {
 		},
 		onSettled: (data, error, variables, context) => {
 			if (!data?.success || error)
-				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], context?.previousTransactions);
+				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS], context?.previousTransactions);
 			invalidateTransactionsQueries(queryClient);
 		}
 	});
@@ -140,24 +171,28 @@ export const useUpdateTransaction = () => {
 	return useMutation({
 		mutationFn: (props: UpdateTransactionProps) => updateTransaction(props),
 		onMutate: async (props: UpdateTransactionProps) => {
-			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS] });
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
 
-			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS]);
+			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS]);
 			console.log("optimistic update");
-			queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], (old: SuccessResponse<Transaction[]>) => {
-				const filtered = old.data.filter((transaction) => transaction.id != props.id);
+			queryClient.setQueryData(
+				[QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
+				(old: SuccessResponse<TransactionWithRelations[]>) => {
+					const filtered = old.data.filter((transaction) => transaction.id != props.id);
 
-				return {
-					...old,
-					["data"]: [props, ...filtered]
-				};
-			});
+					return {
+						...old,
+						["data"]: [props, ...filtered]
+					};
+				}
+			);
 
 			return { previousTransactions };
 		},
 		onSettled: (data, error, variables, context) => {
+			console.log("Trying to settle.....");
 			if (!data?.success || error)
-				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], context?.previousTransactions);
+				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS], context?.previousTransactions);
 			invalidateTransactionsQueries(queryClient);
 		}
 	});
@@ -169,18 +204,21 @@ export const useDeleteTransaction = () => {
 	return useMutation({
 		mutationFn: (props: DeleteTransactionProps) => deleteTransaction(props),
 		onMutate: async (props: DeleteTransactionProps) => {
-			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS] });
-			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS]);
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
+			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS]);
 
-			queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], (old: SuccessResponse<Transaction[]>) => {
-				return { ...old, ["data"]: old.data.filter((transaction) => transaction.id !== props.id) };
-			});
+			queryClient.setQueryData(
+				[QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
+				(old: SuccessResponse<TransactionWithRelations[]>) => {
+					return { ...old, ["data"]: old.data.filter((transaction) => transaction.id !== props.id) };
+				}
+			);
 
 			return { previousTransactions };
 		},
 		onSettled: (data, error, variables, context) => {
 			if (!data?.success || error)
-				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS], context?.previousTransactions);
+				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS], context?.previousTransactions);
 			invalidateTransactionsQueries(queryClient);
 		}
 	});

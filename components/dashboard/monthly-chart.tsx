@@ -43,7 +43,7 @@ const chartTypes = [
 
 export function MonthlyChart() {
 	const { filters, filteredTransactions, timePeriod, customDateRange, handleFilterChange } = useDashboard();
-	const [chartType, setChartType] = useState("account");
+	const [chartType, setChartType] = useState("month");
 
 	const monthlyData = React.useMemo(() => getMonthlyData(filteredTransactions), [filteredTransactions]);
 	const accountData = React.useMemo(() => getAccountData(filteredTransactions), [filteredTransactions]);

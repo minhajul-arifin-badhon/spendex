@@ -14,6 +14,7 @@ import { useGetTransactionsWithRelations } from "@/lib/react-query/transactions.
 import { Filters, TransactionWithRelations } from "@/app/types";
 import { Spinner } from "@/components/ui/spinner";
 import { getDateRange } from "@/lib/utils";
+import Transactions from "@/components/transactions/transactions";
 
 const initialRange: DateRange = {
 	to: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
@@ -191,6 +192,8 @@ export default function Page() {
 			{/* <AdditionalCharts /> */}
 
 			{/* <TransactionsTable /> */}
+
+			<Transactions transactions={filteredTransactions}></Transactions>
 		</DashboardProvider>
 	);
 }

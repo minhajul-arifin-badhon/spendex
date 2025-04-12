@@ -209,14 +209,7 @@ export default function TransactionForm({
 									</FormLabel>
 
 									<FormControl>
-										<Input
-											placeholder="0.00"
-											{...field}
-											type="number"
-											step="0.01"
-											min="0"
-											className="h-10"
-										/>
+										<Input placeholder="0.00" {...field} type="number" step="1" className="h-10" />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
