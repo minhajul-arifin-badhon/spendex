@@ -216,7 +216,7 @@ export const importFormSchema = z.object({
 	includesHeader: z.boolean().default(true)
 });
 
-export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = []) => {
+export const getmMppingFormSchemaWithFilePreview = (existingMappings: Mapping[] = []) => {
 	return z.object({
 		mappingName: z
 			.string()
@@ -234,9 +234,9 @@ export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = [
 					message: "A mapping with this name already exists"
 				}
 			),
-		accountName: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
+		accountName: z.string().min(3, "Please enter at least 3 characters"),
 		includesHeader: z.boolean(),
-		// columnCount: z.number().min(1, "At least one column is required"),
+		negativeAmountMeans: z.string().or(z.literal("")),
 		columnFieldMapping: z
 			.array(columnFieldMappingSchema)
 			.min(3, "At least 3 column mappings are required")
@@ -267,3 +267,15 @@ export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = [
 			)
 	});
 };
+
+export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = []) =>
+	getmMppingFormSchemaWithFilePreview(existingMappings).refine(
+		(data) => {
+			const isAccount = data.columnFieldMapping.some((field) => field.fieldName == "Account");
+			return !isAccount || (isAccount && data.negativeAmountMeans);
+		},
+		{
+			message: "Please, select what a negative amount means.",
+			path: ["negativeAmountMeans"]
+		}
+	);

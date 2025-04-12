@@ -26,12 +26,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Mapping, Transaction } from "@prisma/client";
 import {
 	ColumnFieldMappingProps,
+	CreateMappingProps,
 	CreateTransactionProps,
 	ImportFormProps,
 	MappingFormWithFilePreviewProps
 } from "@/app/types";
 import { importFormSchema, mappingFormSchemaWithFilePreview } from "@/lib/validation";
-import { useGetMappings } from "@/lib/react-query/mappings.queries";
+import { useCreateMapping, useGetMappings } from "@/lib/react-query/mappings.queries";
 import { Spinner } from "../ui/spinner";
 import { SelectWithClear } from "../ui/select-with-clear";
 import { cn, truncateText } from "@/lib/utils";
@@ -117,6 +118,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	const { data: mappingsResponse, isLoading: isLoading, isError: isError } = useGetMappings();
 	const mappings = (mappingsResponse?.data as Mapping[]) || [];
 
+	const createMappingMutation = useCreateMapping();
+
 	// Initialize the form with React Hook Form
 	const form = useForm<ImportFormProps>({
 		resolver: zodResolver(importFormSchema),
@@ -136,6 +139,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 			mappingName: "",
 			accountName: "",
 			includesHeader: true,
+			negativeAmountMeans: "",
 			columnFieldMapping: []
 		}
 	});
@@ -171,7 +175,10 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 			const selectedMapping = mappings.find((m) => m.id === parseInt(data.mappingId as string));
 			if (selectedMapping) {
 				console.log(selectedMapping);
-				processDataWithMapping(data, selectedMapping);
+				processDataWithMapping(
+					{ includesHeader: data.includesHeader, accountName: data.accountName },
+					selectedMapping
+				);
 				return;
 			}
 		}
@@ -194,7 +201,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	};
 
 	// Process data using a selected mapping
-	const processDataWithMapping = (formData: ImportFormProps, mapping: Mapping) => {
+	const processDataWithMapping = (formData: { includesHeader: boolean; accountName: string }, mapping: Mapping) => {
 		// return;
 		if (!fileData.length) return;
 
@@ -258,96 +265,33 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	};
 
 	// Handle form submission for step 2
-	const onSubmitStep2 = (data: MappingFormWithFilePreviewProps) => {
+	const onSubmitStep2 = async (formData: MappingFormWithFilePreviewProps) => {
 		if (!importFormData || !fileData.length) return;
 
-		console.log(data);
+		console.log(formData);
 
-		// Save the new mapping if a name was provided
-		// if (data.mappingName) {
-		// 	const newMapping: Mapping = {
-		// 		id: Date.now().toString(),
-		// 		name: data.mappingName,
-		// 		includesHeader: data.includesHeader,
-		// 		columnMappings: data.columnMappings.filter((cm) => cm.fieldName && cm.fieldName !== "")
-		// 	};
+		const newMapping: CreateMappingProps = {
+			...formData
+		};
 
-		// 	// In a real app, you would save this mapping to your backend
-		// 	console.log("New mapping created:", newMapping);
-		// }
+		try {
+			toast.info("Importing data...");
 
-		// // Process the data based on the column mappings
-		// const startRow = data.includesHeader ? 1 : 0;
-		// const transactions: Transaction[] = [];
+			const response = await createMappingMutation.mutateAsync(newMapping);
+			console.log(response);
 
-		// for (let i = startRow; i < fileData.length; i++) {
-		// 	const row = fileData[i];
-		// 	if (!row.length) continue;
-
-		// 	const transaction: Partial<Transaction> = {
-		// 		id: `import-${Date.now()}-${i}`,
-		// 		accountName: data.accountName || ""
-		// 	};
-
-		// 	// Map each column to the corresponding field
-		// 	data.columnMappings.forEach((mapping) => {
-		// 		if (
-		// 			!mapping.fieldName ||
-		// 			mapping.fieldName === "" ||
-		// 			mapping.fieldName === "none" ||
-		// 			mapping.columnIndex >= row.length
-		// 		)
-		// 			return;
-
-		// 		const value = row[mapping.columnIndex];
-		// 		switch (mapping.fieldName) {
-		// 			case "Date":
-		// 				transaction.date = value;
-		// 				break;
-		// 			case "Merchant":
-		// 				transaction.merchant = value;
-		// 				break;
-		// 			case "Description":
-		// 				transaction.description = value;
-		// 				break;
-		// 			case "Category":
-		// 				transaction.category = value;
-		// 				break;
-		// 			case "Subcategory":
-		// 				transaction.subcategory = value;
-		// 				break;
-		// 			case "Amount":
-		// 				transaction.amount = Number.parseFloat(value.replace(/[^0-9.-]+/g, ""));
-		// 				break;
-		// 			case "Credit":
-		// 				// For Credit, we store as positive amount
-		// 				transaction.amount = Number.parseFloat(value.replace(/[^0-9.-]+/g, ""));
-		// 				break;
-		// 			case "Debit":
-		// 				// For Debit, we store as negative amount
-		// 				transaction.amount = -Math.abs(Number.parseFloat(value.replace(/[^0-9.-]+/g, "")));
-		// 				break;
-		// 			case "Account Name":
-		// 				transaction.accountName = value;
-		// 				break;
-		// 		}
-		// 	});
-
-		// 	// Ensure all required fields have default values
-		// 	transactions.push({
-		// 		id: transaction.id || `import-${Date.now()}-${i}`,
-		// 		date: transaction.date || new Date().toISOString().split("T")[0],
-		// 		accountName: transaction.accountName || "Unknown Account",
-		// 		merchant: transaction.merchant || "Unknown Merchant",
-		// 		description: transaction.description || "",
-		// 		category: transaction.category || "Uncategorized",
-		// 		subcategory: transaction.subcategory || "",
-		// 		amount: transaction.amount || 0
-		// 	});
-		// }
-
-		// onImport(transactions);
-		resetModal();
+			if (response?.success) {
+				processDataWithMapping(
+					{ includesHeader: formData.includesHeader, accountName: formData.accountName },
+					response?.data as Mapping
+				);
+			} else {
+				toast.error(response?.data as string);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
 	};
 
 	// Reset the modal state
@@ -583,7 +527,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 									name="accountName"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Account Name</FormLabel>
+											<FormLabel>Account Name*</FormLabel>
 											<FormControl>
 												<Input placeholder="Enter account name. e.g. CIBC Savings" {...field} />
 											</FormControl>
@@ -623,13 +567,14 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 							/>
 
 							<div className="space-y-4">
-								<div>
-									<Label>Column Mapping*</Label>
-									<p className="text-sm text-muted-foreground">
-										Map each column to the corresponding transaction field or leave unassigned.
-										Mapping to the Date, Description, and Amount fields (or both Credit and Debit)
-										is required.
-									</p>
+								<div className="space-y-1">
+									<FormLabel>Column Mappings*</FormLabel>
+									<FormDescription>
+										- Each column must map to a unique field or leave unassigned.
+										<br /> - Mapping to the Date, Description, and Amount fields (or both Credit and
+										Debit) is required.
+										<br /> - Description field should contain merchant information.
+									</FormDescription>
 								</div>
 
 								<div className="overflow-x-auto">
@@ -706,35 +651,48 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 													</TableBody>
 												</Table>
 											</div>
-
-											{/* <Alert>
-												<Asterisk className="h-4 w-4" />
-												<AlertTitle>
-													Each column must map to a unique field or leave unassigned
-												</AlertTitle>
-												<AlertDescription>
-													Mapping to the Date, Description, and Amount fields (or both Credit
-													and Debit) is required.
-												</AlertDescription>
-											</Alert> */}
-
-											{columnMappingFormErrors.columnFieldMapping &&
-												columnMappingFormErrors.columnFieldMapping.root && (
-													<Alert variant="destructive" className="mt-4 flex align-middle">
-														<AlertCircle className="h-4 w-4" />
-														<AlertDescription>
-															<ul className="list-none">
-																{getColumnMappingErrors().map((error, index) => (
-																	<li key={index}>{error}</li>
-																))}
-															</ul>
-														</AlertDescription>
-													</Alert>
-												)}
 										</div>
 									)}
 								</div>
 							</div>
+
+							{columnMappingForm
+								.watch("columnFieldMapping")
+								.some((field) => field.fieldName == "Amount") && (
+								<FormField
+									control={columnMappingForm.control}
+									name="negativeAmountMeans"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Interpret Negative (-) Amount As*</FormLabel>
+											<SelectWithClear
+												value={field.value ? field.value.toString() : ""}
+												onChange={field.onChange}
+												options={["Debit", "Credit"].map((m) => ({
+													id: m,
+													value: m
+												}))}
+												placeholder="Select a type"
+											/>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							)}
+
+							{columnMappingFormErrors.columnFieldMapping &&
+								columnMappingFormErrors.columnFieldMapping.root && (
+									<Alert variant="destructive" className="mt-4 flex align-middle">
+										<AlertCircle className="h-4 w-4" />
+										<AlertDescription>
+											<ul className="list-none">
+												{getColumnMappingErrors().map((error, index) => (
+													<li key={index}>{error}</li>
+												))}
+											</ul>
+										</AlertDescription>
+									</Alert>
+								)}
 
 							<DialogFooter>
 								<Button type="button" variant="outline" onClick={() => setStep(1)}>

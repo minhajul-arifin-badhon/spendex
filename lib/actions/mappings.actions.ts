@@ -33,7 +33,7 @@ export const getMappings = async (): Promise<Response<Mapping[]>> => {
 	}
 };
 
-export const createMapping = async (data: CreateMappingProps): Promise<Response<string>> => {
+export const createMapping = async (data: CreateMappingProps): Promise<Response<Mapping>> => {
 	try {
 		const { userId } = await auth();
 		// await delay(5000);
@@ -62,7 +62,7 @@ export const createMapping = async (data: CreateMappingProps): Promise<Response<
 			data: { ...data, userId }
 		});
 
-		return sendResponse(200, "The mapping is created successfully.");
+		return sendResponse(200, newItem);
 	} catch (error) {
 		console.error("Error creating mapping:", error);
 		return sendErrorResponse(500, "Failed To Create. \nInternal Server Error");

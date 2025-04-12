@@ -107,11 +107,8 @@ export default function Page() {
 			const response = await createMappingMutation.mutateAsync(newMapping);
 			console.log(response);
 
-			if (!response?.success) {
-				toast.error(response?.data);
-			} else {
-				toast.success(response?.data);
-			}
+			if (response?.success) toast.success("The mapping is created successfully.");
+			else toast.error(response?.data as string);
 		} catch (error) {
 			console.log(error);
 			toast.error("Something went wrong!");

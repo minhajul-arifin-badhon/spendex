@@ -124,7 +124,7 @@ export default function MappingForm({
 							name="mappingName"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Mapping Name</FormLabel>
+									<FormLabel>Mapping Name*</FormLabel>
 									<FormControl>
 										<Input placeholder="Enter a name for this mapping" {...field} />
 									</FormControl>
@@ -138,7 +138,7 @@ export default function MappingForm({
 							name="accountName"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Account Name</FormLabel>
+									<FormLabel>Account Name*</FormLabel>
 									<FormControl>
 										<Input placeholder="Enter account name e.g. CIBC" {...field} />
 									</FormControl>
@@ -165,7 +165,7 @@ export default function MappingForm({
 							name="columnCount"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Number of Columns</FormLabel>
+									<FormLabel>Number of Columns*</FormLabel>
 									<Select
 										value={field.value.toString()}
 										onValueChange={(value) => {
@@ -192,7 +192,7 @@ export default function MappingForm({
 						/>
 
 						<div className="space-y-1">
-							<FormLabel>Column Mappings</FormLabel>
+							<FormLabel>Column Mappings*</FormLabel>
 							<FormDescription>
 								- Each column must map to a unique field or leave unassigned.
 								<br /> - Mapping to the Date, Description, and Amount fields (or both Credit and Debit)
@@ -229,15 +229,6 @@ export default function MappingForm({
 									/>
 								))}
 							</div>
-							{/* 
-							<Alert>
-								<Asterisk className="h-4 w-4" />
-								<AlertTitle>Each column must map to a unique field or leave unassigned</AlertTitle>
-								<AlertDescription>
-									Mapping to the Date, Description, and Amount fields (or both Credit and Debit) is
-									required.
-								</AlertDescription>
-							</Alert> */}
 						</div>
 
 						{form.watch("columnFieldMapping").some((field) => field.fieldName == "Amount") && (
