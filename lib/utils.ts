@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge";
 import { format } from "date-fns";
 import { BarSizeResult, TransactionWithRelations } from "@/app/types";
 import { DateRange } from "react-day-picker";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -143,4 +145,49 @@ export const filterByAmount = (amount: number, filterValue: string): boolean => 
 	}
 
 	return amount.toFixed(2).toLowerCase().includes(filterValue.toLowerCase());
+};
+
+/**
+ * Parses a CSV or Excel file and returns a Promise that resolves to an array of rows.
+ * Each row is either an array of values (for CSV) or an object (for Excel).
+ */
+export const parseFile = (file: File): Promise<string[][]> => {
+	return new Promise((resolve, reject) => {
+		const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+		if (fileExtension === "csv") {
+			Papa.parse<string[]>(file, {
+				header: false,
+				skipEmptyLines: true,
+				// dynamicTyping: true,
+				complete: (result) => {
+					console.log("Parsed Data:", result.data);
+					const cleaned = result.data.map((row: string[]) =>
+						row.map((cell: string) => cell?.trim().replace(/^["']|["']$/g, ""))
+					);
+					resolve(cleaned);
+				},
+				error: (error) => {
+					reject(error);
+				}
+			});
+		} else if (fileExtension === "xlsx" || fileExtension === "xls") {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				try {
+					const data = new Uint8Array(event.target?.result as ArrayBuffer);
+					const workbook = XLSX.read(data, { type: "array" });
+					const sheet = workbook.Sheets[workbook.SheetNames[0]];
+					const rows: string[][] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+					resolve(rows);
+				} catch (error) {
+					reject(error);
+				}
+			};
+			reader.onerror = () => reject(reader.error);
+			reader.readAsArrayBuffer(file);
+		} else {
+			reject(new Error("Unsupported file format. Please upload a CSV or Excel file."));
+		}
+	});
 };

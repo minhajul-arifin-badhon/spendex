@@ -35,7 +35,7 @@ import { importFormSchema, mappingFormSchemaWithFilePreview } from "@/lib/valida
 import { useCreateMapping, useGetMappings } from "@/lib/react-query/mappings.queries";
 import { Spinner } from "../ui/spinner";
 import { SelectWithClear } from "../ui/select-with-clear";
-import { cn, truncateText } from "@/lib/utils";
+import { cn, parseFile, truncateText } from "@/lib/utils";
 import { fieldOptions } from "@/lib/constants";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -153,16 +153,24 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 		form.setValue("file", file, { shouldValidate: true });
 
+		try {
+			const parsedData = await parseFile(file);
+			setFileData(parsedData);
+			console.log("Parsed Data:", parsedData);
+		} catch (err) {
+			console.error("Failed to parse file:", err);
+		}
+
 		// Parse CSV file
-		const reader = new FileReader();
-		reader.onload = (event) => {
-			const text = event.target?.result as string;
-			const rows = text.split("\n").map((row) => row.split(",").map((cell) => cell.trim().replace(/['"]/g, "")));
-			console.log("Uploaded Data: ");
-			console.log(rows);
-			setFileData(rows.filter((row) => row.some((cell) => cell !== "")));
-		};
-		reader.readAsText(file);
+		// const reader = new FileReader();
+		// reader.onload = (event) => {
+		// 	const text = event.target?.result as string;
+		// 	const rows = text.split("\n").map((row) => row.split(",").map((cell) => cell.trim().replace(/['"]/g, "")));
+		// 	console.log("Uploaded Data: ");
+		// 	console.log(rows);
+		// 	setFileData(rows.filter((row) => row.some((cell) => cell !== "")));
+		// };
+		// reader.readAsText(file);
 	};
 
 	// Handle form submission for step 1
@@ -212,6 +220,9 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		const columnFieldMapping = mapping.columnFieldMapping as ColumnFieldMappingProps[];
 
 		if (columnFieldMapping.length != fileData[startRow].length) {
+			console.log("Mapping columns: ", columnFieldMapping.length);
+			console.log("Filedata columns: ", fileData[startRow].length);
+
 			toast.error("Number of columns does not match between the uploaded file and the selected mapping.");
 			return;
 		}
