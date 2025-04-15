@@ -14,13 +14,15 @@ import ThemeProvider from "@/components/theme/theme-provider";
 
 const lustria = Lustria({
 	weight: ["400"],
-	variable: "--font-lustria"
+	variable: "--font-lustria",
+	subsets: ["latin"]
 });
 
 const lato = Lato({
 	weight: ["300", "400", "700", "900"],
 	variable: "--font-lato",
-	preload: true
+	preload: true,
+	subsets: ["latin"]
 });
 
 // const merriweather = Merriweather_Sans({
