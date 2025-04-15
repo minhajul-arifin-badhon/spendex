@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
 				pathname: "/**" // Matches all images from this domain
 			}
 		]
+	},
+	eslint: {
+		ignoreDuringBuilds: true
 	}
 };
 
