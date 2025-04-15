@@ -55,7 +55,8 @@ export const createMerchant = async (data: CreateMerchantProps): Promise<Respons
 
 		const isItem = await prisma.merchant.findFirst({
 			where: {
-				name: data.name
+				name: data.name,
+				userId
 			}
 		});
 

@@ -70,7 +70,8 @@ export const createCategory = async (data: CreateCategoryProps): Promise<Respons
 
 		const isItem = await prisma.category.findFirst({
 			where: {
-				name: data.name
+				name: data.name,
+				userId
 			}
 		});
 

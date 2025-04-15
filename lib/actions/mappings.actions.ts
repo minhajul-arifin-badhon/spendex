@@ -50,7 +50,8 @@ export const createMapping = async (data: CreateMappingProps): Promise<Response<
 
 		const isItem = await prisma.mapping.findFirst({
 			where: {
-				mappingName: data.mappingName
+				mappingName: data.mappingName,
+				userId
 			}
 		});
 

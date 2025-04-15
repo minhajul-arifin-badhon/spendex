@@ -6,6 +6,7 @@
 
 generator client {
     provider = "prisma-client-js"
+    output   = "../node_modules/@prisma/client"
 }
 
 datasource db {
@@ -50,7 +51,7 @@ model Transaction {
 
 model Category {
     id        Int           @id @default(autoincrement())
-    name      String        @unique
+    name      String
     group     CategoryGroup
     userId    String
     createdAt DateTime      @default(now())
@@ -61,12 +62,13 @@ model Category {
     transactions  Transaction[]
     merchants     Merchant[]
 
+    @@unique([userId, name])
     @@map("categories")
 }
 
 model Subcategory {
     id         Int      @id @default(autoincrement())
-    name       String   @unique
+    name       String
     categoryId Int
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
@@ -75,6 +77,7 @@ model Subcategory {
     transactions Transaction[]
     merchants    Merchant[]
 
+    @@unique([categoryId, name])
     @@map("subcategories")
 }
 
@@ -93,6 +96,7 @@ model Merchant {
     user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
     transactions Transaction[]
 
+    @@unique([userId, name])
     @@map("merchants")
 }
 
@@ -105,7 +109,7 @@ enum CategoryGroup {
 model Mapping {
     id                  Int      @id @default(autoincrement())
     userId              String
-    mappingName         String   @unique
+    mappingName         String
     accountName         String
     columnFieldMapping  Json
     includesHeader      Boolean  @default(false)
@@ -115,5 +119,6 @@ model Mapping {
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    @@unique([userId, mappingName])
     @@map("mappings")
 }
