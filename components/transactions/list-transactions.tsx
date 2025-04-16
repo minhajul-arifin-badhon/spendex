@@ -125,7 +125,11 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 						</Button>
 					);
 				},
-				cell: ({ row }) => <div>{row.original.amount.toFixed(2)}</div>,
+				cell: ({ row }) => (
+					<div className={row.original.amount <= 0 ? "text-chart-red" : "text-chart-green"}>
+						{row.original.amount.toFixed(2)}
+					</div>
+				),
 				filterFn: (row, columnId, filterValue) => {
 					const amount = row.original.amount;
 					return filterByAmount(amount, filterValue);

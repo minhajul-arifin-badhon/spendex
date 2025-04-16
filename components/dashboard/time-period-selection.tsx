@@ -61,7 +61,7 @@ export function TimePeriodSelector() {
 						// size="sm"
 						variant="outline"
 						className={cn(
-							"border transition-colors focus-visible:outline-none duration-200 ease-in rounded-md bg-transparent hover:dark:bg-white hover:dark:text-gray-900 hover:bg-gray-900 hover:text-white",
+							"border transition-colors focus-visible:outline-none duration-200 ease-in rounded-md bg-card hover:dark:bg-white hover:dark:text-gray-900 hover:bg-gray-900 hover:text-white",
 							timePeriod === option.value && "dark:bg-white dark:text-gray-900 bg-gray-900 text-white"
 						)}
 					>

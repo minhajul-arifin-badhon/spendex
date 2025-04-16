@@ -153,7 +153,21 @@ export const createTransaction = async (data: CreateTransactionProps): Promise<R
 
 		if (!result.success) return sendErrorResponse(400, JSON.stringify(result.error.errors));
 
-		const merchant = await getMerchant(data.merchant, userId);
+		let merchant = await getMerchant(data.merchant, userId);
+
+		if (!merchant && data.description) {
+			const merchants = await prisma.merchant.findMany({
+				where: { userId }
+			});
+
+			const normalizedDescription = data.description.toLowerCase();
+
+			merchant =
+				merchants.find((m) =>
+					m.includes.some((substr) => normalizedDescription.includes(substr.toLowerCase()))
+				) ?? null;
+		}
+
 		const { merchant: merchantName, ...newTransaction } = data;
 		console.log(merchantName);
 
