@@ -11,6 +11,7 @@ import { createMerchant, deleteMerchant, getMerchants, updateMerchant } from "..
 const invalidateMerchantsQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating grouped categories--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });
+	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
 };
 
 export const useGetMerchants = () => {

@@ -49,45 +49,40 @@ export default function Page() {
 
 		const transactions = transactionsResponse.data as TransactionWithRelations[];
 		// console.log(transactions);
-		console.log("Filtering transactions");
+		// console.log("Filtering transactions");
+		// console.log(filters);
 
-		return transactions.filter((tx: TransactionWithRelations) => {
+		// Helper to match category/subcategory/merchant logic
+		// const matchesField = (fieldValue: string | undefined | null, filterValue: string | undefined) => {
+		// 	if (!filterValue) return true;
+		// 	if (filterValue === "Uncategorized") return !fieldValue;
+		// 	return fieldValue?.toLowerCase().includes(filterValue.toLowerCase());
+		// };
+
+		const matchesExact = (fieldValue: string | undefined | null, filterValue: string) => {
+			if (!filterValue) return true;
+			if (filterValue === "Uncategorized") return !fieldValue;
+			return fieldValue?.toLowerCase() === filterValue.toLowerCase();
+		};
+
+		return transactions.filter((tx) => {
 			const isMoneyIn = tx.amount > 0;
 			const isMoneyOut = tx.amount < 0;
-
-			// console.log(tx.date, filters.dateRange.from, filters.dateRange.to);
 
 			if (filters.dateRange.from && tx.date < filters.dateRange.from) return false;
 			if (filters.dateRange.to && tx.date > filters.dateRange.to) return false;
 
-			if (
-				isMoneyIn &&
-				filters.moneyInMerchant &&
-				!tx.merchant?.name.toLowerCase().includes(filters.moneyInMerchant.toLowerCase())
-			)
-				return false;
+			if (isMoneyIn && !matchesExact(tx.merchant?.name, filters.moneyInMerchant)) return false;
+			if (isMoneyOut && !matchesExact(tx.merchant?.name, filters.moneyOutMerchant)) return false;
 
-			if (
-				isMoneyOut &&
-				filters.moneyOutMerchant &&
-				!tx.merchant?.name.toLowerCase().includes(filters.moneyOutMerchant.toLowerCase())
-			)
-				return false;
+			if (!matchesExact(tx.accountName, filters.accountName)) return false;
 
-			if (filters.accountName && !tx.accountName?.toLowerCase().includes(filters.accountName.toLowerCase()))
-				return false;
+			if (isMoneyIn && !matchesExact(tx.category?.name, filters.moneyInCategory)) return false;
+			if (isMoneyIn && !matchesExact(tx.subcategory?.name, filters.moneyInSubcategory)) return false;
 
-			if (isMoneyIn && filters.moneyInCategory && tx.category?.name !== filters.moneyInCategory) return false;
+			if (isMoneyOut && !matchesExact(tx.category?.name, filters.moneyOutCategory)) return false;
+			if (isMoneyOut && !matchesExact(tx.subcategory?.name, filters.moneyOutSubcategory)) return false;
 
-			if (isMoneyIn && filters.moneyInSubcategory && tx.subcategory?.name !== filters.moneyInSubcategory)
-				return false;
-
-			if (isMoneyOut && filters.moneyOutCategory && tx.category?.name !== filters.moneyOutCategory) return false;
-
-			if (isMoneyOut && filters.moneyOutSubcategory && tx.subcategory?.name !== filters.moneyOutSubcategory)
-				return false;
-
-			// console.log("keeping");
 			return true;
 		});
 	}, [transactionsResponse, filters, isErrorTransactions]);

@@ -49,7 +49,7 @@ const defaultFormValues: TransactionFormProps = {
 };
 
 export default function Transactions({ transactions }: { transactions: TransactionWithRelations[] }) {
-	console.log("Transactions component re-rendering", transactions);
+	// console.log("Transactions component re-rendering", transactions);
 	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
 	// const {

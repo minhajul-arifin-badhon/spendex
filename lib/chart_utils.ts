@@ -27,18 +27,16 @@ export const getAccountData = (transactions: TransactionWithRelations[]) => {
 	const accounts: Record<string, { name: string; moneyIn: number; moneyOut: number }> = {};
 
 	transactions.forEach((transaction) => {
-		const accountName = transaction.accountName;
+		const accountName = transaction.accountName ? transaction.accountName : "Uncategorized";
 
-		if (accountName) {
-			if (!accounts[accountName]) {
-				accounts[accountName] = { name: accountName, moneyIn: 0, moneyOut: 0 };
-			}
+		if (!accounts[accountName]) {
+			accounts[accountName] = { name: accountName, moneyIn: 0, moneyOut: 0 };
+		}
 
-			if (transaction.amount > 0) {
-				accounts[accountName].moneyIn += transaction.amount;
-			} else {
-				accounts[accountName].moneyOut += Math.abs(transaction.amount);
-			}
+		if (transaction.amount > 0) {
+			accounts[accountName].moneyIn += transaction.amount;
+		} else {
+			accounts[accountName].moneyOut += Math.abs(transaction.amount);
 		}
 	});
 
@@ -58,8 +56,10 @@ export const getCategoryData = (
 	const filtered = filteredTransactions.filter((t) => {
 		const isCorrectType = (isMoneyIn && t.amount > 0) || (!isMoneyIn && t.amount < 0);
 
-		const matchesCategory = !category || t.category?.name === category;
-		const matchesSubcategory = !subcategory || t.subcategory?.name === subcategory;
+		const matchesCategory =
+			!category || (!t.category && category == "Uncategorized") || t.category?.name === category;
+		const matchesSubcategory =
+			!subcategory || (!t.subcategory && subcategory == "Uncategorized") || t.subcategory?.name === subcategory;
 
 		return isCorrectType && matchesCategory && matchesSubcategory;
 	});
@@ -70,7 +70,7 @@ export const getCategoryData = (
 		let key: string | null = null;
 
 		if (!category && !subcategory) {
-			key = t.category?.name ?? null;
+			key = t.category?.name ?? "Uncategorized";
 		} else if (category && !subcategory) {
 			key = t.subcategory?.name ?? "Uncategorized";
 		} else if (category && subcategory) {

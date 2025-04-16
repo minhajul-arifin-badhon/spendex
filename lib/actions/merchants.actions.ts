@@ -7,6 +7,7 @@ import { createMerchantSchema, deleteMerchantSchema, updateMerchantSchema } from
 import { prisma } from "../prisma";
 import { Merchant } from "@prisma/client";
 import { delay } from "../utils";
+import _ from "lodash";
 
 export const getMerchants = async (): Promise<Response<Merchant[]>> => {
 	try {
@@ -64,13 +65,52 @@ export const createMerchant = async (data: CreateMerchantProps): Promise<Respons
 			return sendErrorResponse(400, "A merchant with that name already exists.");
 		}
 
-		const newItem = await prisma.merchant.create({
+		const newMerchant = await prisma.merchant.create({
 			data: { ...data, userId }
 		});
 
-		console.log(newItem);
+		console.log(newMerchant);
 
-		return sendResponse(200, "The merchant is created successfully.");
+		const result1 = await prisma.transaction.updateMany({
+			where: {
+				userId,
+				merchantId: null,
+				categoryId: null,
+				subcategoryId: null,
+				OR: newMerchant.includes.map((substring) => ({
+					description: {
+						contains: substring,
+						mode: "insensitive"
+					}
+				}))
+			},
+			data: {
+				merchantId: newMerchant.id,
+				categoryId: newMerchant.categoryId,
+				subcategoryId: newMerchant.subcategoryId
+			}
+		});
+
+		const result2 = await prisma.transaction.updateMany({
+			where: {
+				userId,
+				merchantId: null,
+				OR: newMerchant.includes.map((substring) => ({
+					description: {
+						contains: substring,
+						mode: "insensitive"
+					}
+				}))
+			},
+			data: {
+				merchantId: newMerchant.id
+			}
+		});
+
+		return sendResponse(
+			200,
+			`The merchant is created successfully and affected ${result1.count + result2.count} transactions`
+		);
 	} catch (error) {
 		console.error("Error creating merchant:", error);
 		return sendErrorResponse(500, "Failed To Create. \nInternal Server Error");
@@ -92,12 +132,122 @@ export const updateMerchant = async (data: UpdateMerchantProps): Promise<Respons
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
 		}
 
+		const merchant = await prisma.merchant.findUnique({
+			where: { id: data.id }
+		});
+
+		let totalUpdated = 0;
+		if (merchant?.categoryId != data.categoryId || merchant?.subcategoryId != data.subcategoryId) {
+			const result = await prisma.transaction.updateMany({
+				where: {
+					merchantId: data.id,
+					categoryId: merchant?.categoryId,
+					subcategoryId: merchant?.subcategoryId
+				},
+				data: {
+					categoryId: data.categoryId,
+					subcategoryId: data.subcategoryId
+				}
+			});
+
+			totalUpdated += result.count;
+		}
+
+		const includesChanged =
+			merchant?.includes && !_.isEqual([...merchant?.includes].sort(), [...data.includes].sort());
+
+		console.log("Current:", merchant?.includes);
+		console.log("New", data.includes);
+		console.log("includes changed", includesChanged);
+
+		if (includesChanged) {
+			if (merchant.includes.length > 0) {
+				// updateing the transactions that were surely influenced by the merchant attributes.
+				const result1 = await prisma.transaction.updateMany({
+					where: {
+						merchantId: merchant.id,
+						categoryId: merchant.categoryId,
+						subcategoryId: merchant.subcategoryId,
+						OR: merchant.includes.map((substring) => ({
+							description: {
+								contains: substring,
+								mode: "insensitive"
+							}
+						}))
+					},
+					data: {
+						merchantId: null,
+						categoryId: null,
+						subcategoryId: null
+					}
+				});
+
+				// updateing the transactions that where only the merchant was set, (category and subcategory are not same as merchant settings).
+				const result2 = await prisma.transaction.updateMany({
+					where: {
+						merchantId: merchant.id,
+						OR: merchant.includes.map((substring) => ({
+							description: {
+								contains: substring,
+								mode: "insensitive"
+							}
+						}))
+					},
+					data: {
+						merchantId: null
+					}
+				});
+
+				totalUpdated += result1.count + result2.count;
+			}
+
+			if (data.includes.length > 0) {
+				const result1 = await prisma.transaction.updateMany({
+					where: {
+						merchantId: null,
+						categoryId: null,
+						subcategoryId: null,
+						OR: data.includes.map((substring) => ({
+							description: {
+								contains: substring,
+								mode: "insensitive"
+							}
+						}))
+					},
+					data: {
+						merchantId: data.id,
+						categoryId: data.categoryId,
+						subcategoryId: data.subcategoryId
+					}
+				});
+
+				totalUpdated += result1.count;
+
+				const result2 = await prisma.transaction.updateMany({
+					where: {
+						merchantId: null,
+						OR: data.includes.map((substring) => ({
+							description: {
+								contains: substring,
+								mode: "insensitive"
+							}
+						}))
+					},
+					data: {
+						merchantId: data.id
+					}
+				});
+
+				totalUpdated += result2.count;
+			}
+		}
+
 		await prisma.merchant.update({
 			where: { id: data.id },
 			data: data
 		});
 
-		return sendResponse(200, "Merchant is successfully updated.");
+		return sendResponse(200, `Merchant is successfully updated and affected ${totalUpdated} transactions`);
 	} catch (error) {
 		console.error("Error updating merchant:", error);
 		return sendErrorResponse(500, "Failed To Update. \n Internal Server Error");
@@ -118,12 +268,34 @@ export const deleteMerchant = async (data: DeleteMerchantProps): Promise<Respons
 			return sendErrorResponse(400, JSON.stringify(result.error.errors));
 		}
 
+		const merchant = await prisma.merchant.findUnique({
+			where: { id: data.id }
+		});
+
+		if (!merchant) {
+			return sendErrorResponse(400, "Merchant not found.");
+		}
+
+		const transactionUpdated = await prisma.transaction.updateMany({
+			where: {
+				merchantId: merchant.id,
+				categoryId: merchant.categoryId,
+				subcategoryId: merchant.subcategoryId
+			},
+			data: {
+				categoryId: null,
+				subcategoryId: null
+			}
+		});
+
 		await prisma.merchant.delete({
 			where: { id: data.id }
 		});
 
-		console.log("Server: deleted");
-		return sendResponse(200, "Merchant is deleted successfully");
+		return sendResponse(
+			200,
+			`Merchant is deleted successfully and affected ${transactionUpdated.count} transactions.`
+		);
 	} catch (error) {
 		console.error("Error deleting merchant:", error);
 		return sendErrorResponse(500, "Internal Server Error");

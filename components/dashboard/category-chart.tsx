@@ -90,8 +90,8 @@ export function CategoryChart({ cashFlowType }: { cashFlowType: string }) {
 								data={processedChartData}
 								layout="vertical"
 								margin={{
-									left: 25,
-									right: 36
+									left: 30,
+									right: 45
 								}}
 							>
 								<CartesianGrid horizontal={false} />

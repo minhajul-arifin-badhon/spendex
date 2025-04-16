@@ -11,7 +11,7 @@ import { auth } from "@clerk/nextjs/server";
 import { sendErrorResponse, sendResponse } from "../response";
 import { createTransactionSchema, deleteTransactionSchema, updateTransactionSchema } from "../validation";
 import { prisma } from "../prisma";
-import { Transaction } from "@prisma/client";
+import { Merchant, Transaction } from "@prisma/client";
 import { delay } from "../utils";
 import { z } from "zod";
 import { mockTransactions } from "../constants";
@@ -111,20 +111,19 @@ export const getTransactionsWithRelations = async (): Promise<Response<Transacti
 	}
 };
 
-async function getMerchantId(merchantName: string, userId: string): Promise<number | null> {
-	let merchantId: number | null = null;
-
+async function getMerchant(merchantName: string, userId: string): Promise<Merchant | null> {
 	if (merchantName) {
 		// Try to find the merchant by name
 		const merchant = await prisma.merchant.findFirst({
 			where: {
-				name: merchantName
+				name: merchantName,
+				userId
 			}
 		});
 
 		if (merchant) {
 			// If the merchant exists, return its id
-			merchantId = merchant.id;
+			return merchant;
 		} else {
 			// If the merchant does not exist, create a new one
 			const newMerchant = await prisma.merchant.create({
@@ -136,11 +135,11 @@ async function getMerchantId(merchantName: string, userId: string): Promise<numb
 			});
 
 			// Return the id of the newly created merchant
-			if (newMerchant) merchantId = newMerchant.id;
+			if (newMerchant) return merchant;
 		}
 	}
 
-	return merchantId;
+	return null;
 }
 
 export const createTransaction = async (data: CreateTransactionProps): Promise<Response<string>> => {
@@ -154,12 +153,18 @@ export const createTransaction = async (data: CreateTransactionProps): Promise<R
 
 		if (!result.success) return sendErrorResponse(400, JSON.stringify(result.error.errors));
 
-		const merchantId = await getMerchantId(data.merchant, userId);
-		const { merchant, ...newTransaction } = data;
-		console.log(merchant);
+		const merchant = await getMerchant(data.merchant, userId);
+		const { merchant: merchantName, ...newTransaction } = data;
+		console.log(merchantName);
 
 		const newItem = await prisma.transaction.create({
-			data: { ...newTransaction, userId, merchantId }
+			data: {
+				...newTransaction,
+				merchantId: merchant?.id ?? null,
+				categoryId: newTransaction.categoryId ?? merchant?.categoryId,
+				subcategoryId: newTransaction.subcategoryId ?? merchant?.subcategoryId,
+				userId: userId
+			}
 		});
 
 		console.log(newItem);
@@ -193,8 +198,8 @@ export const createManyTransactions = async (data: CreateTransactionProps[]): Pr
 			return {
 				...transaction,
 				merchantId: matchedMerchant?.id ?? null,
-				categoryId: matchedMerchant?.categoryId ?? null,
-				subcategoryId: matchedMerchant?.subcategoryId ?? null,
+				categoryId: matchedMerchant?.categoryId,
+				subcategoryId: matchedMerchant?.subcategoryId,
 				userId: userId
 			};
 		});
@@ -229,13 +234,18 @@ export const updateTransaction = async (data: UpdateTransactionProps): Promise<R
 		}
 
 		console.log(data);
-		const merchantId = await getMerchantId(data.merchant, userId);
-		const { merchant, ...transactionData } = data;
+		const merchant = await getMerchant(data.merchant, userId);
+		const { merchant: merchantName, ...transactionData } = data;
 		console.log(merchant);
 
 		await prisma.transaction.update({
 			where: { id: data.id },
-			data: { ...transactionData, merchantId }
+			data: {
+				...transactionData,
+				merchantId: merchant?.id ?? null,
+				categoryId: transactionData.categoryId ?? merchant?.categoryId,
+				subcategoryId: transactionData.subcategoryId ?? merchant?.subcategoryId
+			}
 		});
 
 		return sendResponse(200, "Transaction is successfully updated.");

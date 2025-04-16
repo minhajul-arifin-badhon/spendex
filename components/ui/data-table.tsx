@@ -119,7 +119,7 @@ export function DataTable<TData, TValue>({
 													}
 													className={cn(
 														"size-full border-0 rounded-none text-center shadow-none focus-visible:ring-0",
-														index == 0 && "text-left"
+														index == 0 && "text-left pl-5"
 													)}
 												/>
 											) : null}
