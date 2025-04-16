@@ -69,12 +69,12 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	const selectedMapping = mappings.find((m) => m.id.toString() === selectedMappingId);
 	const columnFieldMapping = selectedMapping?.columnFieldMapping as ColumnFieldMappingProps[];
 
-	// let columnFieldMappingFormatted = {};
-	// if (selectedMapping) {
-	// 	columnFieldMapping.forEach((val, indx) => {
-	// 		columnFieldMappingFormatted[`column${val.columnIndex}`] = val.fieldName;
-	// 	});
-	// }
+	if (selectedMappingId && columnFieldMapping.length != fileData[0].length) {
+		form.setError("mappingId", {
+			type: "manual",
+			message: "This mapping does not have the same number of columns as the data."
+		});
+	}
 
 	const formSchema = mappingFormSchemaWithFilePreview(mappings);
 
