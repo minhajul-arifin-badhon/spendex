@@ -3,7 +3,6 @@
 import type React from "react";
 
 import { useState } from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,7 +22,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 // import { Upload, X } from "lucide-react";
-import { Mapping, Transaction } from "@prisma/client";
+import { Mapping } from "@prisma/client";
 import {
 	ColumnFieldMappingProps,
 	CreateMappingProps,
@@ -40,70 +39,6 @@ import { fieldOptions } from "@/lib/constants";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-
-// Sample mappings for demo
-// const sampleMappings: Mapping[] = [
-// 	{
-// 		id: "1",
-// 		name: "Bank CSV Format",
-// 		includesHeader: true,
-// 		columnMappings: [
-// 			{ columnIndex: 0, fieldName: "Date" },
-// 			{ columnIndex: 1, fieldName: "Description" },
-// 			{ columnIndex: 2, fieldName: "Merchant" },
-// 			{ columnIndex: 3, fieldName: "Amount" }
-// 		]
-// 	},
-// 	{
-// 		id: "2",
-// 		name: "Credit Card Statement",
-// 		includesHeader: true,
-// 		columnMappings: [
-// 			{ columnIndex: 0, fieldName: "Date" },
-// 			{ columnIndex: 1, fieldName: "Merchant" },
-// 			{ columnIndex: 2, fieldName: "Amount" },
-// 			{ columnIndex: 3, fieldName: "Category" }
-// 		]
-// 	},
-// 	{
-// 		id: "3",
-// 		name: "Expense Tracker",
-// 		includesHeader: false,
-// 		columnMappings: [
-// 			{ columnIndex: 0, fieldName: "Date" },
-// 			{ columnIndex: 1, fieldName: "Account Name" },
-// 			{ columnIndex: 2, fieldName: "Merchant" },
-// 			{ columnIndex: 3, fieldName: "Amount" },
-// 			{ columnIndex: 4, fieldName: "Category" },
-// 			{ columnIndex: 5, fieldName: "Subcategory" }
-// 		]
-// 	}
-// ];
-
-// Define the form schema with Zod
-// const importFormSchema = z.object({
-// 	file: z.instanceof(File, { message: "Please select a file to import" }),
-// 	accountName: z.string().optional(),
-// 	mappingId: z.string().optional(),
-// 	includesHeader: z.boolean().default(true)
-// });
-
-// type ImportFormValues = z.infer<typeof importFormSchema>;
-
-// Define the column mapping schema for the second step
-// const columnMappingSchema = z.object({
-// 	mappingName: z.string().min(1, "Mapping name is required"),
-// 	accountName: z.string().optional(),
-// 	includesHeader: z.boolean().default(true),
-// 	columnMappings: z.array(
-// 		z.object({
-// 			columnIndex: z.number(),
-// 			fieldName: z.string().optional()
-// 		})
-// 	)
-// });
-
-// type ColumnMappingFormValues = z.infer<typeof columnMappingSchema>;
 
 interface ImportTransactionsModalProps {
 	open: boolean;
@@ -129,6 +64,17 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 			mappingId: undefined
 		}
 	});
+
+	const selectedMappingId = form.watch("mappingId");
+	const selectedMapping = mappings.find((m) => m.id.toString() === selectedMappingId);
+	const columnFieldMapping = selectedMapping?.columnFieldMapping as ColumnFieldMappingProps[];
+
+	// let columnFieldMappingFormatted = {};
+	// if (selectedMapping) {
+	// 	columnFieldMapping.forEach((val, indx) => {
+	// 		columnFieldMappingFormatted[`column${val.columnIndex}`] = val.fieldName;
+	// 	});
+	// }
 
 	const formSchema = mappingFormSchemaWithFilePreview(mappings);
 
@@ -160,17 +106,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		} catch (err) {
 			console.error("Failed to parse file:", err);
 		}
-
-		// Parse CSV file
-		// const reader = new FileReader();
-		// reader.onload = (event) => {
-		// 	const text = event.target?.result as string;
-		// 	const rows = text.split("\n").map((row) => row.split(",").map((cell) => cell.trim().replace(/['"]/g, "")));
-		// 	console.log("Uploaded Data: ");
-		// 	console.log(rows);
-		// 	setFileData(rows.filter((row) => row.some((cell) => cell !== "")));
-		// };
-		// reader.readAsText(file);
 	};
 
 	// Handle form submission for step 1
@@ -471,6 +406,15 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 														{fileData[0].map((_, i) => (
 															<TableHead key={i} className="text-center min-w-[120px]">
 																Column {i + 1}
+																{selectedMappingId ? (
+																	<p className="text-sm font-normal text-muted-foreground">
+																		{
+																			columnFieldMapping.find(
+																				(m) => m.columnIndex == i
+																			)?.fieldName
+																		}
+																	</p>
+																) : null}
 															</TableHead>
 														))}
 													</TableRow>
