@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "images.unsplash.com",
 				pathname: "/**" // Matches all images from this domain
+			},
+			{
+				protocol: "https",
+				hostname: "i.ibb.co",
+				pathname: "/**" // Matches all images from this domain
 			}
 		]
 	},
