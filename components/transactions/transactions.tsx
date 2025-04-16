@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import {
 	AlertDialog,
@@ -37,6 +37,7 @@ import {
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
 import { ImportTransactionsModal } from "./import-transactions-modal";
+import { cn } from "@/lib/utils";
 
 // Default form values
 const defaultFormValues: TransactionFormProps = {
@@ -47,6 +48,21 @@ const defaultFormValues: TransactionFormProps = {
 	description: "",
 	merchant: ""
 };
+
+const cashFlowTypes = [
+	{
+		label: "All",
+		value: "all"
+	},
+	{
+		label: "Money In",
+		value: "moneyIn"
+	},
+	{
+		label: "Money Out",
+		value: "moneyOut"
+	}
+];
 
 export default function Transactions({ transactions }: { transactions: TransactionWithRelations[] }) {
 	// console.log("Transactions component re-rendering", transactions);
@@ -64,6 +80,7 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const [formValues, setFormValues] = useState<TransactionFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+	const [cashFlowType, setCashFlowType] = useState("all");
 
 	// const createMerchantMutation = useCreateMerchant();
 	// const updateMerchantMutation = useUpdateMerchant();
@@ -73,6 +90,12 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const createManyTransactionsMutation = useCreateManyTransactions();
 	const updateTransactionMutation = useUpdateTransaction();
 	const deleteTransactionMutation = useDeleteTransaction();
+
+	if (cashFlowType != "all") {
+		transactions = transactions.filter(
+			(t) => (cashFlowType == "moneyIn" && t.amount > 0) || (cashFlowType == "moneyOut" && t.amount <= 0)
+		);
+	}
 
 	const handleOpenCreateForm = () => {
 		setFormValues(defaultFormValues);
@@ -301,14 +324,34 @@ export default function Transactions({ transactions }: { transactions: Transacti
 
 	return (
 		<>
-			<div className="flex justify-end space-x-3">
-				<Button variant="outline" className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
-					<Upload className="mr-2 h-4 w-4" /> Import
-				</Button>
+			<div className="flex items-end sm:items-center flex-col-reverse sm:flex-row sm:justify-between space-y-reverse space-y-3 sm:space-y-0">
+				<div className="space-x-3">
+					{cashFlowTypes.map((option) => (
+						<Button
+							key={option.value}
+							onClick={() => setCashFlowType(option.value)}
+							// size="sm"
+							variant="outline"
+							className={cn(
+								"border transition-colors focus-visible:outline-none duration-200 ease-in rounded-md bg-card hover:dark:bg-white hover:dark:text-gray-900 hover:bg-gray-900 hover:text-white",
+								cashFlowType === option.value &&
+									"dark:bg-white dark:text-gray-900 bg-gray-900 text-white"
+							)}
+						>
+							{option.label}
+						</Button>
+					))}
+				</div>
 
-				<Button variant="outline" onClick={handleOpenCreateForm}>
-					<Plus className="mr-2 h-4 w-4" /> Create New
-				</Button>
+				<div className="space-x-3">
+					<Button variant="outline" className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
+						<Upload className="mr-2 h-4 w-4" /> Import
+					</Button>
+
+					<Button variant="outline" onClick={handleOpenCreateForm}>
+						<Plus className="mr-2 h-4 w-4" /> Create New
+					</Button>
+				</div>
 			</div>
 
 			<ListTransactions
