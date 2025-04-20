@@ -167,3 +167,8 @@ export type Filters = {
 	accountName: string;
 	dateRange: DateRange;
 };
+
+export type UnassignedDescription = {
+	description: string;
+	count: number;
+};

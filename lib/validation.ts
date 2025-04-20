@@ -279,3 +279,18 @@ export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = [
 			path: ["negativeAmountMeans"]
 		}
 	);
+
+export const merchantRuleFormSchema = z.object({
+	name: z.string().min(3, "Please enter at least 3 characters"),
+	includes: z.array(z.string()).refine((values) => values.length > 0, {
+		message: "Please, add at least one substring that defines the merchant."
+	}),
+	categorySelection: z
+		.object({
+			type: z.enum(["category", "subcategory"]),
+			id: z.number(),
+			categoryId: z.number().optional(),
+			name: z.string()
+		})
+		.nullable()
+});

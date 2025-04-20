@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import {
 	AlertDialog,
@@ -21,6 +21,8 @@ import {
 	CategorySelection,
 	CreateMerchantProps,
 	MerchantFormProps,
+	TransactionWithRelations,
+	UnassignedDescription,
 	UpdateMerchantProps
 } from "@/app/types";
 import {
@@ -34,6 +36,9 @@ import { toast } from "sonner";
 import ListMerchants from "@/components/list-merchants";
 import MerchantForm from "@/components/merchant-form";
 import { useGetCategories } from "@/lib/react-query/categories.queries";
+import { useGetTransactionsWithRelations } from "@/lib/react-query/transactions.queries";
+import ListUnassignedTransactions from "@/components/list-unassigned-transactions";
+import MerchantRuleForm from "@/components/merchant-rule-form";
 
 // Default form values
 const defaultFormValues: MerchantFormProps = {
@@ -42,15 +47,65 @@ const defaultFormValues: MerchantFormProps = {
 	categorySelection: null
 };
 
+function getUnassignedDescriptions(
+	transactions: TransactionWithRelations[],
+	merchants: Merchant[]
+): UnassignedDescription[] {
+	const frequencies: Record<string, number> = {};
+	const descriptionSet = new Set<string>();
+
+	transactions.forEach((item) => {
+		const desc = item.description?.trim().toLowerCase();
+		if (desc) {
+			frequencies[desc] = (frequencies[desc] || 0) + 1;
+			descriptionSet.add(desc);
+		}
+	});
+
+	console.log("Unique descriptions:", descriptionSet.size);
+
+	const uniqueUnassignedDescriptions: UnassignedDescription[] = [...descriptionSet]
+		.filter((desc) => !merchants.some((m) => m.includes.some((substr) => desc.includes(substr.toLowerCase()))))
+		.map((desc) => ({
+			description: desc,
+			count: frequencies[desc]
+		}))
+		.sort((a, b) => b.count - a.count);
+
+	console.log("Unassigned descriptions:", uniqueUnassignedDescriptions.length);
+
+	return uniqueUnassignedDescriptions;
+}
+
 export default function Page() {
 	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
+	const {
+		data: transactionsResponse,
+		isLoading: isLoadingTransactions,
+		isError: isErrorTransactions
+	} = useGetTransactionsWithRelations();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [isRuleFormOpen, setIsRuleFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
 	const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
+	const [selectedDescription, setSelectedDescription] = useState<UnassignedDescription>({
+		description: "",
+		count: 0
+	});
+
 	const [formValues, setFormValues] = useState<MerchantFormProps>(defaultFormValues);
 	const [isEditing, setIsEditing] = useState(false);
+
+	const merchants = (merchantsResponse?.data as Merchant[]) || [];
+	const transactions = (transactionsResponse?.data as TransactionWithRelations[]) || [];
+	const uniqueUnassignedDescriptions = getUnassignedDescriptions(transactions, merchants);
+
+	const categories = useMemo(() => {
+		return (categoriesResponse?.data as CategoriesWithSub[]) || [];
+	}, [categoriesResponse]);
 
 	const createMerchantMutation = useCreateMerchant();
 	const updateMerchantMutation = useUpdateMerchant();
@@ -74,6 +129,11 @@ export default function Page() {
 		setFormValues(formValues);
 		setIsEditing(true);
 		setIsFormOpen(true);
+	};
+
+	const handleOpenRuleForm = (description: UnassignedDescription) => {
+		setSelectedDescription(description);
+		setIsRuleFormOpen(true);
 	};
 
 	// Open delete confirmation dialog
@@ -111,15 +171,13 @@ export default function Page() {
 	};
 
 	// Update existing mapping
-	const handleUpdateMerchant = async (data: MerchantFormProps) => {
-		if (!selectedMerchant) return;
-
+	const handleUpdateMerchant = async (data: MerchantFormProps, merchantId: number) => {
 		console.log(data);
 
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const updatedMerchant: UpdateMerchantProps = {
-			id: selectedMerchant.id,
+			id: merchantId,
 			name: data.name,
 			categoryId,
 			subcategoryId,
@@ -170,7 +228,8 @@ export default function Page() {
 	// Handle form submission based on whether we're editing or creating
 	const handleFormSubmit = (data: MerchantFormProps) => {
 		if (isEditing) {
-			handleUpdateMerchant(data);
+			if (!selectedMerchant) toast.error("Something went wrong. No merchant is selected to update.");
+			else handleUpdateMerchant(data, selectedMerchant.id);
 		} else {
 			handleCreateMerchant(data);
 		}
@@ -180,42 +239,57 @@ export default function Page() {
 		setSelectedMerchant(null);
 	};
 
-	// Function to convert from merchant data to form values
-	const merchantToFormValues = (merchant: Merchant): MerchantFormProps => {
-		let categorySelection: CategorySelection | null = null;
+	const handleRuleFormSubmit = (data: MerchantFormProps) => {
+		console.log(data);
 
-		if (merchant.subcategoryId) {
-			// If there's a subcategory, find it
-			const category = categories.find((c) => c.id === merchant.categoryId);
-			const subcategory = category?.subcategories.find((s) => s.id === merchant.subcategoryId);
+		const merchant = merchants.find((m) => m.name == data.name);
 
-			if (category && subcategory) {
-				categorySelection = {
-					type: "subcategory",
-					id: subcategory.id,
-					categoryId: category.id,
-					name: `${category.name} / ${subcategory.name}`
-				};
-			}
-		} else if (merchant.categoryId) {
-			// If there's only a category, find it
-			const category = categories.find((c) => c.id === merchant.categoryId);
-
-			if (category) {
-				categorySelection = {
-					type: "category",
-					id: category.id,
-					name: category.name
-				};
-			}
+		if (merchant) {
+			console.log("updating merchant");
+			handleUpdateMerchant(data, merchant.id);
+		} else {
+			handleCreateMerchant(data);
 		}
 
-		return {
-			name: merchant.name,
-			includes: merchant.includes,
-			categorySelection
-		};
+		setIsRuleFormOpen(false);
 	};
+
+	const merchantToFormValues = useCallback(
+		(merchant: Merchant): MerchantFormProps => {
+			let categorySelection: CategorySelection | null = null;
+
+			if (merchant.subcategoryId) {
+				const category = categories.find((c) => c.id === merchant.categoryId);
+				const subcategory = category?.subcategories.find((s) => s.id === merchant.subcategoryId);
+
+				if (category && subcategory) {
+					categorySelection = {
+						type: "subcategory",
+						id: subcategory.id,
+						categoryId: category.id,
+						name: `${category.name} / ${subcategory.name}`
+					};
+				}
+			} else if (merchant.categoryId) {
+				const category = categories.find((c) => c.id === merchant.categoryId);
+
+				if (category) {
+					categorySelection = {
+						type: "category",
+						id: category.id,
+						name: category.name
+					};
+				}
+			}
+
+			return {
+				name: merchant.name,
+				includes: merchant.includes,
+				categorySelection
+			};
+		},
+		[categories]
+	);
 
 	// Function to extract category and subcategory IDs from form values
 	const extractCategoryIds = (
@@ -232,14 +306,14 @@ export default function Page() {
 		}
 	};
 
-	if (isErrorCategories || isErrorMerchants)
+	if (isErrorCategories || isErrorMerchants || isErrorTransactions)
 		return (
 			<div>
 				<p>Something bad happened</p>
 			</div>
 		);
 
-	if (isLoadingMerchants || isLoadingCategories)
+	if (isLoadingMerchants || isLoadingCategories || isLoadingTransactions)
 		return (
 			<div className="size-full -mt-20 min-h-screen flex items-center justify-center">
 				<Spinner size="large" />
@@ -262,8 +336,13 @@ export default function Page() {
 		);
 	}
 
-	const merchants = (merchantsResponse.data as Merchant[]) || [];
-	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
+	if (!transactionsResponse?.success) {
+		return (
+			<div>
+				<p>{`${transactionsResponse?.statusCode}: ${transactionsResponse?.data}:`}</p>
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -280,6 +359,11 @@ export default function Page() {
 				onDelete={handleOpenDeleteDialog}
 			/>
 
+			<ListUnassignedTransactions
+				unassignedDescriptions={uniqueUnassignedDescriptions}
+				onCreate={handleOpenRuleForm}
+			></ListUnassignedTransactions>
+
 			{/* Mapping Form Dialog */}
 			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
 				<MerchantForm
@@ -294,6 +378,19 @@ export default function Page() {
 					existingMerchants={merchantsResponse.data as Merchant[]}
 					currentMerchantId={selectedMerchant?.id}
 					isFormOpen={isFormOpen}
+				/>
+			</Dialog>
+
+			<Dialog open={isRuleFormOpen} onOpenChange={setIsRuleFormOpen}>
+				<MerchantRuleForm
+					key={Date.now()}
+					unassignedDescription={selectedDescription}
+					merchants={merchants}
+					categories={categories}
+					onSubmit={handleRuleFormSubmit}
+					onCancel={() => setIsRuleFormOpen(false)}
+					isFormOpen={isFormOpen}
+					merchantToFormValues={merchantToFormValues}
 				/>
 			</Dialog>
 
