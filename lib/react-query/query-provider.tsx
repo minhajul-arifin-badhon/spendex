@@ -20,9 +20,6 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
 			})
 	);
 
-	// Note, typically gcTime should be longer than staleTime. Here's why:
-	// staleTime determines how long data is considered "fresh" before React Query will trigger a background refetch
-	// gcTime determines how long inactive data is kept in the cache before being removed entirely
 	return (
 		<QueryClientProvider client={queryClient}>
 			{children}

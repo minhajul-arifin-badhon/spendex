@@ -13,7 +13,7 @@ import { Merchant } from "@prisma/client";
 import { CategoriesWithSub, CategorySelection, MerchantFormProps } from "@/app/types";
 import { useEffect, useState } from "react";
 // import { SelectWithClear } from "./ui/select-with-clear";
-import { MultiInput } from "./ui/multi-input";
+import { MultiInput } from "../ui/multi-input";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,12 +51,10 @@ export default function MerchantForm({
 		defaultValues
 	});
 
-	// Call onSubmit and reset form when the form is submitted
 	const handleFormSubmit = (data: MerchantFormProps) => {
 		onSubmit(data);
 	};
 
-	// Create a function to prepare the category/subcategory data for the select
 	const getCategorySelectOptions = (): CategorySelection[] => {
 		const options: CategorySelection[] = [];
 
@@ -82,7 +80,6 @@ export default function MerchantForm({
 		return options;
 	};
 
-	// Function to get display text for a selection
 	const getSelectionDisplayText = (selection: CategorySelection | null) => {
 		if (!selection) return "Select category or subcategory";
 		return selection.name;
@@ -245,97 +242,6 @@ export default function MerchantForm({
 								</FormItem>
 							)}
 						/>
-
-						{/* <FormField
-							control={form.control}
-							name="categorySelection"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Category / Subcategory</FormLabel>
-									<Popover
-										modal={true}
-										open={categoryPopoverOpen}
-										onOpenChange={setCategoryPopoverOpen}
-									>
-										<PopoverTrigger asChild>
-											<FormControl>
-												<Button
-													variant="outline"
-													role="combobox"
-													className={cn(
-														"w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													{getSelectionDisplayText(field.value)}
-													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-												</Button>
-											</FormControl>
-										</PopoverTrigger>
-										<PopoverContent
-											className="w-[300px] p-0"
-											onInteractOutside={(e) => {
-												setCategoryPopoverOpen(false);
-												e.preventDefault();
-											}}
-										>
-											<Command>
-												<CommandInput
-													placeholder="Search category or subcategory..."
-													className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-												/>
-												<CommandList>
-													<CommandEmpty>No results found.</CommandEmpty>
-													<CommandGroup>
-														{getCategorySelectOptions().map((option) => (
-															<CommandItem
-																key={`${option.type}-${option.id}`}
-																value={option.name}
-																onSelect={() => {
-																	// Toggle selection if the same item is clicked
-																	if (
-																		field.value?.id === option.id &&
-																		field.value?.type === option.type
-																	) {
-																		field.onChange(null);
-																	} else {
-																		field.onChange(option);
-																	}
-																	// Close only the popover
-																	setCategoryPopoverOpen(false);
-																}}
-																className={cn(
-																	option.type === "subcategory" && "pl-6",
-																	field.value?.id === option.id &&
-																		field.value?.type === option.type &&
-																		"bg-accent"
-																)}
-															>
-																<Check
-																	className={cn(
-																		"mr-2 h-4 w-4",
-																		field.value?.id === option.id &&
-																			field.value?.type === option.type
-																			? "opacity-100"
-																			: "opacity-0"
-																	)}
-																/>
-																{option.type === "category" ? (
-																	<span className="font-medium">{option.name}</span>
-																) : (
-																	<span>{option.name.split(" / ")[1]}</span>
-																)}
-															</CommandItem>
-														))}
-													</CommandGroup>
-												</CommandList>
-											</Command>
-										</PopoverContent>
-									</Popover>
-									<FormMessage />
-								</FormItem>
-							)}
-						/> */}
 					</div>
 
 					<DialogFooter>

@@ -17,7 +17,6 @@ import { getAccountData, getMonthlyData } from "@/lib/chart_utils";
 import { isEqual } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-// import { getMonthlyData } from "@/lib/chart-utils";
 
 const monthlyChartConfig = {
 	moneyIn: {
@@ -149,9 +148,6 @@ export function MonthlyChart() {
 					</ChartContainer>
 				</div>
 			</CardContent>
-			{/* <CardFooter className="text-sm flex-center">
-				<div className="leading-none text-muted-foreground">Note: Click on the bars to drill down.</div>
-			</CardFooter> */}
 		</Card>
 	);
 }

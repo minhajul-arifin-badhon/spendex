@@ -90,9 +90,6 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 						</Button>
 					);
 				}
-				// meta: {
-				// 	className: "hidden md:table-cell" // Hide on mobile and small tablets
-				// }
 			},
 			{
 				accessorKey: "categoryFormatted",
@@ -111,9 +108,6 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 					const formattedCategory = getFormattedCategory(row.original.category, row.original.subcategory);
 					return formattedCategory.toLowerCase().includes(filterValue.toLowerCase());
 				}
-				// meta: {
-				// 	className: "hidden sm:table-cell" // Hide on mobile
-				// }
 			},
 			{
 				accessorKey: "amount",

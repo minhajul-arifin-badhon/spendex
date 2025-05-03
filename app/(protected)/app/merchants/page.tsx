@@ -12,7 +12,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-// import MappingsList from "./components/mappings-list";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Merchant } from "@prisma/client";
@@ -33,14 +32,13 @@ import {
 } from "@/lib/react-query/merchant.queries";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import ListMerchants from "@/components/list-merchants";
-import MerchantForm from "@/components/merchant-form";
+import ListMerchants from "@/components/merchants/list-merchants";
+import MerchantForm from "@/components/merchants/merchant-form";
 import { useGetCategories } from "@/lib/react-query/categories.queries";
 import { useGetTransactionsWithRelations } from "@/lib/react-query/transactions.queries";
 import ListUnassignedTransactions from "@/components/list-unassigned-transactions";
-import MerchantRuleForm from "@/components/merchant-rule-form";
+import MerchantRuleForm from "@/components/merchants/merchant-rule-form";
 
-// Default form values
 const defaultFormValues: MerchantFormProps = {
 	name: "",
 	includes: [],
@@ -71,8 +69,6 @@ function getUnassignedDescriptions(
 			count: frequencies[desc]
 		}))
 		.sort((a, b) => b.count - a.count);
-
-	console.log("Unassigned descriptions:", uniqueUnassignedDescriptions.length);
 
 	return uniqueUnassignedDescriptions;
 }
@@ -122,9 +118,7 @@ export default function Page() {
 	const handleOpenEditForm = (merchant: Merchant) => {
 		setSelectedMerchant(merchant);
 
-		console.log("editing---------");
 		const formValues = merchantToFormValues(merchant);
-		console.log(formValues);
 
 		setFormValues(formValues);
 		setIsEditing(true);
@@ -136,16 +130,12 @@ export default function Page() {
 		setIsRuleFormOpen(true);
 	};
 
-	// Open delete confirmation dialog
 	const handleOpenDeleteDialog = (merchant: Merchant) => {
 		setSelectedMerchant(merchant);
 		setIsDeleteDialogOpen(true);
 	};
 
-	// Create new mapping
 	const handleCreateMerchant = async (data: MerchantFormProps) => {
-		console.log(data);
-
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const newMerchant: CreateMerchantProps = {
@@ -157,7 +147,6 @@ export default function Page() {
 
 		try {
 			const response = await createMerchantMutation.mutateAsync(newMerchant);
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -170,10 +159,7 @@ export default function Page() {
 		}
 	};
 
-	// Update existing mapping
 	const handleUpdateMerchant = async (data: MerchantFormProps, merchantId: number) => {
-		console.log(data);
-
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const updatedMerchant: UpdateMerchantProps = {
@@ -184,11 +170,8 @@ export default function Page() {
 			includes: data.includes
 		};
 
-		console.log(updatedMerchant);
-
 		try {
 			const response = await updateMerchantMutation.mutateAsync(updatedMerchant);
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -201,15 +184,11 @@ export default function Page() {
 		}
 	};
 
-	// Delete mapping
 	const handleDeleteMerchant = async () => {
 		if (!selectedMerchant) return;
 
-		console.log(selectedMerchant);
-
 		try {
 			const response = await deleteMerchantMutation.mutateAsync({ id: selectedMerchant.id });
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -225,7 +204,6 @@ export default function Page() {
 		setSelectedMerchant(null);
 	};
 
-	// Handle form submission based on whether we're editing or creating
 	const handleFormSubmit = (data: MerchantFormProps) => {
 		if (isEditing) {
 			if (!selectedMerchant) toast.error("Something went wrong. No merchant is selected to update.");
@@ -234,18 +212,14 @@ export default function Page() {
 			handleCreateMerchant(data);
 		}
 
-		// setFormValues(defaultFormValues);
 		setIsFormOpen(false);
 		setSelectedMerchant(null);
 	};
 
 	const handleRuleFormSubmit = (data: MerchantFormProps) => {
-		console.log(data);
-
 		const merchant = merchants.find((m) => m.name == data.name);
 
 		if (merchant) {
-			console.log("updating merchant");
 			handleUpdateMerchant(data, merchant.id);
 		} else {
 			handleCreateMerchant(data);
@@ -364,7 +338,6 @@ export default function Page() {
 				onCreate={handleOpenRuleForm}
 			></ListUnassignedTransactions>
 
-			{/* Mapping Form Dialog */}
 			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
 				<MerchantForm
 					key={isEditing ? selectedMerchant?.id : Date.now()}
@@ -394,7 +367,6 @@ export default function Page() {
 				/>
 			</Dialog>
 
-			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader>

@@ -28,7 +28,6 @@ export function MerchantChart({ cashFlowType }: { cashFlowType: string }) {
 	const handleMerchantClick = (merchant: string) => {
 		const isSame = filters[merchantKey] === merchant;
 		handleFilterChange(merchantKey, isSame ? "" : merchant);
-		// resetOtherSelections("merchant");
 	};
 
 	const {

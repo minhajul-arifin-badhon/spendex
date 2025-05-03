@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDashboard } from "./dashboard-context";
-import { cn, getBarSize } from "@/lib/utils";
+import { getBarSize } from "@/lib/utils";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
 import { ArrowLeft } from "lucide-react";
@@ -20,13 +20,7 @@ export function CategoryChart({ cashFlowType }: { cashFlowType: string }) {
 	const categoryKey = cashFlowType == "moneyIn" ? "moneyInCategory" : "moneyOutCategory";
 	const subcategoryKey = cashFlowType == "moneyIn" ? "moneyInSubcategory" : "moneyOutSubcategory";
 	const isShowingCategoryChart = filters[subcategoryKey] === "" && filters[categoryKey] === "";
-
-	// console.log(filters);
-	// console.log(categoryKey, subcategoryKey);
-	// console.log("is showing category chart:  ", isShowingCategoryChart);
-
 	const barColor = cashFlowType == "moneyIn" ? "var(--chart-green)" : "var(--chart-red)";
-	// console.log(barColor);
 
 	const chartData = React.useMemo(
 		() => getCategoryData(filteredTransactions, filters, cashFlowType == "moneyIn"),

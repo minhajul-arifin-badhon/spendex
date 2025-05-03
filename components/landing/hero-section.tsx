@@ -9,8 +9,8 @@ export default function HeroSection() {
 				title1="Take Control of Your"
 				title2="Finances"
 				description="Spendex helps you track, analyze, and optimize your spending habits with powerful tools and intuitive visualizations."
-				className="pt-16" // Add padding for the navbar
-				buttonPosition="close" // Position buttons closer to text
+				className="pt-16"
+				buttonPosition="close"
 			/>
 		</div>
 	);

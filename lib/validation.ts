@@ -1,7 +1,9 @@
 import { CategoryGroup, Mapping, Merchant } from "@prisma/client";
 import { z } from "zod";
 
-// server actions
+// ============================================
+// Category Schemas
+// ============================================
 
 export const createCategorySchema = z.object({
 	name: z.string().nonempty(),
@@ -30,6 +32,10 @@ export const updateSubcategorySchema = z.object({
 export const deleteSubcategorySchema = z.object({
 	id: z.number().int().positive()
 });
+
+// ============================================
+// Mapping Schemas
+// ============================================
 
 export const columnFieldMappingSchema = z.object({
 	columnIndex: z.number(),
@@ -111,6 +117,10 @@ export const deleteMappingSchema = z.object({
 	id: z.number().int().positive()
 });
 
+// ============================================
+// Merchant Schemas
+// ============================================
+
 export const merchantFormSchema = (existingMerchants: Merchant[] = [], currentMerchantId?: number) => {
 	return z.object({
 		name: z
@@ -163,6 +173,25 @@ export const updateMerchantSchema = z.object({
 export const deleteMerchantSchema = z.object({
 	id: z.number().int().positive()
 });
+
+export const merchantRuleFormSchema = z.object({
+	name: z.string().min(3, "Please enter at least 3 characters"),
+	includes: z.array(z.string()).refine((values) => values.length > 0, {
+		message: "Please, add at least one substring that defines the merchant."
+	}),
+	categorySelection: z
+		.object({
+			type: z.enum(["category", "subcategory"]),
+			id: z.number(),
+			categoryId: z.number().optional(),
+			name: z.string()
+		})
+		.nullable()
+});
+
+// ============================================
+// Transaction Schemas
+// ============================================
 
 export const transactionFormSchema = z.object({
 	date: z.date({
@@ -279,18 +308,3 @@ export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = [
 			path: ["negativeAmountMeans"]
 		}
 	);
-
-export const merchantRuleFormSchema = z.object({
-	name: z.string().min(3, "Please enter at least 3 characters"),
-	includes: z.array(z.string()).refine((values) => values.length > 0, {
-		message: "Please, add at least one substring that defines the merchant."
-	}),
-	categorySelection: z
-		.object({
-			type: z.enum(["category", "subcategory"]),
-			id: z.number(),
-			categoryId: z.number().optional(),
-			name: z.string()
-		})
-		.nullable()
-});

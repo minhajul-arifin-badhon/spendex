@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import {
-	Lustria,
-	Lato
-	// Merriweather_Sans,
-	// Source_Sans_3,
-} from "next/font/google";
+import { Lustria, Lato } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/lib/react-query/query-provider";
 import { Toaster } from "sonner";
 import ThemeProvider from "@/components/theme/theme-provider";
-// import { dark, shadesOfPurple } from "@clerk/themes";
 
 const lustria = Lustria({
 	weight: ["400"],
@@ -24,16 +18,6 @@ const lato = Lato({
 	preload: true,
 	subsets: ["latin"]
 });
-
-// const merriweather = Merriweather_Sans({
-// 	variable: "--font-merriweather-sans",
-// 	subsets: ["latin"],
-// });
-
-// const sourceSans = Source_Sans_3({
-// 	variable: "--font-source-sans-3",
-// 	subsets: ["latin"],
-// });
 
 export const metadata: Metadata = {
 	title: "Spendex",

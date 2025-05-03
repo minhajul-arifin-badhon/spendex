@@ -1,16 +1,12 @@
 "use client";
 
 import Link from "next/link";
-// import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-// import { ThemeToggle } from "./theme-toggle";
-// import { usePathname } from "next/navigation";
 import { ThemeToggle } from "../theme/theme-toggle";
 
 export default function HeroNavbar() {
 	const [scrolled, setScrolled] = useState(false);
-	// const pathname = usePathname();
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -40,7 +36,6 @@ export default function HeroNavbar() {
 						Home
 					</Link>
 					<ThemeToggle isLanding={true} />
-					{/* {scrolled && <Button size="sm">Get Started</Button>} */}
 				</nav>
 			</div>
 		</header>

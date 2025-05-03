@@ -12,7 +12,6 @@ import { transactionFormSchema } from "@/lib/validation";
 import { Merchant } from "@prisma/client";
 import { CategoriesWithSub, CategorySelection, TransactionFormProps } from "@/app/types";
 import { useEffect, useState } from "react";
-// import { SelectWithClear } from "./ui/select-with-clear";
 import { CalendarIcon, Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
@@ -28,8 +27,6 @@ interface ComponentProps {
 	title: string;
 	description: string;
 	submitButtonText: string;
-	// existingMerchants?: Merchant[];
-	// currentTransactionId?: number;
 	isFormOpen: boolean;
 }
 
@@ -42,48 +39,34 @@ export default function TransactionForm({
 	title,
 	description,
 	submitButtonText,
-	// existingMerchants = [],
-	// currentTransactionId,
 	isFormOpen
 }: ComponentProps) {
 	const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false);
 	const [merchantPopoverOpen, setMerchantPopoverOpen] = useState(false);
-
-	// const [isProcessing, setIsProcessing] = useState(false);
 	const [newMerchantName, setNewMerchantName] = useState("");
 	const [showAddMerchant, setShowAddMerchant] = useState(false);
 	const [merchantError, setMerchantError] = useState<string | null>(null);
-
-	// Add state for controlling popover open/close
 	const [dateOpen, setDateOpen] = useState(false);
-	// const [merchantOpen, setMerchantOpen] = useState(false);
-
-	// const formSchema = merchantFormSchema(existingMerchants, currentMerchantId);
 
 	const form = useForm<TransactionFormProps>({
 		resolver: zodResolver(transactionFormSchema),
 		defaultValues
 	});
 
-	// Call onSubmit and reset form when the form is submitted
 	const handleFormSubmit = (data: TransactionFormProps) => {
-		// console.log(data);
 		onSubmit(data);
 	};
 
-	// Create a function to prepare the category/subcategory data for the select
 	const getCategorySelectOptions = (): CategorySelection[] => {
 		const options: CategorySelection[] = [];
 
 		categories.forEach((category) => {
-			// Add the category itself
 			options.push({
 				type: "category",
 				id: category.id,
 				name: category.name
 			});
 
-			// Add its subcategories
 			category.subcategories.forEach((subcategory) => {
 				options.push({
 					type: "subcategory",
@@ -97,7 +80,6 @@ export default function TransactionForm({
 		return options;
 	};
 
-	// Function to get display text for a selection
 	const getCategorySelectionDisplayText = (selection: CategorySelection | null) => {
 		if (!selection) return "Select category or subcategory";
 		return selection.name;
@@ -106,7 +88,6 @@ export default function TransactionForm({
 	const handleCreateNewMerchant = (name: string) => {
 		if (!name.trim()) return;
 
-		// Check if merchant already exists
 		const merchantExists = merchants.some((merchant) => merchant.name.toLowerCase() === name.trim().toLowerCase());
 
 		if (merchantExists) {
@@ -117,13 +98,11 @@ export default function TransactionForm({
 		setMerchantError(null);
 		form.setValue("merchant", name);
 		form.trigger("merchant");
-		// setMerchantOpen(false);
 		setShowAddMerchant(false);
 	};
 
 	useEffect(() => {
 		if (!isFormOpen) {
-			console.log("Resetting form---------------");
 			form.reset();
 		}
 	}, [form, isFormOpen]);
@@ -138,7 +117,6 @@ export default function TransactionForm({
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
 					<div className="grid gap-4">
-						{/* Date Field */}
 						<FormField
 							control={form.control}
 							name="date"
@@ -195,7 +173,6 @@ export default function TransactionForm({
 							)}
 						/>
 
-						{/* Amount Field */}
 						<FormField
 							control={form.control}
 							name="amount"
@@ -213,7 +190,6 @@ export default function TransactionForm({
 							)}
 						/>
 
-						{/* Merchant Field - Now Optional */}
 						<FormField
 							control={form.control}
 							name="merchant"
@@ -424,7 +400,6 @@ export default function TransactionForm({
 																			} else {
 																				field.onChange(option);
 																			}
-																			// Close only the popover
 																			setCategoryPopoverOpen(false);
 																		}}
 																		className={cn(
@@ -504,12 +479,7 @@ export default function TransactionForm({
 						<Button variant="outline" type="button" onClick={onCancel}>
 							Cancel
 						</Button>
-						{/* <Button type="submit" disabled={isProcessing}> */}
-						<Button type="submit">
-							{/* {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} */}
-							{submitButtonText}
-						</Button>
-						{/* <Button type="submit">{submitButtonText}</Button> */}
+						<Button type="submit">{submitButtonText}</Button>
 					</DialogFooter>
 				</form>
 			</Form>

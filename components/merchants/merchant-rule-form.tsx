@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { merchantFormSchema, merchantRuleFormSchema } from "@/lib/validation";
+import { merchantRuleFormSchema } from "@/lib/validation";
 import { Merchant } from "@prisma/client";
 import { CategoriesWithSub, CategorySelection, MerchantFormProps, UnassignedDescription } from "@/app/types";
 import { useEffect, useState } from "react";
 // import { SelectWithClear } from "./ui/select-with-clear";
-import { MultiInput } from "./ui/multi-input";
+import { MultiInput } from "../ui/multi-input";
 import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { error } from "console";
@@ -44,8 +44,6 @@ export default function MerchantRuleForm({
 	const [newMerchantName, setNewMerchantName] = useState("");
 	const [merchantError, setMerchantError] = useState<string | null>(null);
 
-	// const [validationSchema, setValidationSchema] = useState(merchantFormSchema(merchants, undefined));
-
 	const form = useForm<MerchantFormProps>({
 		resolver: zodResolver(merchantRuleFormSchema),
 		defaultValues: {
@@ -61,16 +59,10 @@ export default function MerchantRuleForm({
 		const merchant = merchants.find((m) => m.name == merchantName);
 
 		if (merchant) {
-			console.log("selected a merchant");
-			// const updatedSchema = merchantFormSchema(merchants, merchant.id);
-			// setValidationSchema(updatedSchema);
-
 			const formValues = merchantToFormValues(merchant);
 
 			form.setValue("includes", [unassignedDescription.description, ...formValues.includes]);
 			form.setValue("categorySelection", formValues.categorySelection);
-
-			// form.trigger("name");
 		} else {
 			console.log("cleared");
 		}
@@ -82,7 +74,6 @@ export default function MerchantRuleForm({
 			return;
 		}
 
-		console.log(data);
 		onSubmit(data);
 	};
 
@@ -117,7 +108,6 @@ export default function MerchantRuleForm({
 	const handleCreateNewMerchant = (name: string) => {
 		if (!name.trim()) return;
 
-		// Check if merchant already exists
 		const merchantExists = merchants.some((merchant) => merchant.name.toLowerCase() === name.trim().toLowerCase());
 
 		if (merchantExists) {
@@ -128,13 +118,11 @@ export default function MerchantRuleForm({
 		setMerchantError(null);
 		form.setValue("name", name);
 		form.trigger("name");
-		// setMerchantOpen(false);
 		setShowAddMerchant(false);
 	};
 
 	useEffect(() => {
 		if (!isFormOpen) {
-			console.log("Resetting form---------------");
 			form.reset();
 		}
 	}, [form, isFormOpen]);
@@ -143,7 +131,6 @@ export default function MerchantRuleForm({
 		<DialogContent className="w-11/12 sm:max-w-3xl max-h-11/12 sm:max-h-11/12 overflow-y-auto">
 			<DialogHeader>
 				<DialogTitle>{ruleFormMode == "create" ? "Create Merchant" : "Update Merchant"}</DialogTitle>
-				{/* <DialogDescription>agasdasda asdasd</DialogDescription> */}
 				<DialogDescription>
 					{ruleFormMode == "create"
 						? "Add a new merchant with this tag."
@@ -151,167 +138,13 @@ export default function MerchantRuleForm({
 				</DialogDescription>
 			</DialogHeader>
 			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(handleFormSubmit)}
-					className="space-y-6"
-					// onKeyDown={preventEnterKeySubmission}
-				>
-					{/* Merchant Name Field */}
-					{/* <FormField
-						control={form.control}
-						name="name"
-						render={({ field }) => (
-							<FormItem className="flex flex-col">
-								<FormLabel>Merchant Name</FormLabel>
-								<div className="flex flex-col space-y-2">
-									{!showAddMerchant ? (
-										<Popover
-											open={createRuleMerchantPopoverOpen}
-											modal={true}
-											onOpenChange={setCreateRuleMerchantPopoverOpen}
-										>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant="outline"
-														role="combobox"
-														className={cn(
-															"w-full justify-between",
-															!field.value && "text-muted-foreground"
-															// inputStyles.button
-														)}
-													>
-														{field.value || "Select merchant"}
-														<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className="w-[300px] p-0">
-												<Command>
-													<CommandInput
-														placeholder="Search merchant..."
-														className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-													/>
-													<CommandList>
-														<CommandEmpty>
-															<div className="px-2 py-3 text-sm">
-																<p>No merchant found.</p>
-																<Button
-																	variant="link"
-																	className="p-0 h-auto text-blue-500"
-																	onClick={() => {
-																		setShowAddMerchant(true);
-																		setCreateRuleMerchantPopoverOpen(false);
-																	}}
-																>
-																	<Plus className="mr-2 h-4 w-4" />
-																	Add new merchant
-																</Button>
-															</div>
-														</CommandEmpty>
-														<div className="border-t px-2 py-2">
-															<Button
-																variant="ghost"
-																className="w-full justify-start text-sm"
-																onClick={() => {
-																	setShowAddMerchant(true);
-																	setCreateRuleMerchantPopoverOpen(false);
-																}}
-															>
-																<Plus className="mr-2 h-4 w-4" />
-																Add new merchant
-															</Button>
-														</div>
-														<CommandGroup>
-															{merchants.map((merchant, index) => (
-																<CommandItem
-																	key={index}
-																	value={merchant.name}
-																	onSelect={() => {
-																		// handleSelectExistingMerchant(merchantName);
-																		setCreateRuleMerchantPopoverOpen(false);
-																	}}
-																>
-																	<Check
-																		className={cn(
-																			"mr-2 h-4 w-4",
-																			field.value === merchant.name
-																				? "opacity-100"
-																				: "opacity-0"
-																		)}
-																	/>
-																	{merchant.name}
-																</CommandItem>
-															))}
-														</CommandGroup>
-													</CommandList>
-												</Command>
-											</PopoverContent>
-										</Popover>
-									) : (
-										<div className="flex gap-2">
-											<Input
-												placeholder="Enter new merchant name"
-												value={newMerchantName}
-												onChange={(e) => setNewMerchantName(e.target.value)}
-												className="flex-1 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-											/>
-											<Button
-												type="button"
-												onClick={() => {
-													if (newMerchantName.trim()) {
-														// Check if merchant name already exists
-														if (
-															merchants.some(
-																(m) =>
-																	m.name.toLowerCase() ===
-																	newMerchantName.trim().toLowerCase()
-															)
-														) {
-															createRuleForm.setError("name", {
-																type: "manual",
-																message: "A merchant with this name already exists"
-															});
-															return;
-														}
-														createRuleForm.setValue("name", newMerchantName.trim());
-														createRuleForm.clearErrors("name");
-														setCreateRuleMode("create"); // Set mode to create for new merchant
-														setShowNewMerchantInput(false);
-														setNewMerchantName("");
-													}
-												}}
-											>
-												Add
-											</Button>
-											<Button
-												type="button"
-												variant="outline"
-												className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-												onClick={() => {
-													setShowNewMerchantInput(false);
-													setNewMerchantName("");
-												}}
-											>
-												Cancel
-											</Button>
-										</div>
-									)}
-								</div>
-								<FormMessage />
-							</FormItem>
-						)}
-					/> */}
-
+				<form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
 					<FormField
 						control={form.control}
 						name="name"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
-								<FormLabel className="flex items-center gap-1">
-									Merchant
-									{/* <span className="text-sm text-muted-foreground font-normal">(optional)</span> */}
-								</FormLabel>
+								<FormLabel className="flex items-center gap-1">Merchant</FormLabel>
 								{showAddMerchant ? (
 									<div className="space-y-2">
 										<div className="flex gap-2">
@@ -350,7 +183,6 @@ export default function MerchantRuleForm({
 								) : (
 									<div className="flex gap-2">
 										<div className="relative flex-1">
-											{/* <FormControl> */}
 											<>
 												<Popover
 													modal={true}
@@ -468,7 +300,6 @@ export default function MerchantRuleForm({
 						)}
 					/>
 
-					{/* If Includes Field */}
 					<FormField
 						control={form.control}
 						name="includes"
@@ -595,93 +426,6 @@ export default function MerchantRuleForm({
 							</FormItem>
 						)}
 					/>
-
-					{/* <FormField
-						control={form.control}
-						name="categorySelection"
-						render={({ field }) => (
-							<FormItem className="flex flex-col">
-								<FormLabel>Category / Subcategory</FormLabel>
-								<Popover modal={true} open={categoryPopoverOpen} onOpenChange={setCategoryPopoverOpen}>
-									<PopoverTrigger asChild>
-										<FormControl>
-											<Button
-												variant="outline"
-												role="combobox"
-												className={cn(
-													"w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none",
-													!field.value && "text-muted-foreground"
-												)}
-											>
-												{getSelectionDisplayText(field.value)}
-												<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-											</Button>
-										</FormControl>
-									</PopoverTrigger>
-									<PopoverContent
-										className="w-[300px] p-0"
-										onInteractOutside={(e) => {
-											setCategoryPopoverOpen(false);
-											e.preventDefault();
-										}}
-									>
-										<Command>
-											<CommandInput
-												placeholder="Search category or subcategory..."
-												className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-											/>
-											<CommandList>
-												<CommandEmpty>No results found.</CommandEmpty>
-												<CommandGroup>
-													{getCategorySelectOptions().map((option) => (
-														<CommandItem
-															key={`${option.type}-${option.id}`}
-															value={option.name}
-															onSelect={() => {
-																// Toggle selection if the same item is clicked
-																if (
-																	field.value?.id === option.id &&
-																	field.value?.type === option.type
-																) {
-																	field.onChange(null);
-																} else {
-																	field.onChange(option);
-																}
-																// Close only the popover
-																setCategoryPopoverOpen(false);
-															}}
-															className={cn(
-																option.type === "subcategory" && "pl-6",
-																field.value?.id === option.id &&
-																	field.value?.type === option.type &&
-																	"bg-accent"
-															)}
-														>
-															<Check
-																className={cn(
-																	"mr-2 h-4 w-4",
-																	field.value?.id === option.id &&
-																		field.value?.type === option.type
-																		? "opacity-100"
-																		: "opacity-0"
-																)}
-															/>
-															{option.type === "category" ? (
-																<span className="font-medium">{option.name}</span>
-															) : (
-																<span>{option.name.split(" / ")[1]}</span>
-															)}
-														</CommandItem>
-													))}
-												</CommandGroup>
-											</CommandList>
-										</Command>
-									</PopoverContent>
-								</Popover>
-								<FormMessage />
-							</FormItem>
-						)}
-					/> */}
 
 					<div className="flex justify-end space-x-2">
 						<Button type="button" variant="outline" onClick={onCancel}>

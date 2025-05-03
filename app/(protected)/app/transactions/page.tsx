@@ -30,16 +30,12 @@ export default function Page() {
 	if (!transactionsResponse?.success) {
 		return (
 			<div>
-				<p>{`${transactionsResponse?.statusCode}: ${transactionsResponse?.data}:`}</p>
+				<p>{`${transactionsResponse?.statusCode}: ${transactionsResponse?.data}`}</p>
 			</div>
 		);
 	}
 
 	const transactions = (transactionsResponse.data as TransactionWithRelations[]) || [];
 
-	return (
-		<>
-			<Transactions transactions={transactions}></Transactions>
-		</>
-	);
+	return <Transactions transactions={transactions} />;
 }

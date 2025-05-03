@@ -9,10 +9,6 @@ import {
 } from "@/app/types";
 import { createSubcategory, deleteSubcategory, updateSubcategory } from "../actions/subcategories.actions";
 
-// ============================================================
-// SUBCATEGORY QUERIES
-// ============================================================
-
 const invalidateCategoriesQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating grouped categories--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_CATEGORIES] });

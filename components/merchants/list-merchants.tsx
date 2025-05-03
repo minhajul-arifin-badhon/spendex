@@ -7,7 +7,7 @@ import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { Merchant } from "@prisma/client";
 import { CategoriesWithSub } from "@/app/types";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 
 interface ComponentProps {
 	merchants: Merchant[];
@@ -31,20 +31,8 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 		return subcategory ? subcategory.name : "-";
 	};
 
-	// Table columns definition
 	const columns = useMemo<ColumnDef<Merchant>[]>(
 		() => [
-			// {
-			// 	accessorKey: "updatedAt",
-			// 	header: ({ column }) => {
-			// 		return (
-			// 			<Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-			// 				Updated
-			// 				<ArrowUpDown className="ml-2 h-4 w-4" />
-			// 			</Button>
-			// 		);
-			// 	}
-			// },
 			{
 				accessorKey: "name",
 				header: ({ column }) => {
@@ -76,9 +64,6 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 				filterFn: (row, columnId, filterValue) => {
 					return row.original.includes.some((v) => v.toLowerCase().includes(filterValue.toLowerCase()));
 				}
-				// meta: {
-				// 	className: "hidden sm:table-cell" // Hide on mobile
-				// }
 			},
 			{
 				accessorKey: "categoryId",
@@ -91,9 +76,6 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 					const categoryName = getCategoryName(row.original.categoryId);
 					return categoryName?.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
 				}
-				// meta: {
-				// 	className: "hidden sm:table-cell" // Hide on mobile
-				// }
 			},
 			{
 				accessorKey: "subcategoryId",
@@ -106,9 +88,6 @@ export default function ListMerchants({ merchants, categories, onEdit, onDelete 
 					const subcategoryName = getSubcategoryName(row.original.categoryId, row.original.subcategoryId);
 					return subcategoryName?.toLowerCase().includes(filterValue.toLowerCase()) ?? filterValue == "-";
 				}
-				// meta: {
-				// 	className: "hidden md:table-cell" // Hide on smaller screens
-				// }
 			},
 			{
 				id: "actions",

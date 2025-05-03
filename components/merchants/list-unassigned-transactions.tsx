@@ -57,7 +57,6 @@ export default function ListUnassignedTransactions({ unassignedDescriptions, onC
 	return (
 		<div>
 			<h2 className="pb-2 font-semibold">Unassigned Transactions</h2>
-
 			<DataTable columns={columns} data={unassignedDescriptions} />
 		</div>
 	);

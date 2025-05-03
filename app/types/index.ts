@@ -25,6 +25,9 @@ import { Prisma, CategoryGroup } from "@prisma/client";
 import { DateRange } from "react-day-picker";
 import { z } from "zod";
 
+// ============================================
+// API Response Types
+// ============================================
 export type BaseResponse = {
 	success: boolean;
 	statusCode: number;
@@ -39,6 +42,10 @@ export type ErrorResponse = BaseResponse & {
 };
 
 export type Response<T> = SuccessResponse<T> | ErrorResponse;
+
+// ============================================
+// Category Types
+// ============================================
 
 export type CategoriesWithSub = Prisma.CategoryGetPayload<{
 	select: {
@@ -55,15 +62,22 @@ export type CategoriesWithSub = Prisma.CategoryGetPayload<{
 }>;
 
 export type GroupedCategories = Partial<Record<CategoryGroup, CategoriesWithSub[]>>;
+export type CategoryMinimal = TransactionWithRelations["category"];
+export type SubcategoryMinimal = TransactionWithRelations["subcategory"];
 
-// props needed when calling actions
 export type CreateCategoryProps = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryProps = z.infer<typeof updateCategorySchema>;
 export type DeleteCategoryProps = z.infer<typeof deleteCategorySchema>;
-
 export type CreateSubcategoryProps = z.infer<typeof createSubcategorySchema>;
 export type UpdateSubcategoryProps = z.infer<typeof updateSubcategorySchema>;
 export type DeleteSubcategoryProps = z.infer<typeof deleteSubcategorySchema>;
+
+export type CategorySelection = {
+	type: "category" | "subcategory";
+	id: number;
+	categoryId?: number;
+	name: string;
+};
 
 export type CategoryMutationProps = {
 	type: "category" | "subcategory";
@@ -78,38 +92,24 @@ export type CategoryDialogProps = CategoryMutationProps & {
 	isOpen: boolean;
 };
 
-export type MappingFormProps = z.infer<ReturnType<typeof mappingFormSchema>>;
-
-// props needed when calling actions
-export type CreateMappingProps = z.infer<typeof createMappingSchema>;
-export type UpdateMappingProps = z.infer<typeof updateMappingSchema>;
-export type DeleteMappingProps = z.infer<typeof deleteMappingSchema>;
-
-export type ColumnFieldMappingProps = z.infer<typeof columnFieldMappingSchema>;
+// ============================================
+// Merchant Types
+// ============================================
 
 export type MerchantFormProps = z.infer<ReturnType<typeof merchantFormSchema>>;
-
-// props needed when calling actions
 export type CreateMerchantProps = z.infer<typeof createMerchantSchema>;
 export type UpdateMerchantProps = z.infer<typeof updateMerchantSchema>;
 export type DeleteMerchantProps = z.infer<typeof deleteMerchantSchema>;
+export type MerchantMinimal = TransactionWithRelations["merchant"];
 
-export type CategorySelection = {
-	type: "category" | "subcategory";
-	id: number;
-	categoryId?: number;
-	name: string;
-};
+// ============================================
+// Transaction Types
+// ============================================
 
 export type TransactionFormProps = z.infer<typeof transactionFormSchema>;
-
-// props needed when calling actions
 export type CreateTransactionProps = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionProps = z.infer<typeof updateTransactionSchema>;
 export type DeleteTransactionProps = z.infer<typeof deleteTransactionSchema>;
-
-export type ImportFormProps = z.infer<typeof importFormSchema>;
-export type MappingFormWithFilePreviewProps = z.infer<ReturnType<typeof mappingFormSchemaWithFilePreview>>;
 
 export type TransactionWithRelations = Prisma.TransactionGetPayload<{
 	select: {
@@ -146,9 +146,25 @@ export type TransactionWithRelations = Prisma.TransactionGetPayload<{
 	};
 }>;
 
-export type MerchantMinimal = TransactionWithRelations["merchant"];
-export type CategoryMinimal = TransactionWithRelations["category"];
-export type SubcategoryMinimal = TransactionWithRelations["subcategory"];
+// ============================================
+// Import and Mapping Types
+// ============================================
+
+export type ImportFormProps = z.infer<typeof importFormSchema>;
+export type MappingFormProps = z.infer<ReturnType<typeof mappingFormSchema>>;
+export type MappingFormWithFilePreviewProps = z.infer<ReturnType<typeof mappingFormSchemaWithFilePreview>>;
+export type CreateMappingProps = z.infer<typeof createMappingSchema>;
+export type UpdateMappingProps = z.infer<typeof updateMappingSchema>;
+export type DeleteMappingProps = z.infer<typeof deleteMappingSchema>;
+export type ColumnFieldMappingProps = z.infer<typeof columnFieldMappingSchema>;
+export type UnassignedDescription = {
+	description: string;
+	count: number;
+};
+
+// ============================================
+// Chart and Filter Types
+// ============================================
 
 export type BarSizeResult<T> = {
 	barSize: number;
@@ -166,9 +182,4 @@ export type Filters = {
 	moneyOutMerchant: string;
 	accountName: string;
 	dateRange: DateRange;
-};
-
-export type UnassignedDescription = {
-	description: string;
-	count: number;
 };

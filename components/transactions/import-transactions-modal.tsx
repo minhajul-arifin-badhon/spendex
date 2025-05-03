@@ -55,7 +55,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	const createMappingMutation = useCreateMapping();
 
-	// Initialize the form with React Hook Form
 	const form = useForm<ImportFormProps>({
 		resolver: zodResolver(importFormSchema),
 		defaultValues: {
@@ -78,7 +77,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	const formSchema = mappingFormSchemaWithFilePreview(mappings);
 
-	// Initialize the column mapping form
 	const columnMappingForm = useForm<MappingFormWithFilePreviewProps>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -92,7 +90,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	const columnMappingFormErrors = columnMappingForm.formState.errors;
 
-	// Handle file selection and parsing
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
@@ -145,7 +142,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	// Process data using a selected mapping
 	const processDataWithMapping = (formData: { includesHeader: boolean; accountName: string }, mapping: Mapping) => {
-		// return;
 		if (!fileData.length) return;
 
 		// Process the data based on the mapping
@@ -155,9 +151,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		const columnFieldMapping = mapping.columnFieldMapping as ColumnFieldMappingProps[];
 
 		if (columnFieldMapping.length != fileData[startRow].length) {
-			console.log("Mapping columns: ", columnFieldMapping.length);
-			console.log("Filedata columns: ", fileData[startRow].length);
-
 			toast.error("Number of columns does not match between the uploaded file and the selected mapping.");
 			return;
 		}
@@ -214,17 +207,13 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	const onSubmitStep2 = async (formData: MappingFormWithFilePreviewProps) => {
 		if (!importFormData || !fileData.length) return;
 
-		console.log(formData);
-
 		const newMapping: CreateMappingProps = {
 			...formData
 		};
 
 		try {
 			toast.info("Importing data...");
-
 			const response = await createMappingMutation.mutateAsync(newMapping);
-			console.log(response);
 
 			if (response?.success) {
 				processDataWithMapping(
@@ -240,7 +229,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		}
 	};
 
-	// Reset the modal state
 	const resetModal = () => {
 		setStep(1);
 		setFileData([]);
@@ -249,7 +237,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		columnMappingForm.reset();
 	};
 
-	// Handle modal close
 	const handleOpenChange = (open: boolean) => {
 		if (!open) {
 			resetModal();
@@ -258,9 +245,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	};
 
 	const getColumnMappingErrors = () => {
-		console.log("CHECKING FIELD ERRORS--------------");
-		console.log(columnMappingFormErrors);
-
 		const errors: string[] = [];
 
 		if (columnMappingFormErrors.columnFieldMapping) {
@@ -312,26 +296,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 													className="flex-1 cursor-pointer"
 													{...fieldProps}
 												/>
-												{/* <Button
-													type="button"
-													variant="outline"
-													size="icon"
-													onClick={() => document.getElementById("file-upload")?.click()}
-												>
-													<Upload className="h-4 w-4" />
-												</Button> */}
-												{/* <input
-													id="file-upload"
-													type="file"
-													accept=".csv,.xlsx,.xls"
-													className="hidden"
-													onChange={handleFileChange}
-												/> */}
 											</div>
 										</FormControl>
-										{/* <FormDescription>
-											Select a CSV or Excel file containing your transaction data.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
@@ -346,9 +312,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 										<FormControl>
 											<Input placeholder="Enter account name. e.g. CIBC Savings" {...field} />
 										</FormControl>
-										{/* <FormDescription>
-											Enter the account name for these transactions.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
@@ -369,9 +332,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 											}))}
 											placeholder="Select a mapping"
 										/>
-										{/* <FormDescription>
-											Select a predefined mapping for your file format.
-										</FormDescription> */}
 										<FormMessage />
 									</FormItem>
 								)}
@@ -471,7 +431,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 											<FormControl>
 												<Input placeholder="Enter a name for this mapping" {...field} />
 											</FormControl>
-											{/* <FormDescription>Give your mapping a descriptive name.</FormDescription> */}
 											<FormMessage />
 										</FormItem>
 									)}
@@ -486,9 +445,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 											<FormControl>
 												<Input placeholder="Enter account name. e.g. CIBC Savings" {...field} />
 											</FormControl>
-											{/* <FormDescription>
-												Enter the account name for these transactions.
-											</FormDescription> */}
 											<FormMessage />
 										</FormItem>
 									)}
@@ -504,9 +460,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 											<FormLabel htmlFor="step2-includes-header" className="cursor-pointer">
 												Headers in first row?
 											</FormLabel>
-											{/* <FormDescription>
-												Check this if the first row of your file contains column headers.
-											</FormDescription> */}
 										</div>
 										<FormControl>
 											<Checkbox
@@ -570,7 +523,6 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 															</TableRow>
 														))}
 
-														{/* Field mapping row */}
 														<TableRow className="bg-muted/50 border-t-2">
 															{columnMappingForm
 																.watch("columnFieldMapping")

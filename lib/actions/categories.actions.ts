@@ -11,8 +11,6 @@ import { sendErrorResponse, sendResponse } from "../response";
 import { prisma } from "../prisma";
 import { auth } from "@clerk/nextjs/server";
 import { createCategorySchema, deleteCategorySchema, updateCategorySchema } from "../validation";
-import { delay } from "../utils";
-// import { delay } from "../utils";
 
 export const getCategories = async (): Promise<Response<CategoriesWithSub[]>> => {
 	try {

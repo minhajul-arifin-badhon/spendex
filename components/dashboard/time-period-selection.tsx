@@ -65,7 +65,6 @@ export function TimePeriodSelector() {
 							timePeriod === option.value && "dark:bg-white dark:text-gray-900 bg-gray-900 text-white"
 						)}
 					>
-						{/* {option.value === "custom" && <CalendarIcon className="w-4 h-4" />} */}
 						{option.label}
 					</Button>
 				))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import {
 	AlertDialog,
@@ -33,13 +33,11 @@ import {
 	useCreateManyTransactions,
 	useCreateTransaction,
 	useDeleteTransaction,
-	// useGetTransactionsWithRelations,
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
 import { ImportTransactionsModal } from "./import-transactions-modal";
 import { cn } from "@/lib/utils";
 
-// Default form values
 const defaultFormValues: TransactionFormProps = {
 	accountName: "",
 	amount: 0,
@@ -65,14 +63,8 @@ const cashFlowTypes = [
 ];
 
 export default function Transactions({ transactions }: { transactions: TransactionWithRelations[] }) {
-	// console.log("Transactions component re-rendering", transactions);
 	const { data: merchantsResponse, isLoading: isLoadingMerchants, isError: isErrorMerchants } = useGetMerchants();
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
-	// const {
-	// 	data: transactionsResponse,
-	// 	isLoading: isLoadingTransactions,
-	// 	isError: isErrorTransactions
-	// } = useGetTransactionsWithRelations();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -81,10 +73,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const [isEditing, setIsEditing] = useState(false);
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 	const [cashFlowType, setCashFlowType] = useState("all");
-
-	// const createMerchantMutation = useCreateMerchant();
-	// const updateMerchantMutation = useUpdateMerchant();
-	// const deleteMerchantMutation = useDeleteMercant();
 
 	const createTransactionMutation = useCreateTransaction();
 	const createManyTransactionsMutation = useCreateManyTransactions();
@@ -106,16 +94,13 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const handleOpenEditForm = (transaction: TransactionWithRelations) => {
 		setSelectedTransaction(transaction);
 
-		console.log("editing---------");
 		const formValues = transactionToFormValues(transaction);
-		console.log(formValues);
 
 		setFormValues(formValues);
 		setIsEditing(true);
 		setIsFormOpen(true);
 	};
 
-	// // Open delete confirmation dialog
 	const handleOpenDeleteDialog = (transaction: TransactionWithRelations) => {
 		setSelectedTransaction(transaction);
 		setIsDeleteDialogOpen(true);
@@ -123,7 +108,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 
 	const handleCreateTransaction = async (data: TransactionFormProps) => {
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
-		console.log(categoryId, subcategoryId);
 
 		const newTransaction: CreateTransactionProps = {
 			accountName: data.accountName,
@@ -135,11 +119,8 @@ export default function Transactions({ transactions }: { transactions: Transacti
 			subcategoryId: subcategoryId
 		};
 
-		console.log(newTransaction);
-
 		try {
 			const response = await createTransactionMutation.mutateAsync(newTransaction);
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -155,7 +136,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const handleUpdateTransaction = async (data: TransactionFormProps) => {
 		if (!selectedTransaction) return;
 
-		console.log(data);
 		const { categoryId, subcategoryId } = extractCategoryIds(data.categorySelection);
 
 		const updatedTransaction: UpdateTransactionProps = {
@@ -169,11 +149,8 @@ export default function Transactions({ transactions }: { transactions: Transacti
 			subcategoryId: subcategoryId
 		};
 
-		console.log(updatedTransaction);
-
 		try {
 			const response = await updateTransactionMutation.mutateAsync(updatedTransaction);
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -189,11 +166,8 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const handleDeleteTransaction = async () => {
 		if (!selectedTransaction) return;
 
-		console.log(selectedTransaction);
-
 		try {
 			const response = await deleteTransactionMutation.mutateAsync({ id: selectedTransaction.id });
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -209,7 +183,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 		setSelectedTransaction(null);
 	};
 
-	// Handle form submission based on whether we're editing or creating
 	const handleFormSubmit = (data: TransactionFormProps) => {
 		if (isEditing) {
 			handleUpdateTransaction(data);
@@ -221,7 +194,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 		setSelectedTransaction(null);
 	};
 
-	// Function to convert from merchant data to form values
 	const transactionToFormValues = (transaction: TransactionWithRelations): TransactionFormProps => {
 		let categorySelection: CategorySelection | null = null;
 
@@ -250,7 +222,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 		};
 	};
 
-	// Function to extract category and subcategory IDs from form values
 	const extractCategoryIds = (
 		selection: CategorySelection | null
 	): { categoryId: number | null; subcategoryId: number | null } => {
@@ -265,7 +236,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 		}
 	};
 
-	// Handle import transactions
 	const handleImportTransactions = async (importedTransactions: CreateTransactionProps[]) => {
 		console.log(importedTransactions);
 
@@ -318,9 +288,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 
 	const merchants = (merchantsResponse.data as Merchant[]) || [];
 	const categories = (categoriesResponse.data as CategoriesWithSub[]) || [];
-	// const transactions = (transactionsResponse.data as TransactionWithRelations[]) || [];
-
-	// console.log(transactions);
 
 	return (
 		<>
@@ -330,7 +297,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 						<Button
 							key={option.value}
 							onClick={() => setCashFlowType(option.value)}
-							// size="sm"
 							variant="outline"
 							className={cn(
 								"border transition-colors focus-visible:outline-none duration-200 ease-in rounded-md bg-card hover:dark:bg-white hover:dark:text-gray-900 hover:bg-gray-900 hover:text-white",
@@ -373,8 +339,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 						isEditing ? "Edit the information of an existing transaction." : "Create a new transaction."
 					}
 					submitButtonText={isEditing ? "Save" : "Save"}
-					// existingMerchants={merchantsResponse.data as Merchant[]}
-					// currentTransactionId={selectedTransaction?.id}
 					isFormOpen={isFormOpen}
 				/>
 			</Dialog>
@@ -385,7 +349,6 @@ export default function Transactions({ transactions }: { transactions: Transacti
 				onImport={handleImportTransactions}
 			/>
 
-			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader>

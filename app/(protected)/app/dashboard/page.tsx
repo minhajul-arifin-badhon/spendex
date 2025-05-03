@@ -32,7 +32,6 @@ const defaultFilters: Filters = {
 };
 
 export default function Page() {
-	// State for filters
 	const {
 		data: transactionsResponse,
 		isLoading: isLoadingTransactions,
@@ -48,16 +47,6 @@ export default function Page() {
 		if (isErrorTransactions || !transactionsResponse?.success) return [];
 
 		const transactions = transactionsResponse.data as TransactionWithRelations[];
-		// console.log(transactions);
-		// console.log("Filtering transactions");
-		// console.log(filters);
-
-		// Helper to match category/subcategory/merchant logic
-		// const matchesField = (fieldValue: string | undefined | null, filterValue: string | undefined) => {
-		// 	if (!filterValue) return true;
-		// 	if (filterValue === "Uncategorized") return !fieldValue;
-		// 	return fieldValue?.toLowerCase().includes(filterValue.toLowerCase());
-		// };
 
 		const matchesExact = (fieldValue: string | undefined | null, filterValue: string) => {
 			if (!filterValue) return true;
@@ -88,7 +77,6 @@ export default function Page() {
 	}, [transactionsResponse, filters, isErrorTransactions]);
 
 	useEffect(() => {
-		console.log("Changed custom range");
 		handleFilterChange("dateRange", customDateRange);
 	}, [customDateRange]);
 
@@ -98,7 +86,6 @@ export default function Page() {
 		const dateRange = getDateRange(value);
 
 		if (dateRange) {
-			console.log(dateRange.from, dateRange.to);
 			handleFilterChange("dateRange", dateRange);
 		}
 	};

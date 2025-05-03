@@ -107,22 +107,3 @@ export const getMerchantData = (transactions: TransactionWithRelations[], isMone
 		.map(([name, value]) => ({ name, value }))
 		.sort((a, b) => b.value - a.value);
 };
-
-// Prepare account data for pie chart
-// export const getAccountData = (transactions: TransactionWithRelations[]) => {
-// 	const accounts: Record<string, number> = {};
-
-// 	transactions
-// 		.filter((t) => t.amount < 0) // Only expenses
-// 		.forEach((transaction) => {
-// 			const accountName = transaction.accountName;
-// 			if (accountName) {
-// 				if (!accounts[accountName]) {
-// 					accounts[accountName] = 0;
-// 				}
-// 				accounts[accountName] += Math.abs(transaction.amount);
-// 			}
-// 		});
-
-// 	return Object.entries(accounts).map(([name, value]) => ({ name, value }));
-// };

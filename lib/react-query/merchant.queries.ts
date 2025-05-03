@@ -4,10 +4,6 @@ import { CreateMerchantProps, DeleteMerchantProps, SuccessResponse, UpdateMercha
 import { Merchant } from "@prisma/client";
 import { createMerchant, deleteMerchant, getMerchants, updateMerchant } from "../actions/merchants.actions";
 
-// ============================================================
-// MERCHANT QUERIES
-// ============================================================
-
 const invalidateMerchantsQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating grouped categories--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_MERCHANTS] });

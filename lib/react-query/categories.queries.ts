@@ -9,10 +9,6 @@ import {
 	UpdateCategoryProps
 } from "@/app/types";
 
-// ============================================================
-// CATEGORY QUERIES
-// ============================================================
-
 const invalidateCategoriesQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating grouped categories--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_CATEGORIES] });
@@ -22,7 +18,6 @@ export const useGetCategories = () => {
 	return useQuery({
 		queryKey: [QUERY_KEYS.GET_CATEGORIES],
 		queryFn: () => {
-			console.log("query: calling categories................");
 			return getCategories();
 		}
 	});

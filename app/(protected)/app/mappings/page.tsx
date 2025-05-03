@@ -12,12 +12,11 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-// import MappingsList from "./components/mappings-list";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Mapping } from "@prisma/client";
 import { ColumnFieldMappingProps, CreateMappingProps, MappingFormProps, UpdateMappingProps } from "@/app/types";
-import MappingForm from "@/components/mapping-form";
+import MappingForm from "@/components/mappings/mapping-form";
 import {
 	useCreateMapping,
 	useDeleteMapping,
@@ -28,7 +27,6 @@ import { Spinner } from "@/components/ui/spinner";
 import ListMappings from "@/components/list-mappings";
 import { toast } from "sonner";
 
-// Default form values
 const defaultFormValues: MappingFormProps = {
 	mappingName: "",
 	accountName: "",
@@ -53,23 +51,17 @@ export default function Page() {
 	const updateMappingMutation = useUpdateMapping();
 	const deleteMappingMutation = useDeleteMapping();
 
-	// Open form for creating a new mapping
 	const handleOpenCreateForm = () => {
 		setFormValues(defaultFormValues);
 		setIsEditing(false);
 		setIsFormOpen(true);
 	};
 
-	// Open form for editing an existing mapping
 	const handleOpenEditForm = (mapping: Mapping) => {
 		setSelectedMapping(mapping);
 
 		const columnFieldMapping = mapping.columnFieldMapping as ColumnFieldMappingProps[];
 
-		console.log("editing---------");
-		console.log(mapping);
-
-		// Set form values with existing mapping data
 		setFormValues({
 			mappingName: mapping.mappingName,
 			accountName: mapping.accountName,
@@ -83,16 +75,12 @@ export default function Page() {
 		setIsFormOpen(true);
 	};
 
-	// Open delete confirmation dialog
 	const handleOpenDeleteDialog = (mapping: Mapping) => {
 		setSelectedMapping(mapping);
 		setIsDeleteDialogOpen(true);
 	};
 
-	// Create new mapping
 	const handleCreateMapping = async (data: MappingFormProps) => {
-		console.log(data.columnFieldMapping);
-
 		const newMapping: CreateMappingProps = {
 			mappingName: data.mappingName.trim(),
 			accountName: data.accountName.trim(),
@@ -101,11 +89,8 @@ export default function Page() {
 			negativeAmountMeans: data.negativeAmountMeans ?? ""
 		};
 
-		console.log(newMapping);
-
 		try {
 			const response = await createMappingMutation.mutateAsync(newMapping);
-			console.log(response);
 
 			if (response?.success) toast.success("The mapping is created successfully.");
 			else toast.error(response?.data as string);
@@ -115,11 +100,9 @@ export default function Page() {
 		}
 	};
 
-	// Update existing mapping
 	const handleUpdateMapping = async (data: MappingFormProps) => {
 		if (!selectedMapping) return;
 
-		console.log(data);
 		const updatedMapping: UpdateMappingProps = {
 			id: selectedMapping.id,
 			mappingName: data.mappingName.trim(),
@@ -129,11 +112,8 @@ export default function Page() {
 			negativeAmountMeans: data.negativeAmountMeans ?? ""
 		};
 
-		console.log(updatedMapping);
-
 		try {
 			const response = await updateMappingMutation.mutateAsync(updatedMapping);
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -149,15 +129,11 @@ export default function Page() {
 		setSelectedMapping(null);
 	};
 
-	// Delete mapping
 	const handleDeleteMapping = async () => {
 		if (!selectedMapping) return;
 
-		console.log(selectedMapping);
-
 		try {
 			const response = await deleteMappingMutation.mutateAsync({ id: selectedMapping.id });
-			console.log(response);
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -173,7 +149,6 @@ export default function Page() {
 		setSelectedMapping(null);
 	};
 
-	// Handle form submission based on whether we're editing or creating
 	const handleFormSubmit = (data: MappingFormProps) => {
 		if (isEditing) {
 			handleUpdateMapping(data);
@@ -181,7 +156,6 @@ export default function Page() {
 			handleCreateMapping(data);
 		}
 
-		// setFormValues(defaultFormValues);
 		setIsFormOpen(false);
 	};
 
@@ -219,7 +193,6 @@ export default function Page() {
 
 			<ListMappings mappings={mappings} onEdit={handleOpenEditForm} onDelete={handleOpenDeleteDialog} />
 
-			{/* Mapping Form Dialog */}
 			<Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
 				<MappingForm
 					key={isEditing ? selectedMapping?.id : Date.now()}
@@ -239,7 +212,6 @@ export default function Page() {
 				/>
 			</Dialog>
 
-			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader>

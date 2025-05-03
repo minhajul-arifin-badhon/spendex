@@ -8,13 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { AlertCircle, ArrowRight, Asterisk } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { mappingFormSchema } from "@/lib/validation";
 import { Mapping } from "@prisma/client";
 import { MappingFormProps } from "@/app/types";
 import { useEffect } from "react";
-import { SelectWithClear } from "./ui/select-with-clear";
+import { SelectWithClear } from "../ui/select-with-clear";
 import { fieldOptions } from "@/lib/constants";
 
 interface ComponentProps {
@@ -55,7 +55,6 @@ export default function MappingForm({
 		name: "columnFieldMapping"
 	});
 
-	// const isAmount = form.watch("columnFieldMapping").some((field) => field.fieldName == "Account");
 	const formErrors = form.formState.errors;
 
 	const handleColumnCountChange = (value: string) => {
@@ -63,7 +62,6 @@ export default function MappingForm({
 		form.setValue("columnCount", count);
 
 		if (count > fields.length) {
-			// Add new empty mappings
 			for (let i = fields.length; i < count; i++) {
 				append({
 					columnIndex: i,
@@ -71,16 +69,11 @@ export default function MappingForm({
 				});
 			}
 		} else if (count < fields.length) {
-			// Remove excess mappings
 			for (let i = fields.length - 1; i >= count; i--) {
 				remove(i);
 			}
 		}
 	};
-
-	// const getAvailableFieldOptions = (columnIndex: number) => {
-	// 	return [...fieldOptions];
-	// };
 
 	const getColumnMappingErrors = () => {
 		console.log("CHECKING FIELD ERRORS--------------");
@@ -97,7 +90,6 @@ export default function MappingForm({
 		return errors;
 	};
 
-	// Call onSubmit and reset form when the form is submitted
 	const handleFormSubmit = (data: MappingFormProps) => {
 		onSubmit(data);
 	};

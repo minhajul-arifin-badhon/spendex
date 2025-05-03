@@ -28,7 +28,7 @@ import {
 	useUpdateSubcategory
 } from "@/lib/react-query/subcategories.queries";
 import { toast } from "sonner";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 
 const initDialogProps: CategoryDialogProps = {
 	isOpen: false,
@@ -40,7 +40,6 @@ const initDialogProps: CategoryDialogProps = {
 };
 
 export default function ListCategories() {
-	console.log("--------rendering category list");
 	const { data: categoriesResponse, isLoading: isLoadingCategories, isError: isErrorCategories } = useGetCategories();
 	const createCategoryMutation = useCreateCategory();
 	const updateCategoryMutation = useUpdateCategory();
@@ -89,7 +88,6 @@ export default function ListCategories() {
 
 	const handleMutation = async (data: CategoryMutationProps) => {
 		const { type, operation, group, categoryId, subcategoryId, name } = data;
-		console.log(type, operation, group, categoryId, subcategoryId, name);
 
 		try {
 			let response;
@@ -114,8 +112,6 @@ export default function ListCategories() {
 				}
 			}
 
-			console.log(response);
-
 			if (!response?.success) {
 				toast.error(response?.data);
 			}
@@ -127,11 +123,6 @@ export default function ListCategories() {
 
 	const saveEdit = async () => {
 		if (!editingItem) return;
-
-		// if (isDuplicate(editingItem)) {
-		// 	toast.error(`A ${editingItem.type} with that name already exists.`);
-		// 	return;
-		// }
 
 		const data = JSON.parse(JSON.stringify(editingItem));
 
@@ -160,11 +151,6 @@ export default function ListCategories() {
 				}
 			]
 		});
-
-		// setExpandedCategories((prev) => ({
-		// 	...prev,
-		// 	[newCategoryId]: true
-		// }));
 
 		startEditing({
 			type: "category",
@@ -208,11 +194,6 @@ export default function ListCategories() {
 		const handleClickOutside = (event: MouseEvent) => {
 			if (editingItem && !(event.target as HTMLElement).closest("input")) {
 				saveEdit();
-				// if (!isDuplicate(editingItem)) saveEdit();
-				// else {
-				// 	removeFromGroupCategories(editingItem);
-				// 	setEditingItem(null);
-				// }
 			}
 		};
 
@@ -223,7 +204,6 @@ export default function ListCategories() {
 	}, [editingItem]);
 
 	useEffect(() => {
-		console.log("------categories changed-------------");
 		if (categoriesResponse?.success) {
 			const categories = categoriesResponse.data as CategoriesWithSub[];
 
@@ -237,7 +217,7 @@ export default function ListCategories() {
 				return acc;
 			}, {});
 
-			setGroupedCategories(groupedCategories); // Store the fetched data in the local state
+			setGroupedCategories(groupedCategories);
 		}
 	}, [categoriesResponse]);
 
@@ -423,7 +403,6 @@ export default function ListCategories() {
 				</div>
 			))}
 
-			{/* Delete Confirmation Dialog */}
 			<AlertDialog open={deleteDialog.isOpen} onOpenChange={closeDeleteDialog}>
 				<AlertDialogContent>
 					<AlertDialogHeader>

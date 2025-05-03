@@ -4,10 +4,6 @@ import { CreateMappingProps, DeleteMappingProps, SuccessResponse, UpdateMappingP
 import { createMapping, deleteMapping, getMappings, updateMapping } from "../actions/mappings.actions";
 import { Mapping } from "@prisma/client";
 
-// ============================================================
-// MAPPING QUERIES
-// ============================================================
-
 const invalidateMappingsQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating grouped categories--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_MAPPINGS] });
@@ -17,7 +13,6 @@ export const useGetMappings = () => {
 	return useQuery({
 		queryKey: [QUERY_KEYS.GET_MAPPINGS],
 		queryFn: () => {
-			console.log("query: calling mappings................");
 			return getMappings();
 		}
 	});

@@ -11,7 +11,6 @@ export default function FeaturesShowcase() {
 				</p>
 			</div>
 
-			{/* <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" /> */}
 			<FeatureSection
 				title="Bank-Free Transaction Management"
 				description="No need to link sensitive bank accounts. Import transactions from files or add them manually, then analyze your spending patterns with our comprehensive dashboard and visualization tools."

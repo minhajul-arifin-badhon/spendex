@@ -15,7 +15,6 @@ interface ComponentProps {
 }
 
 export default function ListMappings({ mappings, onEdit, onDelete }: ComponentProps) {
-	// Format column mappings for display in the table
 	const formatColumnMappings = (columnFieldMapping: ColumnFieldMappingProps[]) => {
 		return columnFieldMapping
 			.filter((m) => m.fieldName)
@@ -23,7 +22,6 @@ export default function ListMappings({ mappings, onEdit, onDelete }: ComponentPr
 			.join(", ");
 	};
 
-	// Table columns definition
 	const columns = useMemo<ColumnDef<Mapping>[]>(
 		() => [
 			{

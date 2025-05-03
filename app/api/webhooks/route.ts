@@ -47,8 +47,6 @@ export async function POST(req: Request) {
 		});
 	}
 
-	// Do something with payload
-	// For this guide, log payload to console
 	const { id } = evt.data;
 	const eventType = evt.type;
 	console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
@@ -62,8 +60,6 @@ export async function POST(req: Request) {
 			email: email_addresses[0].email_address,
 			fullName: first_name + " " + last_name
 		};
-
-		console.log(data);
 
 		try {
 			const user = await prisma.user.upsert({

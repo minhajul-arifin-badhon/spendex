@@ -7,34 +7,18 @@ import {
 	TransactionWithRelations,
 	UpdateTransactionProps
 } from "@/app/types";
-import { Merchant, Transaction } from "@prisma/client";
 import {
 	createManyTransactions,
 	createTransaction,
 	deleteTransaction,
-	// getTransactions,
 	getTransactionsWithRelations,
 	updateTransaction
 } from "../actions/transactions.actions";
-
-// ============================================================
-// TRANSACTION QUERIES
-// ============================================================
 
 const invalidateTransactionsQueries = (queryClient: QueryClient) => {
 	console.log("=------------invalidating transactions--------------------");
 	queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
 };
-
-// export const useGetTransactions = () => {
-// 	return useQuery({
-// 		queryKey: [QUERY_KEYS.GET_TRANSACTIONS],
-// 		queryFn: () => {
-// 			console.log("query: calling transactions................");
-// 			return getTransactions();
-// 		}
-// 	});
-// };
 
 export const useGetTransactionsWithRelations = () => {
 	return useQuery({
