@@ -40,8 +40,9 @@ This project uses many tools like:
 
 -   [Next.js](https://nextjs.org/) with App Router and Server Actions.
 -   [ReactJS](https://reactjs.org)
--   [Clerk](https://clerk.com)
--   [React Query](https://tanstack.com/query/latest)
+-   [Clerk](https://clerk.com) for Auth
+-   [React Query](https://tanstack.com/query/latest) for State Management
+-   [Prisma](https://www.prisma.io/) as ORM Client
 -   [TypeScript](https://www.typescriptlang.org)
 -   [Tailwindcss](https://tailwindcss.com)
 -   [Shadcn](https://ui.shadcn.com)
