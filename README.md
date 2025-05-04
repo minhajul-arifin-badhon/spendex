@@ -33,3 +33,17 @@ There’s no need to link sensitive bank accounts. Users can easily import trans
 ### Comprehensive Presets for Quick Onboarding
 
 Spendex provides a comprehensive set of presets for categories and subcategories, merchants, and mapping rules for common banks. These presets offer a great starting point, making it easy for new users to get up and running quickly and streamlining the onboarding process.
+
+## What is inside?
+
+This project uses many tools like:
+
+-   [Next.js](https://nextjs.org/) with App Router and Server Actions.
+-   [ReactJS](https://reactjs.org)
+-   [Clerk](https://clerk.com)
+-   [React Query](https://tanstack.com/query/latest)
+-   [TypeScript](https://www.typescriptlang.org)
+-   [Tailwindcss](https://tailwindcss.com)
+-   [Shadcn](https://ui.shadcn.com)
+-   [Eslint](https://eslint.org)
+-   [Prettier](https://prettier.io)
