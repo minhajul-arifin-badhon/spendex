@@ -24,7 +24,7 @@ import {
 	useUpdateMapping
 } from "@/lib/react-query/mappings.queries";
 import { Spinner } from "@/components/ui/spinner";
-import ListMappings from "@/components/list-mappings";
+import ListMappings from "@/components/mappings/list-mappings";
 import { toast } from "sonner";
 
 const defaultFormValues: MappingFormProps = {

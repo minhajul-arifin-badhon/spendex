@@ -36,7 +36,7 @@ import ListMerchants from "@/components/merchants/list-merchants";
 import MerchantForm from "@/components/merchants/merchant-form";
 import { useGetCategories } from "@/lib/react-query/categories.queries";
 import { useGetTransactionsWithRelations } from "@/lib/react-query/transactions.queries";
-import ListUnassignedTransactions from "@/components/list-unassigned-transactions";
+import ListUnassignedTransactions from "@/components/merchants/list-unassigned-transactions";
 import MerchantRuleForm from "@/components/merchants/merchant-rule-form";
 
 const defaultFormValues: MerchantFormProps = {
