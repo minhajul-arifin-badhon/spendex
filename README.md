@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+#### Note: Spendex is in the MVP stage and actively under development. Upcoming features include duplication detection during transaction import and other enhancements based on user feedback.
 
-## Getting Started
+# Spendex - Expense Tracker
 
-First, run the development server:
+### Live app: https://spendex.badhon.ca
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## What is Spendex?
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Spendex is an expense tracker application with unique features that distinguish it from others. Rather than relying heavily on AI automation, Spendex focuses on providing customization tools, making it accessible and free for students and professionals. It offers a simple account setup and easy insights into financial data, with a comprehensive dashboard and advanced visualization tools.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Motivation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+I was searching for an expense tracker, ideally free, to manage transactions from multiple bank accounts and analyze them. However, most apps encourage linking bank accounts for transaction syncing, which I wasn't comfortable with. When attempting to bulk import transactions using CSV files, I noticed that while some files worked, others failed due to parsing errors. Additionally, there was no way to manually intervene and map the fields correctly. This experience led to the idea of Spendex, which includes the following features.
 
-## Learn More
+## Core Features
 
-To learn more about Next.js, take a look at the following resources:
+### Effortless Data Import and Mapping
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+While many expense trackers offer import functionality, the diverse ways transactions are organized in files often lead to parsing errors, data loss, and inaccurate mapping. Spendex overcomes this by providing a flexible column mapping system, enabling users to quickly match their bank's export format to Spendex fields, ensuring a smooth and accurate transition without data loss.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Transaction Categorization with Keyword Matching
 
-## Deploy on Vercel
+Transactions are automatically categorized by matching their descriptions with predefined keywords. Users can create merchants with keyword matching and pre-assign categories and subcategories to each merchant. When new transactions are imported, their descriptions are evaluated against existing merchant keywords, and if a match is found, the appropriate merchant, category, and subcategory are automatically assigned to the transaction. Once the usual merchants are set up, this process automates categorization for future imports, saving time.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Customizable Categories & Subcategories
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Spendex allows designing a financial organization system with fully customizable categories and subcategories that reflect users unique spending habits and financial goals. Creating and modifying categories is powered by an intuitive, fast user interface with inline editing.
+
+### Bank-Free Transaction Management and Analysis
+
+There’s no need to link sensitive bank accounts. Users can easily import transactions from files or enter them manually, then analyze their spending patterns using Spendex's comprehensive dashboard and visualization tools.
+
+### Comprehensive Presets for Quick Onboarding
+
+Spendex provides a comprehensive set of presets for categories and subcategories, merchants, and mapping rules for common banks. These presets offer a great starting point, making it easy for new users to get up and running quickly and streamlining the onboarding process.
