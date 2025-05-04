@@ -40,11 +40,18 @@ This project uses many tools like:
 
 -   [Next.js](https://nextjs.org/) with App Router and Server Actions.
 -   [ReactJS](https://reactjs.org)
--   [Clerk](https://clerk.com) for Auth
--   [React Query](https://tanstack.com/query/latest) for State Management
--   [Prisma](https://www.prisma.io/) as ORM Client
 -   [TypeScript](https://www.typescriptlang.org)
 -   [Tailwindcss](https://tailwindcss.com)
+-   [Prisma](https://www.prisma.io/) as ORM Client.
+-   [Clerk](https://clerk.com) for Auth.
+-   [TanStack Query](https://tanstack.com/query/latest) for State Management.
+-   [React Hook Form](https://react-hook-form.com/)
+-   [Zod](https://zod.dev/) for both client side form and server side data validation.
 -   [Shadcn](https://ui.shadcn.com)
+-   [TanStack Table](https://tanstack.com/table/latest) for tables with pagination, filtering, sorting etc.
+-   [Rechart](https://recharts.org/en-US) for data visualization and analysis.
+-   [PapaParse](https://www.papaparse.com/) for CSV parsing.
+-   [SheetJS](https://www.npmjs.com/package/xlsx) for Excel parsing.
+-   [Motion](https://motion.dev/) for animation.
 -   [Eslint](https://eslint.org)
 -   [Prettier](https://prettier.io)
