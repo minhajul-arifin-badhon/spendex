@@ -4,6 +4,10 @@
 
 ### Live app: https://spendex.badhon.ca
 
+### Video demo showcasing core features: https://youtu.be/dvYRIoKF2zw
+
+### Screenshots: https://shorturl.at/F5REK
+
 ## What is Spendex?
 
 Spendex is an expense tracker application with unique features that distinguish it from others. Rather than relying heavily on AI automation, Spendex focuses on providing customization tools, making it accessible and free for students and professionals. It offers a simple account setup and easy insights into financial data, with a comprehensive dashboard and advanced visualization tools.
