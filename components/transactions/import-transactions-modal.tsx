@@ -179,10 +179,10 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 							transaction.amount = mapping.negativeAmountMeans != "Debit" ? -amount : amount;
 							break;
 						case "Credit":
-							transaction.amount = Number.parseFloat(value.replace(/[^0-9.]+/g, ""));
+							if (value) transaction.amount = -Number.parseFloat(value.replace(/[^0-9.]+/g, ""));
 							break;
 						case "Debit":
-							transaction.amount = -Number.parseFloat(value.replace(/[^0-9.]+/g, ""));
+							if (value) transaction.amount = Number.parseFloat(value.replace(/[^0-9.]+/g, ""));
 							break;
 					}
 				}
