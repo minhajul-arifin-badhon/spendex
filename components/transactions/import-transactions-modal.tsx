@@ -175,8 +175,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 							transaction.description = value;
 							break;
 						case "Amount":
-							const amount = Math.abs(Number.parseFloat(value.replace(/[^0-9.-]+/g, "")));
-							transaction.amount = mapping.negativeAmountMeans != "Debit" ? -amount : amount;
+							const amount = Number.parseFloat(value.replace(/[^0-9.-]+/g, ""));
+							transaction.amount = mapping.negativeAmountMeans == "Credit" ? amount : -amount;
 							break;
 						case "Credit":
 							if (value)
