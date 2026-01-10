@@ -4,6 +4,7 @@ import { BarSizeResult } from "@/app/types";
 import { DateRange } from "react-day-picker";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
+import { formatInTimeZone } from "date-fns-tz";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -89,6 +90,9 @@ export const getDateRange = (timePeriod: string): DateRange | null => {
 		case "year":
 			from = new Date(now.getFullYear(), 0, 1);
 			to = now;
+
+			console.log(from);
+			console.log(to);
 			break;
 
 		case "custom":
@@ -190,3 +194,7 @@ export const parseFile = (file: File): Promise<string[][]> => {
 		}
 	});
 };
+
+export function formatToUTC(d: Date): string {
+	return formatInTimeZone(d, "UTC", "yyyy-MM-dd");
+}

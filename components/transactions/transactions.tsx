@@ -37,7 +37,7 @@ import {
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
 import { ImportTransactionsModal } from "./import-transactions-modal";
-import { cn } from "@/lib/utils";
+import { cn, formatToUTC } from "@/lib/utils";
 
 const defaultFormValues: TransactionFormProps = {
 	accountName: "",
@@ -233,7 +233,7 @@ export default function Transactions({ transactions }: { transactions: Transacti
 		}
 
 		return {
-			date: new Date(transaction.date),
+			date: transaction.date,
 			amount: transaction.amount,
 			merchant: transaction.merchant?.name || "",
 			description: transaction.description || "",

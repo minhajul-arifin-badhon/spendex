@@ -187,8 +187,8 @@ export default function MappingForm({
 							<FormLabel>Column Mappings*</FormLabel>
 							<FormDescription>
 								- Each column must map to a unique field or leave unassigned.
-								<br /> - Mapping to the Date, Description, and Amount fields (or both Credit and Debit)
-								is required.
+								<br /> - Mapping to the Date, Description, and Amount fields (or both Credit (Money In)
+								and Debit (Money Out)) is required.
 								<br /> - Description field should contain merchant information.
 							</FormDescription>
 							<div className="space-y-3 py-1">
@@ -229,7 +229,9 @@ export default function MappingForm({
 								name="negativeAmountMeans"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Interpret Negative (-) Amount As*</FormLabel>
+										<FormLabel>
+											Interpret Negative (-) Amount As (Credit is money in, Debit is money out)*
+										</FormLabel>
 										<SelectWithClear
 											value={field.value ? field.value.toString() : ""}
 											onChange={field.onChange}

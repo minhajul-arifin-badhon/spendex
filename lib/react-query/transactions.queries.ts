@@ -27,7 +27,16 @@ export const useGetTransactionsWithRelations = () => {
 		queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
 		queryFn: () => {
 			console.log("query: calling transactions................");
-			return getTransactionsWithRelations();
+			return getTransactionsWithRelations().then((res) => {
+				// convert all transaction dates to UTC
+				if (res && Array.isArray(res.data)) {
+					res.data = res.data.map((txn) => ({
+						...txn,
+						date: new Date(txn.date.getUTCFullYear(), txn.date.getUTCMonth(), txn.date.getUTCDate())
+					}));
+				}
+				return res;
+			});
 		}
 	});
 };

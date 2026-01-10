@@ -73,8 +73,10 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		const currentAccountName = form.getValues("accountName");
 		if (selectedMapping) {
 			form.setValue("accountName", selectedMapping.accountName ?? "");
+			form.setValue("includesHeader", selectedMapping.includesHeader);
 		} else if (!selectedMapping && currentAccountName) {
 			form.setValue("accountName", "");
+			form.setValue("includesHeader", true);
 		}
 	}, [selectedMappingId, selectedMapping, form]);
 
@@ -179,22 +181,26 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 					const value = row[columnMapping.columnIndex];
 					switch (columnMapping.fieldName) {
 						case "Date":
-							const [year, month, day] = value.split("-").map(Number);
-							transaction.date = new Date(year, month - 1, day);
+							const parsedDate = new Date(value);
+							transaction.date = new Date(
+								parsedDate.getUTCFullYear(),
+								parsedDate.getUTCMonth(),
+								parsedDate.getUTCDate()
+							);
 							break;
 						case "Description":
 							transaction.description = value;
 							break;
 						case "Amount":
 							const amount = Number.parseFloat(value.replace(/[^0-9.-]+/g, ""));
-							transaction.amount = mapping.negativeAmountMeans == "Credit" ? amount : -amount;
+							transaction.amount = mapping.negativeAmountMeans == "Credit" ? -amount : amount;
 							break;
 						case "Credit":
-							if (value)
-								transaction.amount = -Math.abs(Number.parseFloat(value.replace(/[^0-9.]+/g, "")));
+							if (value) transaction.amount = Math.abs(Number.parseFloat(value.replace(/[^0-9.]+/g, "")));
 							break;
 						case "Debit":
-							if (value) transaction.amount = Math.abs(Number.parseFloat(value.replace(/[^0-9.]+/g, "")));
+							if (value)
+								transaction.amount = -Math.abs(Number.parseFloat(value.replace(/[^0-9.]+/g, "")));
 							break;
 					}
 				}
@@ -217,6 +223,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	// Handle form submission for step 2
 	const onSubmitStep2 = async (formData: MappingFormWithFilePreviewProps) => {
+		console.log("Submitting form");
 		if (!importFormData || !fileData.length) return;
 
 		const newMapping: CreateMappingProps = {
@@ -491,8 +498,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 									<FormLabel>Column Mappings*</FormLabel>
 									<FormDescription>
 										- Each column must map to a unique field or leave unassigned.
-										<br /> - Mapping to the Date, Description, and Amount fields (or both Credit and
-										Debit) is required.
+										<br /> - Mapping to the Date, Description, and Amount fields (or both Credit
+										(Money In) and Debit (Money Out)) is required.
 										<br /> - Description field should contain merchant information.
 									</FormDescription>
 								</div>
@@ -583,7 +590,10 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 									name="negativeAmountMeans"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Interpret Negative (-) Amount As*</FormLabel>
+											<FormLabel>
+												Interpret Negative (-) Amount As (Credit is money in, Debit is money
+												out)*
+											</FormLabel>
 											<SelectWithClear
 												value={field.value ? field.value.toString() : ""}
 												onChange={field.onChange}

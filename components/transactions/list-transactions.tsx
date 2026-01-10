@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { CategoryMinimal, MerchantMinimal, SubcategoryMinimal, TransactionWithRelations } from "@/app/types";
+import { filterByAmount, formatToUTC } from "@/lib/utils";
 import { format } from "date-fns";
-import { filterByAmount } from "@/lib/utils";
 
 interface ComponentProps {
 	transactions: TransactionWithRelations[];
@@ -38,12 +38,12 @@ export default function ListTransactions({ transactions, onEdit, onDelete }: Com
 					);
 				},
 				cell: ({ row }) => {
-					const formattedDate = format(new Date(row.original.date), "yyyy-MM-dd");
+					const formattedDate = format(row.original.date, "yyyy-MM-dd");
 					return <div>{formattedDate}</div>;
 				},
 
 				filterFn: (row, columnId, filterValue) => {
-					const formattedDate = format(new Date(row.original.date), "yyyy-MM-dd");
+					const formattedDate = format(row.original.date, "yyyy-MM-dd");
 					return formattedDate.includes(filterValue);
 				}
 			},
