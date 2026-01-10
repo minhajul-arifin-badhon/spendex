@@ -110,6 +110,7 @@ export type TransactionFormProps = z.infer<typeof transactionFormSchema>;
 export type CreateTransactionProps = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionProps = z.infer<typeof updateTransactionSchema>;
 export type DeleteTransactionProps = z.infer<typeof deleteTransactionSchema>;
+export type DeleteAllTransactionsProps = z.infer<typeof deleteAllTransactionsSchema>;
 
 export type TransactionWithRelations = Prisma.TransactionGetPayload<{
 	select: {

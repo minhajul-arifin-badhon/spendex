@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -68,7 +68,17 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 	const selectedMapping = mappings.find((m) => m.id.toString() === selectedMappingId);
 	const columnFieldMapping = selectedMapping?.columnFieldMapping as ColumnFieldMappingProps[];
 
-	if (selectedMappingId && columnFieldMapping.length != fileData[0].length) {
+	// Auto-fill accountName from selected mapping if current accountName is empty
+	useEffect(() => {
+		const currentAccountName = form.getValues("accountName");
+		if (selectedMapping) {
+			form.setValue("accountName", selectedMapping.accountName ?? "");
+		} else if (!selectedMapping && currentAccountName) {
+			form.setValue("accountName", "");
+		}
+	}, [selectedMappingId, selectedMapping, form]);
+
+	if (selectedMappingId && fileData && fileData[0] && columnFieldMapping.length != fileData[0].length) {
 		form.setError("mappingId", {
 			type: "manual",
 			message: "This mapping does not have the same number of columns as the data."
@@ -169,7 +179,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 					const value = row[columnMapping.columnIndex];
 					switch (columnMapping.fieldName) {
 						case "Date":
-							transaction.date = new Date(value);
+							const [year, month, day] = value.split("-").map(Number);
+							transaction.date = new Date(year, month - 1, day);
 							break;
 						case "Description":
 							transaction.description = value;

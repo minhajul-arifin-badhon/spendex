@@ -2,6 +2,7 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/re
 import { QUERY_KEYS } from "./query-keys";
 import {
 	CreateTransactionProps,
+	DeleteAllTransactionsProps,
 	DeleteTransactionProps,
 	SuccessResponse,
 	TransactionWithRelations,
@@ -10,6 +11,7 @@ import {
 import {
 	createManyTransactions,
 	createTransaction,
+	deleteAllTransactions,
 	deleteTransaction,
 	getTransactionsWithRelations,
 	updateTransaction
@@ -195,6 +197,32 @@ export const useDeleteTransaction = () => {
 				[QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
 				(old: SuccessResponse<TransactionWithRelations[]>) => {
 					return { ...old, ["data"]: old.data.filter((transaction) => transaction.id !== props.id) };
+				}
+			);
+
+			return { previousTransactions };
+		},
+		onSettled: (data, error, variables, context) => {
+			if (!data?.success || error)
+				queryClient.setQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS], context?.previousTransactions);
+			invalidateTransactionsQueries(queryClient);
+		}
+	});
+};
+
+export const useDeleteAllTransactions = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (props: DeleteAllTransactionsProps) => deleteAllTransactions(props),
+		onMutate: async () => {
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS] });
+			const previousTransactions = queryClient.getQueryData([QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS]);
+
+			queryClient.setQueryData(
+				[QUERY_KEYS.GET_TRANSACTIONS_WITH_RELATIONS],
+				(old: SuccessResponse<TransactionWithRelations[]>) => {
+					return { ...old, ["data"]: [] as TransactionWithRelations[] };
 				}
 			);
 

@@ -13,7 +13,7 @@ import {
 	AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Trash, Upload } from "lucide-react";
 import { Merchant } from "@prisma/client";
 import {
 	CategoriesWithSub,
@@ -32,6 +32,7 @@ import TransactionForm from "./transaction-form";
 import {
 	useCreateManyTransactions,
 	useCreateTransaction,
+	useDeleteAllTransactions,
 	useDeleteTransaction,
 	useUpdateTransaction
 } from "@/lib/react-query/transactions.queries";
@@ -78,6 +79,7 @@ export default function Transactions({ transactions }: { transactions: Transacti
 	const createManyTransactionsMutation = useCreateManyTransactions();
 	const updateTransactionMutation = useUpdateTransaction();
 	const deleteTransactionMutation = useDeleteTransaction();
+	const deleteAllTransactionsMutation = useDeleteAllTransactions();
 
 	if (cashFlowType != "all") {
 		transactions = transactions.filter(
@@ -168,6 +170,24 @@ export default function Transactions({ transactions }: { transactions: Transacti
 
 		try {
 			const response = await deleteTransactionMutation.mutateAsync({ id: selectedTransaction.id });
+
+			if (!response?.success) {
+				toast.error(response?.data);
+			} else {
+				toast.success(response?.data);
+			}
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong!");
+		}
+
+		setIsDeleteDialogOpen(false);
+		setSelectedTransaction(null);
+	};
+
+	const handleDeleteAllTransactions = async () => {
+		try {
+			const response = await deleteAllTransactionsMutation.mutateAsync({});
 
 			if (!response?.success) {
 				toast.error(response?.data);
@@ -310,6 +330,10 @@ export default function Transactions({ transactions }: { transactions: Transacti
 				</div>
 
 				<div className="space-x-3">
+					<Button variant="outline" onClick={handleDeleteAllTransactions}>
+						<Trash className="mr-2 h-4 w-4" /> Delete All
+					</Button>
+
 					<Button variant="outline" className="cursor-pointer" onClick={() => setIsImportModalOpen(true)}>
 						<Upload className="mr-2 h-4 w-4" /> Import
 					</Button>

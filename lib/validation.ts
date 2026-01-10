@@ -238,6 +238,8 @@ export const deleteTransactionSchema = z.object({
 	id: z.number().int().positive()
 });
 
+export const deleteAllTransactionsSchema = z.object({});
+
 export const importFormSchema = z.object({
 	file: z.instanceof(File, { message: "Please select a file to import" }),
 	accountName: z.string().min(3, "Please enter at least 3 characters").or(z.literal("")),
