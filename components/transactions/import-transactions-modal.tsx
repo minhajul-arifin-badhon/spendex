@@ -227,6 +227,11 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 		console.log("Submitting step 2 form");
 		if (!importFormData || !fileData.length) return;
 
+		if (fileData.length > 2 && fileData[0].length != fileData[1].length) {
+			toast.error("The uploaded file contains rows with different numbers of columns.");
+			return;
+		}
+
 		const newMapping: CreateMappingProps = {
 			...formData
 		};
