@@ -146,7 +146,8 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 			mappingName: "",
 			accountName: data.accountName || "",
 			includesHeader: data.includesHeader,
-			columnFieldMapping: initialMappings
+			columnFieldMapping: initialMappings,
+			negativeAmountMeans: ""
 		});
 
 		setStep(2);
@@ -223,7 +224,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 
 	// Handle form submission for step 2
 	const onSubmitStep2 = async (formData: MappingFormWithFilePreviewProps) => {
-		console.log("Submitting form");
+		console.log("Submitting step 2 form");
 		if (!importFormData || !fileData.length) return;
 
 		const newMapping: CreateMappingProps = {
@@ -526,7 +527,7 @@ export function ImportTransactionsModal({ open, onOpenChange, onImport }: Import
 															<TableRow
 																key={i}
 																className={
-																	i === 0 && form.watch("includesHeader")
+																	i === 0 && columnMappingForm.watch("includesHeader")
 																		? "bg-muted font-medium"
 																		: ""
 																}

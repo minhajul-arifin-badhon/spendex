@@ -302,8 +302,8 @@ export const getmMppingFormSchemaWithFilePreview = (existingMappings: Mapping[] 
 export const mappingFormSchemaWithFilePreview = (existingMappings: Mapping[] = []) =>
 	getmMppingFormSchemaWithFilePreview(existingMappings).refine(
 		(data) => {
-			const isAccount = data.columnFieldMapping.some((field) => field.fieldName == "Account");
-			return !isAccount || (isAccount && data.negativeAmountMeans);
+			const isAmount = data.columnFieldMapping.some((field) => field.fieldName == "Amount");
+			return !isAmount || (isAmount && data.negativeAmountMeans);
 		},
 		{
 			message: "Please, select what a negative amount means.",
