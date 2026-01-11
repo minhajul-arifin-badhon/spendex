@@ -252,3 +252,206 @@ export const initialMerchants = [
 	{ name: "PlayStation Store", category: "Entertainment", subcategory: "Gaming", includes: ["playstation store"] },
 	{ name: "Xbox Store", category: "Entertainment", subcategory: "Gaming", includes: ["xbox store"] }
 ];
+
+export const initialMappings = [
+	{
+		mappingName: "Scotia Chequing",
+		accountName: "Scotia Chequing",
+		columnFieldMapping: [
+			{
+				fieldName: "",
+				columnIndex: 0
+			},
+			{
+				fieldName: "Date",
+				columnIndex: 1
+			},
+			{
+				fieldName: "",
+				columnIndex: 2
+			},
+			{
+				fieldName: "Description",
+				columnIndex: 3
+			},
+			{
+				fieldName: "",
+				columnIndex: 4
+			},
+			{
+				fieldName: "Amount",
+				columnIndex: 5
+			},
+			{
+				fieldName: "",
+				columnIndex: 6
+			}
+		],
+		includesHeader: true,
+		negativeAmountMeans: "Debit"
+	},
+	{
+		mappingName: "Scotia Credit Card",
+		accountName: "Scotia Credit Card",
+		columnFieldMapping: [
+			{
+				fieldName: "",
+				columnIndex: 0
+			},
+			{
+				fieldName: "Date",
+				columnIndex: 1
+			},
+			{
+				fieldName: "Description",
+				columnIndex: 2
+			},
+			{
+				fieldName: "",
+				columnIndex: 3
+			},
+			{
+				fieldName: "",
+				columnIndex: 4
+			},
+			{
+				fieldName: "",
+				columnIndex: 5
+			},
+			{
+				fieldName: "Amount",
+				columnIndex: 6
+			}
+		],
+		includesHeader: true,
+		negativeAmountMeans: "Credit"
+	},
+	{
+		mappingName: "CIBC Credit Card",
+		accountName: "CIBC Credit Card",
+		columnFieldMapping: [
+			{
+				fieldName: "Date",
+				columnIndex: 0
+			},
+			{
+				fieldName: "Description",
+				columnIndex: 1
+			},
+			{
+				fieldName: "Debit",
+				columnIndex: 2
+			},
+			{
+				fieldName: "Credit",
+				columnIndex: 3
+			},
+			{
+				fieldName: "",
+				columnIndex: 4
+			}
+		],
+		includesHeader: false,
+		negativeAmountMeans: ""
+	},
+	{
+		mappingName: "CIBC Chequing",
+		accountName: "CIBC Chequing",
+		columnFieldMapping: [
+			{
+				columnIndex: 0,
+				fieldName: "Date"
+			},
+			{
+				columnIndex: 1,
+				fieldName: "Description"
+			},
+			{
+				columnIndex: 2,
+				fieldName: "Debit"
+			},
+			{
+				columnIndex: 3,
+				fieldName: "Credit"
+			}
+		],
+		includesHeader: false,
+		negativeAmountMeans: ""
+	},
+	{
+		mappingName: "CIBC Savings",
+		accountName: "CIBC Savings",
+		columnFieldMapping: [
+			{
+				columnIndex: 0,
+				fieldName: "Date"
+			},
+			{
+				columnIndex: 1,
+				fieldName: "Description"
+			},
+			{
+				columnIndex: 2,
+				fieldName: "Debit"
+			},
+			{
+				columnIndex: 3,
+				fieldName: "Credit"
+			}
+		],
+		includesHeader: false,
+		negativeAmountMeans: ""
+	},
+	{
+		mappingName: "TD Chequing",
+		accountName: "TD Chequing",
+		columnFieldMapping: [
+			{
+				columnIndex: 0,
+				fieldName: "Date"
+			},
+			{
+				columnIndex: 1,
+				fieldName: "Description"
+			},
+			{
+				columnIndex: 2,
+				fieldName: "Debit"
+			},
+			{
+				columnIndex: 3,
+				fieldName: "Credit"
+			},
+			{
+				columnIndex: 4,
+				fieldName: ""
+			}
+		],
+		includesHeader: false,
+		negativeAmountMeans: ""
+	},
+	{
+		mappingName: "Amazon Credit Card",
+		accountName: "Amazon Credit Card",
+		columnFieldMapping: [
+			{
+				columnIndex: 0,
+				fieldName: "Date"
+			},
+			{
+				columnIndex: 1,
+				fieldName: "Description"
+			},
+			{
+				columnIndex: 2,
+				fieldName: ""
+			},
+			{
+				columnIndex: 3,
+				fieldName: "Amount"
+			}
+		],
+		includesHeader: true,
+		negativeAmountMeans: "Debit"
+	}
+];

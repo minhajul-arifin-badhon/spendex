@@ -1,5 +1,5 @@
 import { CategoryGroup } from "@prisma/client";
-import { initialCategories, initialMerchants } from "../predefined_data";
+import { initialCategories, initialMappings, initialMerchants } from "../predefined_data";
 import { prisma } from "../prisma";
 
 interface createCategorySchema {
@@ -87,8 +87,27 @@ export const createPredefinedCategories = async (userId: string) => {
 	}
 };
 
+export const createPredefinedMappings = async (userId: string) => {
+	// Insert predefined mappings for the new user
+	try {
+		console.log("Creating mappings...");
+		const mappingsWithUserId = initialMappings.map((mapping) => ({
+			...mapping,
+			userId: userId
+		}));
+
+		await prisma.mapping.createMany({
+			data: mappingsWithUserId
+		});
+
+		console.log("created mappings");
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 export const createPredefinedMerchants = async (userId: string, categories: Item[], subcategories: Item[]) => {
-	// Insert predefined categories and subcategories for the new user
+	// Insert predefined merchants for the new user
 	try {
 		const categoriesNameIdMap = createNameIdMap(categories);
 		const subcategoriesNameIdMap = createNameIdMap(subcategories);

@@ -2,7 +2,11 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { createPredefinedCategories, createPredefinedMerchants } from "@/lib/actions/onboarding.actions";
+import {
+	createPredefinedCategories,
+	createPredefinedMappings,
+	createPredefinedMerchants
+} from "@/lib/actions/onboarding.actions";
 
 export async function POST(req: Request) {
 	const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -70,6 +74,7 @@ export async function POST(req: Request) {
 
 			const response = await createPredefinedCategories(id);
 			await createPredefinedMerchants(id, response!.categories, response!.subcategories);
+			await createPredefinedMappings(id);
 
 			return new Response(JSON.stringify(user), {
 				status: 201
