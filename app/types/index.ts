@@ -5,6 +5,7 @@ import {
 	createMerchantSchema,
 	createSubcategorySchema,
 	createTransactionSchema,
+	deleteAllTransactionsSchema,
 	deleteCategorySchema,
 	deleteMappingSchema,
 	deleteMerchantSchema,
