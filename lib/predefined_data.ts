@@ -393,7 +393,28 @@ export const initialMerchants = [
 	{ name: "WorldRemit", category: "Other Expenses", subcategory: null, includes: ["worldremit"] },
 	{ name: "Xoom", category: "Other Expenses", subcategory: null, includes: ["xoom"] },
 	{ name: "Ria Money Transfer", category: "Other Expenses", subcategory: null, includes: ["ria money transfer"] },
-	{ name: "OFX", category: "Other Expenses", subcategory: null, includes: ["ofx"] }
+	{ name: "OFX", category: "Other Expenses", subcategory: null, includes: ["ofx"] },
+
+	// Loans and Fees - Additional
+	{ name: "ATB Financial", category: "Loans and Fees", subcategory: null, includes: ["atb financial loan"] },
+
+	// Transfer - Additional
+	{ name: "Scotia Card Payment", category: "Transfer", subcategory: null, includes: ["mb-credit-card"] },
+
+	// Insurance - Additional
+	{ name: "Greenshield", category: "Insurance", subcategory: null, includes: ["gsci"] },
+
+	// Income - Cashback
+	{ name: "Cashback", category: "Repayment from Others", subcategory: "Cash back", includes: ["cash back"] },
+
+	// Shopping - Online Marketplaces
+	{ name: "AliExpress", category: "Shopping", subcategory: null, includes: ["aliexpress"] },
+	{ name: "Temu", category: "Shopping", subcategory: null, includes: ["temu"] },
+	{ name: "Shein", category: "Shopping", subcategory: "Clothing", includes: ["shein"] },
+
+	// Subscriptions - Additional
+	{ name: "Chatr", category: "Subscriptions", subcategory: "Internet & Mobile Services", includes: ["chatr"] },
+	{ name: "YouTube", category: "Subscriptions", subcategory: null, includes: ["youtube"] }
 ];
 
 export const initialMappings = [
